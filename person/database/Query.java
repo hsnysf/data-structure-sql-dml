@@ -36,7 +36,7 @@ public class Query {
 			
 		}else if(type == Types.CHAR){
 			
-			if (value != null) {
+			if (value != null && !"".equals(value.toString().trim())) {
 				statement.setString(index, String.valueOf(value.toString().trim()));
 			} else {
 				statement.setNull(index, Types.CHAR);
@@ -44,7 +44,7 @@ public class Query {
 
 		}else if(type == Types.SMALLINT){
 			
-			if(value != null && !value.equals(0)) {
+			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setShort(index, Short.parseShort(value.toString().trim()));
 			}else {
 				statement.setNull(index, Types.SMALLINT);
@@ -52,7 +52,7 @@ public class Query {
 			
 		}else if(type == Types.INTEGER){
 			
-			if(value != null && !value.equals(0)) {
+			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setInt(index, Integer.parseInt(value.toString().trim()));
 			}else {
 				statement.setNull(index, Types.INTEGER);
@@ -60,7 +60,7 @@ public class Query {
 			
 		}else if(type == Types.BIGINT){
 			
-			if(value != null && !value.equals(0)) {
+			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setLong(index, Long.parseLong(value.toString().trim()));
 			}else {
 				statement.setNull(index, Types.BIGINT);
@@ -68,7 +68,7 @@ public class Query {
 			
 		}else if(type == Types.FLOAT){
 			
-			if(value != null && !value.equals(0)) {
+			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setFloat(index, Float.parseFloat(value.toString().trim()));
 			}else {
 				statement.setNull(index, Types.FLOAT);
@@ -76,7 +76,7 @@ public class Query {
 		
 		}else if(type == Types.DOUBLE){
 			
-			if(value != null && !value.equals(0)) {
+			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setDouble(index, Double.parseDouble(value.toString().trim()));
 			}else {
 				statement.setNull(index, Types.DOUBLE);
@@ -84,7 +84,7 @@ public class Query {
 		
 		}else if(type == Types.DECIMAL){
 			
-			if(value != null && !value.equals(0)) {
+			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setBigDecimal(index, new BigDecimal(value.toString().trim()));
 			}else {
 				statement.setNull(index, Types.DECIMAL);
@@ -92,7 +92,7 @@ public class Query {
 		
 		}else if(type == Types.DATE){
 			
-			if(value != null) {
+			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setDate(index, Date.valueOf(value.toString().trim()));
 			}else {
 				statement.setNull(index, Types.DATE);
@@ -100,7 +100,7 @@ public class Query {
 			
 		}else if(type == Types.TIMESTAMP){
 			
-			if(value != null) {
+			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setTimestamp(index, Timestamp.valueOf(value.toString().trim()));
 			}else {
 				statement.setNull(index, Types.TIMESTAMP);
@@ -108,7 +108,7 @@ public class Query {
 		
 		}else if(type == Types.TIME){
 			
-			if(value != null) {
+			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setTime(index, Time.valueOf(value.toString().trim()));
 			}else {
 				statement.setNull(index, Types.TIME);
@@ -116,7 +116,7 @@ public class Query {
 			
 		}else if(type == Types.BOOLEAN){
 			
-			if(value != null) {
+			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setBoolean(index, Boolean.parseBoolean(value.toString().trim()));
 			}else {
 				statement.setNull(index, Types.BOOLEAN);
@@ -243,9 +243,9 @@ public class Query {
 		
 		int id = 0;
 		
-		String columnList = "";
+		StringBuilder columnList = new StringBuilder();
 		
-		String valueList = "";
+		StringBuilder valueList = new StringBuilder();
 		
 		int index = 0;
 		
@@ -255,13 +255,13 @@ public class Query {
 			
 			if(index != 0){
 				
-				columnList += ", ";
-				valueList += ", ";
+				columnList.append(", ");
+				valueList.append(", ");
 			}
 			
-			columnList += column.name;
+			columnList.append(column.name);
 			
-			valueList += "?";
+			valueList.append("?");
 			
 			index++;
 		}
