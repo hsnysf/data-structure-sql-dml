@@ -15,7 +15,8 @@ public class Test {
 		
 		Connection connection = GeneratorUtils.getConnection();
 		
-		ModernPersonDAO modernPersonDAO = new ModernPersonDAO(connection);
+		//ClassicPersonDAO personDAO = new ClassicPersonDAO(connection);
+		ModernPersonDAO personDAO = new ModernPersonDAO(connection);
 		
 		PersonDTO personDTO = new PersonDTO();
 		personDTO.setName("Hasan Yusuf");
@@ -31,8 +32,10 @@ public class Test {
 		personDTO.setSleepTime(Time.valueOf("05:05:05"));
 		personDTO.setGraduated(true);
 		
-		modernPersonDAO.insertPerson(personDTO);
+		personDAO.insertPerson(personDTO);
 		
 		System.out.println("id == " + personDTO.getId());
+		
+		System.out.println("rows == " + personDAO.deletePerson(personDTO));
 	}
 }

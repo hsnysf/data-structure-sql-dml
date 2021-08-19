@@ -9,14 +9,19 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 
 public class Query {
 
 	private Connection connection;
 	private Table table;
 	private Map<Column, Object> values = new LinkedHashMap<Column, Object>();
+	private List<Restriction> restrictions = new ArrayList<Restriction>();
 	
 	public Query(Connection connection) {
 		this.connection = connection;
@@ -37,7 +42,7 @@ public class Query {
 		}else if(type == Types.CHAR){
 			
 			if (value != null && !"".equals(value.toString().trim())) {
-				statement.setString(index, String.valueOf(value.toString().trim()));
+				statement.setString(index, value.toString().trim());
 			} else {
 				statement.setNull(index, Types.CHAR);
 			}
@@ -124,65 +129,6 @@ public class Query {
 		}
 	}
 	
-	public Object getValue(String value, int type) {
-		
-		Object result = null;
-		
-		if(value != null) {
-			
-			if(type == Types.VARCHAR){
-				
-				result = value.trim();
-				
-			}else if(type == Types.CHAR){
-				
-				result = value.trim().charAt(0);
-
-			}else if(type == Types.SMALLINT){
-				
-				result = Short.parseShort(value.trim());
-				
-			}else if(type == Types.INTEGER){
-				
-				result = Integer.parseInt(value.trim());
-				
-			}else if(type == Types.BIGINT){
-				
-				result = Long.parseLong(value.trim());
-				
-			}else if(type == Types.FLOAT){
-				
-				result = Float.parseFloat(value.trim());
-			
-			}else if(type == Types.DOUBLE){
-				
-				result = Double.parseDouble(value.trim());
-			
-			}else if(type == Types.DECIMAL){
-				
-				result = new BigDecimal(value.trim());
-			
-			}else if(type == Types.DATE){
-				
-				result = Date.valueOf(value.trim());
-				
-			}else if(type == Types.TIMESTAMP){
-				
-				result = Timestamp.valueOf(value.trim());
-			
-			}else if(type == Types.TIME){
-				
-				result = Time.valueOf(value.trim());
-				
-			}else if(type == Types.BOOLEAN){
-				
-				result = Boolean.parseBoolean(value.trim());
-			}
-		}
-		
-		return result;
-	}
-	
 	public Query insertInto(Table table) {
 
 		this.table = table;
@@ -249,9 +195,7 @@ public class Query {
 		
 		int index = 0;
 		
-		for(Map.Entry<Column, Object> entry : values.entrySet()) {
-			
-			Column column = entry.getKey();
+		for(Column column : values.keySet()) {
 			
 			if(index != 0){
 				
@@ -305,6 +249,137 @@ public class Query {
 		
 		System.out.println("Generated ID :: " + id);
 		
+		table = null;
+		
+		values.clear();
+		
 		return id;
+	}
+	
+	public Query deleteFrom(Table table) {
+		
+		this.table = table;
+		
+		return this;
+	}
+	
+	public Query where(Restriction restriction) {
+
+		if(!restrictions.isEmpty()) {
+			
+			restriction.operator = Operator.AND;
+		}
+		
+		restrictions.add(restriction);
+		
+		return this;
+	}
+	
+	public Query and(Restriction restriction) {
+
+		restriction.operator = Operator.AND;
+		
+		restrictions.add(restriction);
+		
+		return this;
+	}
+	
+	public Query or(Restriction restriction) {
+
+		restriction.operator = Operator.OR;
+		
+		restrictions.add(restriction);
+		
+		return this;
+	}
+	
+	public StringBuilder buildRestriction(Restriction restriction, List<Entry<Column, Object>> parameters){
+		
+		StringBuilder builder = new StringBuilder();
+		
+		if(restriction.operator != null){
+			
+			builder.append(" ");
+			builder.append(restriction.operator);
+		}
+		
+		if(restriction.criteria == Criteria.EQUAL 
+				|| restriction.criteria == Criteria.NOT_EQUAL
+				|| restriction.criteria == Criteria.GREATER 
+				|| restriction.criteria == Criteria.GREATER_EQUAL
+				|| restriction.criteria == Criteria.LESS
+				|| restriction.criteria == Criteria.LESS_EQUAL){
+
+			builder.append(" ");
+			builder.append(restriction.column.name);
+			builder.append(" ");
+			builder.append(restriction.criteria);
+			builder.append(" ");
+			builder.append("?");
+			
+			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
+			
+		}else if(restriction.criteria == Criteria.LIKE){
+			
+			builder.append(" ");
+			builder.append(restriction.column.name);
+			builder.append(" ");
+			builder.append(restriction.criteria);
+			builder.append(" ");
+			builder.append("'%' || ? || '%'");
+			
+			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
+		}
+		
+		return builder;
+	}
+	
+	public int executeDelete() throws SQLException {
+		
+		int count = 0;
+		
+		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append("delete from ");
+		builder.append(table.name);
+		
+		if(!restrictions.isEmpty()) {
+			
+			builder.append(" where");
+			
+			for(Restriction restriction : restrictions) {
+				
+				builder.append(buildRestriction(restriction, parameters));
+			}
+		}
+		
+		System.out.println("SQL Query :: " + builder);
+		
+		try(PreparedStatement statement = connection.prepareStatement(builder.toString())){
+			
+			int index = 1;
+			
+			for(Entry<Column, Object> parameter : parameters) {
+				
+				Column column = parameter.getKey();
+				Object value = parameter.getValue();
+				
+				setObject(statement, index, column.type, value);
+				
+				index++;
+			}
+			
+			count = statement.executeUpdate();
+		}
+		
+		System.out.println("Affected Rows :: " + count);
+		
+		table = null;
+		
+		restrictions.clear();
+
+		return count;
 	}
 }
