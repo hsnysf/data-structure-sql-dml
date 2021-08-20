@@ -10,18 +10,14 @@ public enum Criteria {
 	LESS("<"),
 	LESS_EQUAL("<=");
 	
-	String condititon;
+	private String criteria;
 	
-	private Criteria(String condititon){
-		this.condititon = condititon;
-	}
-	
-	public String getCondititon() {
-		return condititon;
+	private Criteria(String criteria){
+		this.criteria = criteria;
 	}
 	
 	@Override
 	public String toString() {
-		return condititon;
+		return criteria;
 	}
 }

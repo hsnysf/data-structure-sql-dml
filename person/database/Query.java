@@ -203,7 +203,7 @@ public class Query {
 				valueList.append(", ");
 			}
 			
-			columnList.append(column.name);
+			columnList.append(column);
 			
 			valueList.append("?");
 			
@@ -213,7 +213,7 @@ public class Query {
 		StringBuilder builder = new StringBuilder();
 		
 		builder.append("insert into ");
-		builder.append(table.name);
+		builder.append(table);
 		builder.append(" (");
 		builder.append(columnList);
 		builder.append(") values (");
@@ -311,7 +311,7 @@ public class Query {
 				|| restriction.criteria == Criteria.LESS_EQUAL){
 
 			builder.append(" ");
-			builder.append(restriction.column.name);
+			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
 			builder.append(" ");
@@ -322,7 +322,7 @@ public class Query {
 		}else if(restriction.criteria == Criteria.LIKE){
 			
 			builder.append(" ");
-			builder.append(restriction.column.name);
+			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
 			builder.append(" ");
@@ -343,7 +343,7 @@ public class Query {
 		StringBuilder builder = new StringBuilder();
 		
 		builder.append("delete from ");
-		builder.append(table.name);
+		builder.append(table);
 		
 		if(!restrictions.isEmpty()) {
 			

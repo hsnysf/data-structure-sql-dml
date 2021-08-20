@@ -122,8 +122,7 @@ public class ClassicPersonDAO {
 		StringBuilder builder = new StringBuilder();
 		
 		builder.append("delete from public.person ");
-		builder.append("where ");
-		builder.append("prsn_name like '%' || ? || '%' ");
+		builder.append("where prsn_name like '%' || ? || '%' ");
 		builder.append("and prsn_gender = ? ");
 		builder.append("and prsn_age = ? ");
 		builder.append("and prsn_cpr = ? ");

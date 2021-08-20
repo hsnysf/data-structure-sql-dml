@@ -34,8 +34,6 @@ public class Test {
 		
 		personDAO.insertPerson(personDTO);
 		
-		System.out.println("id == " + personDTO.getId());
-		
-		System.out.println("rows == " + personDAO.deletePerson(personDTO));
+		personDAO.deletePerson(personDTO);
 	}
 }

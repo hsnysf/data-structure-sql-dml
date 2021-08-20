@@ -1,12 +1,16 @@
 package person.database;
 
-public class Table {
+public enum Table {
 
-	public final static Table PERSON = new Table("public.person");
+	PERSON("public.person");
 
-	public String name;
+	private String name;
 
-	public Table(String name) {
+	private Table(String name) {
 		this.name = name;
+	}
+
+	public String toString() {
+		return name;
 	}
 }

@@ -168,4 +168,9 @@ public class Column {
 		
 		return new Restriction(this, Criteria.LESS_EQUAL, value);
 	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
 }
