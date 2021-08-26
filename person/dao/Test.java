@@ -34,6 +34,8 @@ public class Test {
 		
 		personDAO.insertPerson(personDTO);
 		
+		personDAO.updatePerson(personDTO);
+		
 		personDAO.deletePerson(personDTO);
 	}
 }

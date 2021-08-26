@@ -382,4 +382,133 @@ public class Query {
 
 		return count;
 	}
+	
+	public Query update(Table table) {
+		
+		this.table = table;
+		
+		return this;
+	}
+	
+	public Query set(Column column, String value) {
+		
+		values.put(column, value);
+		
+		return this;
+	}
+	
+	public Query set(Column column, Character value) {
+		
+		values.put(column, value);
+		
+		return this;
+	}
+	
+	public Query set(Column column, Number value) {
+		
+		values.put(column, value);
+		
+		return this;
+	}
+	
+	public Query set(Column column, Date value) {
+		
+		values.put(column, value);
+		
+		return this;
+	}
+	
+	public Query set(Column column, Timestamp value) {
+		
+		values.put(column, value);
+		
+		return this;
+	}
+	
+	public Query set(Column column, Time value) {
+		
+		values.put(column, value);
+		
+		return this;
+	}
+	
+	public Query set(Column column, Boolean value) {
+		
+		values.put(column, value);
+		
+		return this;
+	}
+	
+	public int executeUpdate() throws SQLException {
+		
+		int count = 0;
+		
+		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append("update ");
+		builder.append(table);
+		builder.append(" set");
+		
+		int index = 0;
+		
+		for(Map.Entry<Column, Object> entry : values.entrySet()){
+			
+			Column column = entry.getKey();
+			Object value = entry.getValue();
+			
+			if(index != 0) {
+				
+				builder.append(",");
+			}
+			
+			builder.append(" ");
+			builder.append(column);
+			builder.append(" = ?");
+			
+			parameters.add(new SimpleEntry<Column, Object>(column, value));
+			
+			index++;
+		}
+		
+		if(!restrictions.isEmpty()) {
+			
+			builder.append(" where");
+			
+			for(Restriction restriction : restrictions) {
+				
+				builder.append(buildRestriction(restriction, parameters));
+			}
+		}
+		
+		System.out.println("SQL Query :: " + builder);
+		
+		try(PreparedStatement statement = connection.prepareStatement(builder.toString())){
+			
+			index = 1;
+			
+			for(Entry<Column, Object> parameter : parameters) {
+				
+				Column column = parameter.getKey();
+				Object value = parameter.getValue();
+				
+				setObject(statement, index, column.type, value);
+				
+				index++;
+			}
+			
+			count = statement.executeUpdate();
+		}
+		
+		System.out.println("Affected Rows :: " + count);
+		
+		table = null;
+		
+		values.clear();
+		
+		restrictions.clear();
+		
+		return count;
+	}
 }

@@ -54,4 +54,23 @@ public class ModernPersonDAO extends Query {
 					.and(Person.ID.equal(personDTO.getId()))
 					.executeDelete();
 	}
+	
+	public int updatePerson(PersonDTO personDTO) throws SQLException {
+		
+		return update(Table.PERSON)
+				.set(Person.NAME, personDTO.getName())
+				.set(Person.GENDER, personDTO.getGender())
+				.set(Person.AGE, personDTO.getAge())
+				.set(Person.CPR, personDTO.getCpr())
+				.set(Person.ACCOUNT_NO, personDTO.getAccountNo())
+				.set(Person.GPA, personDTO.getGpa())
+				.set(Person.SALARY, personDTO.getSalary())
+				.set(Person.ANNUAL_INCOME, personDTO.getAnnualIncome())
+				.set(Person.DATE_OF_BIRTH, personDTO.getDateOfBirth())
+				.set(Person.REGISTRATION_DATE_TIME, personDTO.getRegistrationDateTime())
+				.set(Person.SLEEP_TIME, personDTO.getSleepTime())
+				.set(Person.GRADUATED, personDTO.getGraduated())
+				.where(Person.ID.equal(personDTO.getId()))
+					.executeUpdate();
+	}
 }
