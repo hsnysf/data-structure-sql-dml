@@ -15,7 +15,6 @@ public class Test {
 		
 		Connection connection = GeneratorUtils.getConnection();
 		
-		//ClassicPersonDAO personDAO = new ClassicPersonDAO(connection);
 		ModernPersonDAO personDAO = new ModernPersonDAO(connection);
 		
 		PersonDTO personDTO = new PersonDTO();
@@ -34,8 +33,12 @@ public class Test {
 		
 		personDAO.insertPerson(personDTO);
 		
-		personDAO.updatePerson(personDTO);
+		personDAO.getPerson(personDTO);
+		
+		//personDAO.updatePerson(personDTO);
 		
 		personDAO.deletePerson(personDTO);
+		
+		personDAO.getPerson(personDTO);
 	}
 }

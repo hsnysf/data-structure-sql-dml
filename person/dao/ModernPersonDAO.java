@@ -3,7 +3,9 @@ package person.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import person.column.Doctor;
 import person.column.Person;
+import person.column.UniqueDateOfBirth;
 import person.database.Query;
 import person.database.Table;
 import person.dto.PersonDTO;
@@ -72,5 +74,47 @@ public class ModernPersonDAO extends Query {
 				.set(Person.GRADUATED, personDTO.getGraduated())
 				.where(Person.ID.equal(personDTO.getId()))
 					.executeUpdate();
+	}
+	
+	public PersonDTO getPerson(PersonDTO personDTO) throws SQLException {
+		
+		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+		.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
+		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
+		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED)
+		.from(Table.PERSON)
+		.where(Person.ID.equal(personDTO.getId()))
+		.orderBy(Person.NAME.asc(), Person.ID.desc())
+			.executeSelect();
+		
+		return personDTO;
+	}
+	
+	public void selectAdvanced() throws SQLException {
+		
+		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+		.from(Table.PERSON)
+		.where(Person.ID.equal(1))
+		.where(Person.NAME.like("Hasan"))
+		.and(Person.CPR.notEqual(88111111))
+		.and(Person.AGE.greater(12))
+		.and(Person.GPA.less(3.12))
+		.and(Person.SALARY.lessEqual(500))
+		.and(Person.ANNUAL_INCOME.greaterEqual(100))
+		.and(Person.ACCOUNT_NO.in(111, 222, 333))
+		.and(Person.AGE.notIn(11, 12, 13))
+		.and(Person.SLEEP_TIME.between("08:10:10", "10:30:10"))
+		.and(Person.GENDER.isNull())
+		.and(Person.GRADUATED.isNotNull())
+		.and(Person.DATE_OF_BIRTH.in(new Query().select(UniqueDateOfBirth.DATE)
+				.from(Table.UNIQUE_DATE_OF_BIRTH).where(UniqueDateOfBirth.LEAP_YEAR.equal(true))))
+		.and(Person.DATE_OF_BIRTH.notIn(new Query().select(UniqueDateOfBirth.DATE)
+				.from(Table.UNIQUE_DATE_OF_BIRTH).where(UniqueDateOfBirth.LEAP_YEAR.equal(false))))
+		.and(exists(new Query().select(Doctor.ID)
+				.from(Table.DOCTOR).where(Doctor.CPR.equal(Person.CPR)).and(Doctor.HOSPITAL.equal("Alkindi"))))
+		.and(notExists(new Query().select(Doctor.ID)
+				.from(Table.DOCTOR).where(Doctor.CPR.equal(Person.CPR)).and(Doctor.HOSPITAL.equal("Bin Hayan"))))
+		.orderBy(Person.ID.asc(), Person.NAME.desc())
+		.executeSelect();
 	}
 }

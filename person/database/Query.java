@@ -10,6 +10,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +20,15 @@ import java.util.Map.Entry;
 public class Query {
 
 	private Connection connection;
+	private List<Column> columns = new ArrayList<Column>();
 	private Table table;
 	private Map<Column, Object> values = new LinkedHashMap<Column, Object>();
 	private List<Restriction> restrictions = new ArrayList<Restriction>();
+	private Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
+	
+	public Query() {
+		
+	}
 	
 	public Query(Connection connection) {
 		this.connection = connection;
@@ -329,6 +336,103 @@ public class Query {
 			builder.append("'%' || ? || '%'");
 			
 			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
+		
+		}else if(restriction.criteria == Criteria.EQUAL_COLUMN 
+				|| restriction.criteria == Criteria.NOT_EQUAL_COLUMN 
+				|| restriction.criteria == Criteria.GREATER_COLUMN 
+				|| restriction.criteria == Criteria.GREATER_EQUAL_COLUMN 
+				|| restriction.criteria == Criteria.LESS_COLUMN 
+				|| restriction.criteria == Criteria.LESS_EQUAL_COLUMN){
+
+			builder.append(" ");
+			builder.append(restriction.column);
+			builder.append(" ");
+			builder.append(restriction.criteria);
+			builder.append(" ");
+			builder.append(restriction.column2);
+			
+		}else if(restriction.criteria == Criteria.IS_NULL 
+				|| restriction.criteria == Criteria.IS_NOT_NULL){
+			
+			builder.append(" ");
+			builder.append(restriction.column);
+			builder.append(" ");
+			builder.append(restriction.criteria);
+			
+		}else if(restriction.criteria == Criteria.IN
+					|| restriction.criteria == Criteria.NOT_IN){
+			
+			builder.append(" ");
+			builder.append(restriction.column);
+			builder.append(" ");
+			builder.append(restriction.criteria);
+			builder.append(" ");
+			
+			builder.append("(");
+			
+			int index = 0;
+			
+			for(Object value : restriction.values){
+				
+				if(index != 0){
+					
+					builder.append(", ");
+				}
+				
+				builder.append("?");
+				
+				parameters.add(new SimpleEntry<Column, Object>(restriction.column, value));
+				
+				index++;
+			}
+			
+			builder.append(")");
+		
+		}else if(restriction.criteria == Criteria.BETWEEN){
+			
+			builder.append(" ");
+			builder.append(restriction.column);
+			builder.append(" ");
+			builder.append(restriction.criteria);
+			builder.append(" ? ");
+			builder.append(Operator.AND);
+			builder.append(" ?");
+			
+			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
+			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.to));
+		
+		}else if(restriction.criteria == Criteria.BETWEEN_COLUMNS){
+			
+			builder.append(" ");
+			builder.append(restriction.column);
+			builder.append(" ");
+			builder.append(restriction.criteria);
+			builder.append(" ");
+			builder.append(restriction.column2);
+			builder.append(" ");
+			builder.append(Operator.AND);
+			builder.append(" ");
+			builder.append(restriction.column3);
+		
+		}else if(restriction.criteria == Criteria.IN_QUERY
+					|| restriction.criteria == Criteria.NOT_IN_QUERY){
+			
+			builder.append(" ");
+			builder.append(restriction.column);
+			builder.append(" ");
+			builder.append(restriction.criteria);
+			builder.append("(");
+			builder.append(restriction.query.getSelectQuery(parameters));
+			builder.append(")");
+		
+		}else if(restriction.criteria == Criteria.EXISTS
+				|| restriction.criteria == Criteria.NOT_EXISTS){
+			
+			builder.append(" ");
+			builder.append(restriction.criteria);
+			builder.append(" (");
+			builder.append(restriction.query.getSelectQuery(parameters));
+			builder.append(")");
 		}
 		
 		return builder;
@@ -510,5 +614,170 @@ public class Query {
 		restrictions.clear();
 		
 		return count;
+	}
+	
+	public Query select(Column... column) {
+
+		columns.addAll(Arrays.asList(column));
+		
+		return this;
+	}
+	
+	public Query from(Table table) {
+
+		this.table = table;
+		
+		return this;
+	}
+	
+	public Query orderBy(Column... columns) {
+
+		for(Column column : columns){
+			
+			orders.put(column, Order.ASC);
+		}
+		
+		return this;
+	}
+	
+	public Query orderBy(Entry<Column, Order>... entries) {
+
+		for(Entry<Column, Order> entry : entries){
+			
+			orders.put(entry.getKey(), entry.getValue());
+		}
+		
+		return this;
+	}
+	
+	public Query orderByDesc(Column... columns) {
+
+		for(Column column : columns){
+			
+			orders.put(column, Order.DESC);
+		}
+		
+		return this;
+	}
+	
+	public static Restriction exists(Query query) {
+		
+		return new Restriction(Criteria.EXISTS, query);
+	}
+	
+	public static Restriction notExists(Query query) {
+		
+		return new Restriction(Criteria.NOT_EXISTS, query);
+	}
+	
+	public StringBuilder getSelectQuery(List<Entry<Column, Object>> parameters) {
+		
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append("select ");
+		
+		int index = 0;
+		
+		for(Column column : columns) {
+			
+			if(index != 0) {
+				
+				builder.append(", ");
+			}
+			
+			builder.append(column);
+			
+			index++;
+		}
+		
+		builder.append(" from ");
+		builder.append(table);
+		
+		if(!restrictions.isEmpty()) {
+			
+			builder.append(" where");
+			
+			for(Restriction restriction : restrictions) {
+				
+				builder.append(buildRestriction(restriction, parameters));
+			}
+		}
+		
+		if (!orders.isEmpty()) {
+
+			builder.append(" order by ");
+
+			index = 0;
+			
+			for(Map.Entry<Column, Order> entry : orders.entrySet()){
+				
+				Column column = entry.getKey();
+				Order order = entry.getValue();
+				
+				if(index != 0){
+					
+					builder.append(", ");
+				}
+				
+				builder.append(column.name);
+				
+				if(order == Order.DESC){
+					
+					builder.append(" ");
+					builder.append(order);
+				}
+				
+				index++;
+			}
+		}
+		
+		return builder;
+	}
+	
+	public ResultSet executeSelect() throws SQLException {
+		
+		int count = 0;
+		
+		ResultSet result = null;
+		
+		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		
+		StringBuilder builder = getSelectQuery(parameters);
+		
+		System.out.println("SQL Query :: " + builder);
+		
+		try(PreparedStatement statement = connection.prepareStatement(builder.toString())){
+			
+			int index = 1;
+			
+			for(Entry<Column, Object> parameter : parameters) {
+				
+				Column column = parameter.getKey();
+				Object value = parameter.getValue();
+				
+				setObject(statement, index, column.type, value);
+				
+				index++;
+			}
+			
+			result = statement.executeQuery();
+			
+			while(result.next()) {
+				
+				count++;
+			}
+		}
+		
+		System.out.println("Matched Rows :: " + count);
+		
+		columns.clear();
+		
+		table = null;
+		
+		restrictions.clear();
+		
+		orders.clear();
+		
+		return result;
 	}
 }

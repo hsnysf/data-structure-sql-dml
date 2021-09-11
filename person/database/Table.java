@@ -2,9 +2,11 @@ package person.database;
 
 public enum Table {
 
-	PERSON("public.person");
+	DOCTOR("public.doctor"),
+	PERSON("public.person"),
+	UNIQUE_DATE_OF_BIRTH("public.unique_date_of_birth");
 
-	private String name;
+	public String name;
 
 	private Table(String name) {
 		this.name = name;
