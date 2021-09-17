@@ -90,12 +90,12 @@ public class ModernPersonDAO extends Query {
 		return personDTO;
 	}
 	
-	public void selectAdvanced() throws SQLException {
+	public void selectPersonWithRestrictions() throws SQLException {
 		
 		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 		.from(Table.PERSON)
 		.where(Person.ID.equal(1))
-		.where(Person.NAME.like("Hasan"))
+		.and(Person.NAME.like("Hasan"))
 		.and(Person.CPR.notEqual(88111111))
 		.and(Person.AGE.greater(12))
 		.and(Person.GPA.less(3.12))
@@ -115,6 +115,17 @@ public class ModernPersonDAO extends Query {
 		.and(notExists(new Query().select(Doctor.ID)
 				.from(Table.DOCTOR).where(Doctor.CPR.equal(Person.CPR)).and(Doctor.HOSPITAL.equal("Bin Hayan"))))
 		.orderBy(Person.ID.asc(), Person.NAME.desc())
+		.executeSelect();
+	}
+	
+	public void selectPersonWithNestedRestrictions() throws SQLException {
+		
+		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+		.from(Table.PERSON)
+		.where(Person.GENDER.equal('M'))
+		.and(Person.AGE.equal(12).and(Person.SALARY.greater(100)))
+		.and(Person.CPR.equal(8811111).and(Person.NAME.like("Ali")
+											.or(Person.NAME.like("Mohd"))))
 		.executeSelect();
 	}
 }

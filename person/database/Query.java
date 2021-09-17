@@ -310,6 +310,13 @@ public class Query {
 			builder.append(restriction.operator);
 		}
 		
+		builder.append(" ");
+		
+		if(!restriction.restrictions.isEmpty()){
+			
+			builder.append("(");
+		}
+		
 		if(restriction.criteria == Criteria.EQUAL 
 				|| restriction.criteria == Criteria.NOT_EQUAL
 				|| restriction.criteria == Criteria.GREATER 
@@ -317,7 +324,6 @@ public class Query {
 				|| restriction.criteria == Criteria.LESS
 				|| restriction.criteria == Criteria.LESS_EQUAL){
 
-			builder.append(" ");
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
@@ -327,8 +333,7 @@ public class Query {
 			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
 			
 		}else if(restriction.criteria == Criteria.LIKE){
-			
-			builder.append(" ");
+
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
@@ -344,7 +349,6 @@ public class Query {
 				|| restriction.criteria == Criteria.LESS_COLUMN 
 				|| restriction.criteria == Criteria.LESS_EQUAL_COLUMN){
 
-			builder.append(" ");
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
@@ -353,16 +357,14 @@ public class Query {
 			
 		}else if(restriction.criteria == Criteria.IS_NULL 
 				|| restriction.criteria == Criteria.IS_NOT_NULL){
-			
-			builder.append(" ");
+
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
 			
 		}else if(restriction.criteria == Criteria.IN
 					|| restriction.criteria == Criteria.NOT_IN){
-			
-			builder.append(" ");
+
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
@@ -390,7 +392,6 @@ public class Query {
 		
 		}else if(restriction.criteria == Criteria.BETWEEN){
 			
-			builder.append(" ");
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
@@ -403,7 +404,6 @@ public class Query {
 		
 		}else if(restriction.criteria == Criteria.BETWEEN_COLUMNS){
 			
-			builder.append(" ");
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
@@ -417,21 +417,29 @@ public class Query {
 		}else if(restriction.criteria == Criteria.IN_QUERY
 					|| restriction.criteria == Criteria.NOT_IN_QUERY){
 			
-			builder.append(" ");
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
-			builder.append("(");
+			builder.append(" (");
 			builder.append(restriction.query.getSelectQuery(parameters));
 			builder.append(")");
 		
 		}else if(restriction.criteria == Criteria.EXISTS
 				|| restriction.criteria == Criteria.NOT_EXISTS){
 			
-			builder.append(" ");
 			builder.append(restriction.criteria);
 			builder.append(" (");
 			builder.append(restriction.query.getSelectQuery(parameters));
+			builder.append(")");
+		}
+		
+		if(!restriction.restrictions.isEmpty()){
+			
+			for(Restriction nestedRestriction : restriction.restrictions) {
+				
+				builder.append(buildRestriction(nestedRestriction, parameters));
+			}
+			
 			builder.append(")");
 		}
 		

@@ -1,5 +1,8 @@
 package person.database;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Restriction {
 
 	public Operator operator;
@@ -11,6 +14,7 @@ public class Restriction {
 	public Column column2;
 	public Column column3;
 	public Query query;
+	public List<Restriction> restrictions = new ArrayList<Restriction>();
 	
 	public Restriction(Column column, Criteria criteria, Object value) {
 		this.column = column;
@@ -58,5 +62,23 @@ public class Restriction {
 		this.column = column;
 		this.criteria = criteria;
 		this.query = query;
+	}
+	
+	public Restriction and(Restriction restriction) {
+
+		restriction.operator = Operator.AND;
+		
+		restrictions.add(restriction);
+		
+		return this;
+	}
+	
+	public Restriction or(Restriction restriction) {
+
+		restriction.operator = Operator.OR;
+		
+		restrictions.add(restriction);
+		
+		return this;
 	}
 }
