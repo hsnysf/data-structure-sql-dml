@@ -2,6 +2,34 @@ drop schema public cascade;
 
 create schema public;
 
+create table public.city
+(
+  ct_id serial,
+  ct_name character varying(100),
+  constraint pk_ct_id primary key (ct_id)
+);
+
+create table public.school
+(
+  sch_id serial,
+  sch_name character varying(100),
+  constraint pk_sch_id primary key (sch_id)
+);
+
+create table public.country
+(
+  cnt_id serial,
+  cnt_name character varying(100),
+  constraint pk_cnt_id primary key (cnt_id)
+);
+
+create table public.company
+(
+  cmp_id serial,
+  cmp_name character varying(100),
+  constraint pk_cmp_id primary key (cmp_id)
+);
+
 create table public.person
 (
   prsn_id serial,
@@ -17,7 +45,19 @@ create table public.person
   prsn_registration_date_time timestamp default '2010-10-10 05:05:56',
   prsn_sleep_time time default '10:10:10',
   prsn_graduated boolean default true,
-  constraint pk_prsn_id primary key (prsn_id)
+  prsn_city_id integer,
+  prsn_school_id integer,
+  prsn_country_id integer,
+  prsn_company_id integer,
+  constraint pk_prsn_id primary key (prsn_id),
+  constraint fk_city_id foreign key (prsn_city_id)
+	references public.city (ct_id) match simple,
+  constraint fk_school_id foreign key (prsn_school_id)
+	references public.school (sch_id) match simple,
+  constraint fk_country_id foreign key (prsn_country_id)
+	references public.country (cnt_id) match simple,
+  constraint fk_company_id foreign key (prsn_company_id)
+	references public.company (cmp_id) match simple
 );
 
 create table public.unique_date_of_birth
