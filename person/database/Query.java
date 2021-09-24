@@ -22,6 +22,7 @@ public class Query {
 	private Connection connection;
 	private List<Column> columns = new ArrayList<Column>();
 	private Table table;
+	private List<Relation> relations = new ArrayList<Relation>();
 	private Map<Column, Object> values = new LinkedHashMap<Column, Object>();
 	private List<Restriction> restrictions = new ArrayList<Restriction>();
 	private Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
@@ -678,6 +679,47 @@ public class Query {
 		return new Restriction(Criteria.NOT_EXISTS, query);
 	}
 	
+	public Relation join(Table table){
+		
+		return innerJoin(table);
+	}
+	
+	public Relation innerJoin(Table table){
+		
+		Relation relation = new Relation(Join.INNER, table, this);
+		
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Relation rightJoin(Table table){
+		
+		Relation relation = new Relation(Join.RIGHT, table, this);
+				
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Relation leftJoin(Table table){
+		
+		Relation relation = new Relation(Join.LEFT, table, this);
+		
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Relation fullJoin(Table table){
+		
+		Relation relation = new Relation(Join.FULL, table, this);
+		
+		relations.add(relation);
+		
+		return relation;
+	}
+	
 	public StringBuilder getSelectQuery(List<Entry<Column, Object>> parameters) {
 		
 		StringBuilder builder = new StringBuilder();
@@ -700,6 +742,20 @@ public class Query {
 		
 		builder.append(" from ");
 		builder.append(table);
+		
+		if(!relations.isEmpty()) {
+			
+			for(Relation relation : relations) {
+				
+				builder.append(" ");
+				builder.append(relation.join);
+				builder.append(" ");
+				builder.append(relation.table);
+				builder.append(" on");
+				
+				builder.append(buildRestriction(relation.restriction, parameters));
+			}
+		}
 		
 		if(!restrictions.isEmpty()) {
 			

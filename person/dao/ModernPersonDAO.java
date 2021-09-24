@@ -3,8 +3,12 @@ package person.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import person.column.City;
+import person.column.Company;
+import person.column.Country;
 import person.column.Doctor;
 import person.column.Person;
+import person.column.School;
 import person.column.UniqueDateOfBirth;
 import person.database.Query;
 import person.database.Table;
@@ -81,7 +85,7 @@ public class ModernPersonDAO extends Query {
 		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 		.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
-		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED)
+		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME)
 		.from(Table.PERSON)
 		.where(Person.ID.equal(personDTO.getId()))
 		.orderBy(Person.NAME.asc(), Person.ID.desc())
@@ -126,6 +130,24 @@ public class ModernPersonDAO extends Query {
 		.and(Person.AGE.equal(12).and(Person.SALARY.greater(100)))
 		.and(Person.CPR.equal(8811111).and(Person.NAME.like("Ali")
 											.or(Person.NAME.like("Mohd"))))
+		.executeSelect();
+	}
+	
+	public void selectPersonWithJoins() throws SQLException {
+		
+		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+		.select(City.ID, City.NAME)
+		.select(Company.ID, Company.NAME)
+		.select(Country.ID, Country.NAME)
+		.select(School.ID, School.NAME)
+		.from(Table.PERSON)
+		.innerJoin(Table.CITY).on(Person.CITY_ID.equal(City.ID))
+		.rightJoin(Table.COMPANY).on(Person.COMPANY_ID.equal(Company.ID)
+									.and(Company.NAME.like("Google")))
+		.leftJoin(Table.COUNTRY).on(Person.COUNTRY_ID.equal(Country.ID))
+		.fullJoin(Table.SCHOOL).on(Person.SCHOOL_ID.equal(School.ID)
+								.and(School.NAME.equal("UOB")))
+		.where(Person.ID.equal(1))
 		.executeSelect();
 	}
 }
