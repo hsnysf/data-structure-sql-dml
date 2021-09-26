@@ -310,7 +310,7 @@ public class Query {
 			builder.append(" ");
 			builder.append(restriction.operator);
 		}
-		
+
 		builder.append(" ");
 		
 		if(!restriction.restrictions.isEmpty()){
@@ -334,7 +334,7 @@ public class Query {
 			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
 			
 		}else if(restriction.criteria == Criteria.LIKE){
-
+			
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
@@ -358,14 +358,14 @@ public class Query {
 			
 		}else if(restriction.criteria == Criteria.IS_NULL 
 				|| restriction.criteria == Criteria.IS_NOT_NULL){
-
+			
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
 			
 		}else if(restriction.criteria == Criteria.IN
 					|| restriction.criteria == Criteria.NOT_IN){
-
+			
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
@@ -440,7 +440,7 @@ public class Query {
 				
 				builder.append(buildRestriction(nestedRestriction, parameters));
 			}
-			
+
 			builder.append(")");
 		}
 		

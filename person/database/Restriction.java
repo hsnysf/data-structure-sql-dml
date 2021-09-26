@@ -5,16 +5,16 @@ import java.util.List;
 
 public class Restriction {
 
-	public Operator operator;
-	public Column column;
-	public Criteria criteria;
-	public Object value;
-	public Object values[];
-	public Object to;
-	public Column column2;
-	public Column column3;
-	public Query query;
-	public List<Restriction> restrictions = new ArrayList<Restriction>();
+	protected Operator operator;
+	protected Column column;
+	protected Criteria criteria;
+	protected Object value;
+	protected Object values[];
+	protected Object to;
+	protected Column column2;
+	protected Column column3;
+	protected Query query;
+	protected List<Restriction> restrictions = new ArrayList<Restriction>();
 	
 	public Restriction(Column column, Criteria criteria, Object value) {
 		this.column = column;

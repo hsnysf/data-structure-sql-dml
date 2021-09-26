@@ -8,8 +8,8 @@ import java.util.Map.Entry;
 
 public class Column {
 
-	public String name;
-	public int type;
+	protected String name;
+	protected int type;
 	
 	public Column(String name, int type) {
 		this.name = name;

@@ -2,10 +2,10 @@ package person.database;
 
 public class Relation {
 
-	public Join join;
-	public Table table;
-	public Restriction restriction;
-	public Query query;
+	protected Join join;
+	protected Table table;
+	protected Restriction restriction;
+	protected Query query;
 	
 	public Relation(Join join, Table table, Query query) {
 		this.join = join;

@@ -10,7 +10,7 @@ public enum Table {
 	SCHOOL("public.school"),
 	UNIQUE_DATE_OF_BIRTH("public.unique_date_of_birth");
 
-	public String name;
+	private String name;
 
 	private Table(String name) {
 		this.name = name;
