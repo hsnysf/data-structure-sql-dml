@@ -113,7 +113,7 @@ and prsn_sleep_time = '20:30'
 and prsn_graduated = true
 
 select
-prsn_id, prsn_name, prsn_gender, 
+prsn_name, prsn_gender, prson_age, 
 prsn_age, prsn_cpr, prsn_account_no, 
 prsn_gpa, prsn_salary, prsn_annual_income, 
 prsn_date_of_birth, prsn_registration_date_time, 
@@ -122,7 +122,7 @@ from public.person
 where prsn_id = 1
 order by prsn_name, prsn_id desc;
 
-select prsn_id, prsn_name, prsn_gender, prsn_age 
+select prsn_name, prsn_gender, prson_age, prsn_age 
 from public.person 
 where prsn_id = 1
 and prsn_name ilike '%Hasan%' 
@@ -150,3 +150,17 @@ and not exists (select dctr_id
 					from public.doctor 
 					where dctr_cpr = prsn_cpr and dctr_hospital = 'Bin Hayan') 
 order by prsn_id, prsn_name desc
+
+select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 1
+union
+select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 2
+union all
+select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 3
+intersect
+select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 4
+intersect all
+select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 5
+except
+select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 6
+except all
+select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 7;
