@@ -150,4 +150,42 @@ public class ModernPersonDAO extends Query {
 		.where(Person.ID.equal(1))
 		.executeSelect();
 	}
+	
+	public void selectPersonWithCombinedQueries() throws SQLException {
+		
+		select(Person.NAME, Person.GENDER, Person.AGE)
+		.from(Table.PERSON)
+		.where(Person.ID.equal(1))
+		.union(
+			new Query().select(Person.NAME, Person.GENDER, Person.AGE)
+			.from(Table.PERSON)
+			.where(Person.ID.equal(2))
+		)
+		.unionAll(
+			new Query().select(Person.NAME, Person.GENDER, Person.AGE)
+			.from(Table.PERSON)
+			.where(Person.ID.equal(3))
+		)
+		.intersect(
+			new Query().select(Person.NAME, Person.GENDER, Person.AGE)
+			.from(Table.PERSON)
+			.where(Person.ID.equal(4))
+		)
+		.intersectAll(
+			new Query().select(Person.NAME, Person.GENDER, Person.AGE)
+			.from(Table.PERSON)
+			.where(Person.ID.equal(5))
+		)
+		.except(
+			new Query().select(Person.NAME, Person.GENDER, Person.AGE)
+			.from(Table.PERSON)
+			.where(Person.ID.equal(6))
+		)
+		.exceptAll(
+			new Query().select(Person.NAME, Person.GENDER, Person.AGE)
+			.from(Table.PERSON)
+			.where(Person.ID.equal(7))
+		)
+		.executeSelect();
+	}
 }

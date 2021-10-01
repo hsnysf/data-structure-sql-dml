@@ -26,6 +26,7 @@ public class Query {
 	private Map<Column, Object> values = new LinkedHashMap<Column, Object>();
 	private List<Restriction> restrictions = new ArrayList<Restriction>();
 	private Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
+	private List<Entry<CombineOperator, Query>> queries = new ArrayList<Map.Entry<CombineOperator,Query>>();
 	
 	public Query() {
 		
@@ -718,6 +719,48 @@ public class Query {
 		return relation;
 	}
 	
+	public Query union(Query query) {
+		
+		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.UNION, query));
+		
+		return this;
+	}
+	
+	public Query unionAll(Query query) {
+		
+		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.UNION_ALL, query));
+		
+		return this;
+	}
+	
+	public Query intersect(Query query) {
+		
+		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.INTERSECT, query));
+		
+		return this;
+	}
+	
+	public Query intersectAll(Query query) {
+		
+		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.INTERSECT_ALL, query));
+		
+		return this;
+	}
+	
+	public Query except(Query query) {
+		
+		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.EXCEPT, query));
+		
+		return this;
+	}
+	
+	public Query exceptAll(Query query) {
+		
+		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.EXPECT_ALL, query));
+		
+		return this;
+	}
+	
 	private StringBuilder getSelectQuery(List<Entry<Column, Object>> parameters) {
 		
 		StringBuilder builder = new StringBuilder();
@@ -790,6 +833,20 @@ public class Query {
 				}
 				
 				index++;
+			}
+		}
+		
+		if(!queries.isEmpty()) {
+			
+			for(Entry<CombineOperator, Query> combinedQuery : queries) {
+				
+				CombineOperator operator = combinedQuery.getKey();
+				Query query = combinedQuery.getValue();
+				
+				builder.append(" ");
+				builder.append(operator);
+				builder.append(" ");
+				builder.append(query.getSelectQuery(parameters));
 			}
 		}
 		
