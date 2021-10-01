@@ -824,7 +824,7 @@ public class Query {
 					builder.append(", ");
 				}
 				
-				builder.append(column.name);
+				builder.append(column);
 				
 				if(order == Order.DESC){
 					
