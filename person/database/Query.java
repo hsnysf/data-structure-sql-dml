@@ -35,7 +35,7 @@ public class Query {
 		this.connection = connection;
 	}
 	
-	public void setObject(PreparedStatement statement, int index, int type, Object value) throws SQLException {
+	private void setObject(PreparedStatement statement, int index, int type, Object value) throws SQLException {
 		
 		System.out.println("Param #" + index + " :: " + value);
 		
@@ -301,7 +301,7 @@ public class Query {
 		return this;
 	}
 	
-	public StringBuilder buildRestriction(Restriction restriction, List<Entry<Column, Object>> parameters){
+	private StringBuilder buildRestriction(Restriction restriction, List<Entry<Column, Object>> parameters){
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -369,9 +369,7 @@ public class Query {
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
-			builder.append(" ");
-			
-			builder.append("(");
+			builder.append(" (");
 			
 			int index = 0;
 			
@@ -720,7 +718,7 @@ public class Query {
 		return relation;
 	}
 	
-	public StringBuilder getSelectQuery(List<Entry<Column, Object>> parameters) {
+	private StringBuilder getSelectQuery(List<Entry<Column, Object>> parameters) {
 		
 		StringBuilder builder = new StringBuilder();
 		
