@@ -85,7 +85,7 @@ public class ModernPersonDAO extends Query {
 		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 		.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
-		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME)
+		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED)
 		.from(Table.PERSON)
 		.where(Person.ID.equal(personDTO.getId()))
 		.orderBy(Person.NAME.asc(), Person.ID.desc())
@@ -127,9 +127,8 @@ public class ModernPersonDAO extends Query {
 		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 		.from(Table.PERSON)
 		.where(Person.GENDER.equal('M'))
-		.and(Person.AGE.equal(12).and(Person.SALARY.greater(100)))
-		.and(Person.CPR.equal(8811111).and(Person.NAME.like("Ali")
-											.or(Person.NAME.like("Mohd"))))
+		.and(Person.ID.equal(1).and(Person.NAME.like("Hasan").or(Person.NAME.like("Ali"))))
+		.and(Person.CPR.notEqual(88111111).or(Person.GENDER.isNull()))
 		.executeSelect();
 	}
 	
@@ -142,11 +141,9 @@ public class ModernPersonDAO extends Query {
 		.select(School.ID, School.NAME)
 		.from(Table.PERSON)
 		.innerJoin(Table.CITY).on(Person.CITY_ID.equal(City.ID))
-		.rightJoin(Table.COMPANY).on(Person.COMPANY_ID.equal(Company.ID)
-									.and(Company.NAME.like("Google")))
+		.rightJoin(Table.COMPANY).on(Person.COMPANY_ID.equal(Company.ID).and(Company.NAME.like("Google")))
 		.leftJoin(Table.COUNTRY).on(Person.COUNTRY_ID.equal(Country.ID))
-		.fullJoin(Table.SCHOOL).on(Person.SCHOOL_ID.equal(School.ID)
-								.and(School.NAME.equal("UOB")))
+		.fullJoin(Table.SCHOOL).on(Person.SCHOOL_ID.equal(School.ID).and(School.NAME.equal("Microsoft")))
 		.where(Person.ID.equal(1))
 		.executeSelect();
 	}
@@ -196,8 +193,8 @@ public class ModernPersonDAO extends Query {
 		.from(Table.PERSON)
 		.where(Person.ID.equal(1))
 		.groupBy(Person.GENDER, Person.AGE)
-		.orderBy(Person.GENDER)
 		.having(count(Person.ID).greater(10).and(sum(Person.SALARY).less(100)))
+		.orderBy(Person.GENDER)
 		.executeSelect();
 		
 		select(distinct(Person.DATE_OF_BIRTH))
