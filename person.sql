@@ -113,7 +113,7 @@ and prsn_sleep_time = '20:30'
 and prsn_graduated = true
 
 select
-prsn_name, prsn_gender, prson_age, 
+prsn_name, prsn_gender, prsn_age, 
 prsn_age, prsn_cpr, prsn_account_no, 
 prsn_gpa, prsn_salary, prsn_annual_income, 
 prsn_date_of_birth, prsn_registration_date_time, 
@@ -122,7 +122,7 @@ from public.person
 where prsn_id = 1
 order by prsn_name, prsn_id desc;
 
-select prsn_name, prsn_gender, prson_age, prsn_age 
+select prsn_name, prsn_gender, prsn_age, prsn_age 
 from public.person 
 where prsn_id = 1
 and prsn_name ilike '%Hasan%' 
@@ -151,16 +151,42 @@ and not exists (select dctr_id
 					where dctr_cpr = prsn_cpr and dctr_hospital = 'Bin Hayan') 
 order by prsn_id, prsn_name desc
 
-select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 1
+select prsn_name, prsn_gender, prsn_age from public.person where prsn_id = 1
 union
-select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 2
+select prsn_name, prsn_gender, prsn_age from public.person where prsn_id = 2
 union all
-select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 3
+select prsn_name, prsn_gender, prsn_age from public.person where prsn_id = 3
 intersect
-select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 4
+select prsn_name, prsn_gender, prsn_age from public.person where prsn_id = 4
 intersect all
-select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 5
+select prsn_name, prsn_gender, prsn_age from public.person where prsn_id = 5
 except
-select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 6
+select prsn_name, prsn_gender, prsn_age from public.person where prsn_id = 6
 except all
-select prsn_name, prsn_gender, prson_age from public.person where prsn_id = 7;
+select prsn_name, prsn_gender, prsn_age from public.person where prsn_id = 7;
+
+select  count(prsn_id) as prsn_id_count, 
+		sum(prsn_salary) as prsn_salary_sum, 
+		avg(prsn_annual_income) as prsn_annual_income_avg, 
+		min(prsn_cpr) as prsn_cpr_min, 
+		max(prsn_gpa) as prsn_gpa_max 
+from public.person 
+where prsn_id = ? 
+group by prsn_gender, prsn_age 
+having (count(prsn_id) > 10 and sum(prsn_salary) < 100) 
+order by prsn_gender
+
+select distinct(prsn_date_of_birth) as prsn_date_of_birth_distinct 
+from public.person 
+where prsn_gpa > 3.12
+
+select coalesce(prsn_date_of_birth, '12-12-2020') 
+				as prsn_date_of_birth_coalesce 
+from public.person
+
+select prsn_date_of_birth, 
+count(prsn_id) as prsn_id_count 
+from public.person 
+group by prsn_date_of_birth 
+having count(prsn_id) > 2
+order by prsn_date_of_birth
