@@ -188,4 +188,32 @@ public class ModernPersonDAO extends Query {
 		)
 		.executeSelect();
 	}
+	
+	public void selectPersonWithFunctions() throws SQLException {
+		
+		select(count(Person.ID), sum(Person.SALARY), average(Person.ANNUAL_INCOME))
+		.select(min(Person.CPR), max(Person.GPA))
+		.from(Table.PERSON)
+		.where(Person.ID.equal(1))
+		.groupBy(Person.GENDER, Person.AGE)
+		.orderBy(Person.GENDER)
+		.having(count(Person.ID).greater(10).and(sum(Person.SALARY).less(100)))
+		.executeSelect();
+		
+		select(distinct(Person.DATE_OF_BIRTH))
+		.from(Table.PERSON)
+		.where(Person.GPA.greater(3.12))
+		.executeSelect();
+		
+		select(coalesce(Person.DATE_OF_BIRTH, "12-12-2020"))
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(Person.DATE_OF_BIRTH, count(Person.ID))
+		.from(Table.PERSON)
+		.groupBy(Person.DATE_OF_BIRTH)
+		.having(count(Person.ID).greater(2))
+		.orderBy(Person.DATE_OF_BIRTH)
+		.executeSelect();
+	}
 }

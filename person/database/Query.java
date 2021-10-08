@@ -25,6 +25,8 @@ public class Query {
 	private List<Relation> relations = new ArrayList<Relation>();
 	private Map<Column, Object> values = new LinkedHashMap<Column, Object>();
 	private List<Restriction> restrictions = new ArrayList<Restriction>();
+	private List<Column> groups = new ArrayList<Column>();
+	private Restriction having;
 	private Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
 	private List<Entry<CombineOperator, Query>> queries = new ArrayList<Map.Entry<CombineOperator,Query>>();
 	
@@ -631,9 +633,58 @@ public class Query {
 		return this;
 	}
 	
+	public static Column count(Column column){
+		
+		return column.copyWithFunction(Function.COUNT);
+	}
+	
+	public static Column distinct(Column column){
+		
+		return column.copyWithFunction(Function.DISTINCT);
+	}
+	
+	public static Column sum(Column column){
+		
+		return column.copyWithFunction(Function.SUM);
+	}
+	
+	public static Column average(Column column){
+		
+		return column.copyWithFunction(Function.AVERAGE);
+	}
+	
+	public static Column min(Column column){
+		
+		return column.copyWithFunction(Function.MIN);
+	}
+	
+	public static Column max(Column column){
+		
+		return column.copyWithFunction(Function.MAX);
+	}
+	
+	public static Column coalesce(Column column, String value) {
+		
+		return column.copyWithFunction(Function.COALESCE, value);
+	}
+	
 	public Query from(Table table) {
 
 		this.table = table;
+		
+		return this;
+	}
+	
+	public Query groupBy(Column... column) {
+
+		groups.addAll(Arrays.asList(column));
+		
+		return this;
+	}
+	
+	public Query having(Restriction having) {
+		
+		this.having = having;
 		
 		return this;
 	}
@@ -778,6 +829,12 @@ public class Query {
 			
 			builder.append(column);
 			
+			if(column.alias != null) {
+				
+				builder.append(" as ");
+				builder.append(column.alias);
+			}
+			
 			index++;
 		}
 		
@@ -806,6 +863,32 @@ public class Query {
 				
 				builder.append(buildRestriction(restriction, parameters));
 			}
+		}
+		
+		if (!groups.isEmpty()) {
+
+			builder.append(" group by ");
+
+			index = 0;
+			
+			for(Column column : groups){
+				
+				if(index != 0){
+					
+					builder.append(", ");
+				}
+				
+				builder.append(column);
+				
+				index++;
+			}
+		}
+		
+		if (having != null) {
+
+			builder.append(" having");
+
+			builder.append(buildRestriction(having, parameters));
 		}
 		
 		if (!orders.isEmpty()) {
@@ -894,6 +977,10 @@ public class Query {
 		table = null;
 		
 		restrictions.clear();
+		
+		groups.clear();
+		
+		having = null;
 		
 		orders.clear();
 		

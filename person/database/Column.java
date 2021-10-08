@@ -9,11 +9,23 @@ import java.util.Map.Entry;
 public class Column {
 
 	protected String name;
+	protected String nameInQuery;
 	protected int type;
+	protected Function function;
+	protected String alias;
 	
 	public Column(String name, int type) {
 		this.name = name;
 		this.type = type;
+		this.nameInQuery = name;
+	}
+	
+	public Column(String name, String nameInQuery, int type, Function function, String alias) {
+		this.name = name;
+		this.nameInQuery = nameInQuery;
+		this.type = type;
+		this.function = function;
+		this.alias = alias;
 	}
 	
 	public Restriction equal(String value) {
@@ -316,8 +328,18 @@ public class Column {
 		return new SimpleEntry<Column, Order>(this, Order.DESC);
 	}
 	
+	public Column copyWithFunction(Function function) {
+		
+		return new Column(name, function + "(" + name + ")", type, function, name + "_" + function);
+	}
+	
+	public Column copyWithFunction(Function function, String value) {
+		
+		return new Column(name, function + "(" + name + ", '" + value + "')", type, function, name + "_" + function);
+	}
+	
 	@Override
 	public String toString() {
-		return name;
+		return nameInQuery;
 	}
 }
