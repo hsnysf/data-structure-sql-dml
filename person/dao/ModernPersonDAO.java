@@ -3,6 +3,7 @@ package person.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import person.column.Address;
 import person.column.City;
 import person.column.Company;
 import person.column.Country;
@@ -211,6 +212,29 @@ public class ModernPersonDAO extends Query {
 		.groupBy(Person.DATE_OF_BIRTH)
 		.having(count(Person.ID).greater(2))
 		.orderBy(Person.DATE_OF_BIRTH)
+		.executeSelect();
+	}
+	
+	public void selectPersonWithAlias() throws SQLException {
+		
+		select(Person.NAME, Person.GENDER, Person.AGE)
+		.select(Address.ROAD.of("home_address"), Address.BLOCK.of("home_address"))
+		.select(Address.ROAD.of("work_address"), Address.BLOCK.of("work_address"))
+		.from(Table.PERSON.as("person"))
+		.join(Table.ADDRESS.as("home_address"))
+			.on(Person.HOME_ADDRESS_ID.equal(Address.ID.of("home_address")))
+		.join(Table.ADDRESS.as("work_address"))
+			.on(Person.WORK_ADDRESS_ID.equal(Address.ID.of("work_address")))
+		.where(Person.ID.equal(1))
+		.executeSelect();
+	}
+	
+	public void selectPersonWithPagination() throws SQLException {
+		
+		select(Person.NAME, Person.GENDER, Person.AGE)
+		.from(Table.PERSON)
+		.limit(2)
+		.offset(4)
 		.executeSelect();
 	}
 }

@@ -16,49 +16,49 @@ public class Restriction {
 	protected Query query;
 	protected List<Restriction> restrictions = new ArrayList<Restriction>();
 	
-	public Restriction(Column column, Criteria criteria, Object value) {
+	protected Restriction(Column column, Criteria criteria, Object value) {
 		this.column = column;
 		this.criteria = criteria;
 		this.value = value;
 	}
 	
-	public Restriction(Column column, Criteria criteria, Object values[]) {
+	protected Restriction(Column column, Criteria criteria, Object values[]) {
 		this.column = column;
 		this.criteria = criteria;
 		this.values = values;
 	}
 	
-	public Restriction(Column column, Criteria criteria, Column column2) {
+	protected Restriction(Column column, Criteria criteria, Column column2) {
 		this.column = column;
 		this.criteria = criteria;
 		this.column2 = column2;
 	}
 	
-	public Restriction(Column column, Criteria criteria, Object value, Object to) {
+	protected Restriction(Column column, Criteria criteria, Object value, Object to) {
 		this.column = column;
 		this.criteria = criteria;
 		this.value = value;
 		this.to = to;
 	}
 	
-	public Restriction(Column column, Criteria criteria, Column column2, Column column3) {
+	protected Restriction(Column column, Criteria criteria, Column column2, Column column3) {
 		this.column = column;
 		this.criteria = criteria;
 		this.column2 = column2;
 		this.column3 = column3;
 	}
 	
-	public Restriction(Column column, Criteria criteria) {
+	protected Restriction(Column column, Criteria criteria) {
 		this.column = column;
 		this.criteria = criteria;
 	}
 	
-	public Restriction(Criteria criteria, Query query) {
+	protected Restriction(Criteria criteria, Query query) {
 		this.criteria = criteria;
 		this.query = query;
 	}
 	
-	public Restriction(Column column, Criteria criteria, Query query) {
+	protected Restriction(Column column, Criteria criteria, Query query) {
 		this.column = column;
 		this.criteria = criteria;
 		this.query = query;

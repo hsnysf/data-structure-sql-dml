@@ -12,6 +12,7 @@ public class Column {
 	protected String nameInQuery;
 	protected int type;
 	protected Function function;
+	protected String tableAlias;
 	protected String alias;
 	
 	public Column(String name, int type) {
@@ -20,12 +21,23 @@ public class Column {
 		this.nameInQuery = name;
 	}
 	
-	public Column(String name, String nameInQuery, int type, Function function, String alias) {
+	private Column(String name, String nameInQuery, int type, Function function, String tableAlias, String alias) {
 		this.name = name;
 		this.nameInQuery = nameInQuery;
 		this.type = type;
 		this.function = function;
+		this.tableAlias = tableAlias;
 		this.alias = alias;
+	}
+	
+	public Column of(String tableAlias) {
+		
+		return new Column(name, tableAlias + "." + name, type, function, tableAlias, tableAlias + "_" + name);
+	}
+	
+	public Column as(String alias) {
+		
+		return new Column(name, nameInQuery, type, function, tableAlias, alias);
 	}
 	
 	public Restriction equal(String value) {
@@ -330,12 +342,12 @@ public class Column {
 	
 	public Column copyWithFunction(Function function) {
 		
-		return new Column(name, function + "(" + name + ")", type, function, name + "_" + function);
+		return new Column(name, function + "(" + name + ")", type, function, tableAlias, name + "_" + function);
 	}
 	
 	public Column copyWithFunction(Function function, String value) {
 		
-		return new Column(name, function + "(" + name + ", '" + value + "')", type, function, name + "_" + function);
+		return new Column(name, function + "(" + name + ", '" + value + "')", type, function, tableAlias, name + "_" + function);
 	}
 	
 	@Override

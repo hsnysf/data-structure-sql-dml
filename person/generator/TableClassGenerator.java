@@ -14,27 +14,40 @@ public class TableClassGenerator {
 		
 		builder.append("package person.database;");
 		builder.append("\r\n\r\n");
-		builder.append("public enum Table {");
+		builder.append("public class Table {");
 		builder.append("\r\n\r\n");
-		
-		int index = 1;
 		
 		for(TableConfig tableConfig : tableMap.values()){
 			
-			builder.append("	" + tableConfig.enumName + "(\"public." + tableConfig.name + "\")");
-			builder.append(index == tableMap.size() ? ";" : ",");
+			builder.append("	public final static Table " + tableConfig.enumName + " = new Table(\"public." + tableConfig.name + "\");");
 		    builder.append("\r\n");
-		    
-		    index++;
 		}
 		
 		builder.append("\r\n");
-		builder.append("	public String name;");
+		builder.append("	protected String name;");
+		builder.append("\r\n");
+		builder.append("	protected String alias;");
 		
 		builder.append("\r\n\r\n");
 		builder.append("	private Table(String name) {");
 		builder.append("\r\n");
 		builder.append("		this.name = name;");
+		builder.append("\r\n");
+		builder.append("	}");
+		
+		builder.append("\r\n\r\n");
+		builder.append("	private Table(String name, String alias) {");
+		builder.append("\r\n");
+		builder.append("		this.name = name;");
+		builder.append("\r\n");
+		builder.append("		this.alias = alias;");
+		builder.append("\r\n");
+		builder.append("	}");
+		
+		builder.append("\r\n\r\n");
+		builder.append("	public Table as(String alias) {");
+		builder.append("\r\n");
+		builder.append("		return new Table(name, alias);");
 		builder.append("\r\n");
 		builder.append("	}");
 		

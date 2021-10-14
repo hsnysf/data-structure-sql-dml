@@ -22,4 +22,6 @@ public interface Person {
 	Column SCHOOL_ID = new Column("prsn_school_id", Types.INTEGER);
 	Column COUNTRY_ID = new Column("prsn_country_id", Types.INTEGER);
 	Column COMPANY_ID = new Column("prsn_company_id", Types.INTEGER);
+	Column HOME_ADDRESS_ID = new Column("prsn_home_address_id", Types.INTEGER);
+	Column WORK_ADDRESS_ID = new Column("prsn_work_address_id", Types.INTEGER);
 }

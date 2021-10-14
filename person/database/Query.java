@@ -19,16 +19,19 @@ import java.util.Map.Entry;
 
 public class Query {
 
-	private Connection connection;
-	private List<Column> columns = new ArrayList<Column>();
-	private Table table;
-	private List<Relation> relations = new ArrayList<Relation>();
-	private Map<Column, Object> values = new LinkedHashMap<Column, Object>();
-	private List<Restriction> restrictions = new ArrayList<Restriction>();
-	private List<Column> groups = new ArrayList<Column>();
-	private Restriction having;
-	private Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
-	private List<Entry<CombineOperator, Query>> queries = new ArrayList<Map.Entry<CombineOperator,Query>>();
+	protected Connection connection;
+	protected List<Column> columns = new ArrayList<Column>();
+	protected Table table;
+	protected List<Relation> relations = new ArrayList<Relation>();
+	protected Map<Column, Object> values = new LinkedHashMap<Column, Object>();
+	protected List<Restriction> restrictions = new ArrayList<Restriction>();
+	protected List<Column> groups = new ArrayList<Column>();
+	protected Restriction having;
+	protected Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
+	protected List<Entry<CombineOperator, Query>> combineQueries = new ArrayList<Map.Entry<CombineOperator,Query>>();
+	protected Integer limit;
+	protected Integer offset;
+	
 	
 	public Query() {
 		
@@ -772,42 +775,56 @@ public class Query {
 	
 	public Query union(Query query) {
 		
-		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.UNION, query));
+		combineQueries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.UNION, query));
 		
 		return this;
 	}
 	
 	public Query unionAll(Query query) {
 		
-		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.UNION_ALL, query));
+		combineQueries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.UNION_ALL, query));
 		
 		return this;
 	}
 	
 	public Query intersect(Query query) {
 		
-		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.INTERSECT, query));
+		combineQueries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.INTERSECT, query));
 		
 		return this;
 	}
 	
 	public Query intersectAll(Query query) {
 		
-		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.INTERSECT_ALL, query));
+		combineQueries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.INTERSECT_ALL, query));
 		
 		return this;
 	}
 	
 	public Query except(Query query) {
 		
-		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.EXCEPT, query));
+		combineQueries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.EXCEPT, query));
 		
 		return this;
 	}
 	
 	public Query exceptAll(Query query) {
 		
-		queries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.EXPECT_ALL, query));
+		combineQueries.add(new SimpleEntry<CombineOperator, Query>(CombineOperator.EXPECT_ALL, query));
+		
+		return this;
+	}
+	
+	public Query limit(Integer limit) {
+		
+		this.limit = limit;
+		
+		return this;
+	}
+
+	public Query offset(Integer offset) {
+		
+		this.offset = offset;
 		
 		return this;
 	}
@@ -841,6 +858,12 @@ public class Query {
 		builder.append(" from ");
 		builder.append(table);
 		
+		if(table.alias != null) {
+			
+			builder.append(" as ");
+			builder.append(table.alias);
+		}
+		
 		if(!relations.isEmpty()) {
 			
 			for(Relation relation : relations) {
@@ -849,6 +872,13 @@ public class Query {
 				builder.append(relation.join);
 				builder.append(" ");
 				builder.append(relation.table);
+				
+				if(relation.table.alias != null) {
+					
+					builder.append(" as ");
+					builder.append(relation.table.alias);
+				}
+				
 				builder.append(" on");
 				
 				builder.append(buildRestriction(relation.restriction, parameters));
@@ -919,12 +949,26 @@ public class Query {
 			}
 		}
 		
-		if(!queries.isEmpty()) {
+		if(limit != null && limit != 0) {
 			
-			for(Entry<CombineOperator, Query> combinedQuery : queries) {
+			builder.append(" limit ?");
+
+			parameters.add(new SimpleEntry<Column, Object>(new Column("limit", Types.INTEGER), limit));
+		}
+		
+		if(offset != null && offset != 0) {
+			
+			builder.append(" offset ?");
+			
+			parameters.add(new SimpleEntry<Column, Object>(new Column("offset", Types.INTEGER), offset));
+		}
+		
+		if(!combineQueries.isEmpty()) {
+			
+			for(Entry<CombineOperator, Query> combineQuery : combineQueries) {
 				
-				CombineOperator operator = combinedQuery.getKey();
-				Query query = combinedQuery.getValue();
+				CombineOperator operator = combineQuery.getKey();
+				Query query = combineQuery.getValue();
 				
 				builder.append(" ");
 				builder.append(operator);
