@@ -28,9 +28,9 @@ public class Query {
 	protected List<Column> groups = new ArrayList<Column>();
 	protected Restriction having;
 	protected Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
-	protected List<Entry<CombineOperator, Query>> combineQueries = new ArrayList<Map.Entry<CombineOperator,Query>>();
 	protected Integer limit;
 	protected Integer offset;
+	protected List<Entry<CombineOperator, Query>> combineQueries = new ArrayList<Map.Entry<CombineOperator,Query>>();
 	
 	
 	public Query() {
@@ -1028,6 +1028,12 @@ public class Query {
 		
 		orders.clear();
 		
+		limit = null;
+		
+		offset = null;
+		
+		combineQueries.clear();
+		;
 		return result;
 	}
 }
