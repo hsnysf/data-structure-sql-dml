@@ -1033,7 +1033,7 @@ public class Query {
 		offset = null;
 		
 		combineQueries.clear();
-		;
+		
 		return result;
 	}
 }
