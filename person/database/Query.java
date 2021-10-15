@@ -1020,6 +1020,8 @@ public class Query {
 		
 		table = null;
 		
+		relations.clear();
+		
 		restrictions.clear();
 		
 		groups.clear();
