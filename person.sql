@@ -30,6 +30,15 @@ create table public.company
   constraint pk_cmp_id primary key (cmp_id)
 );
 
+create table public.address
+(
+  addr_id serial,
+  addr_building character varying(20),
+  addr_road character varying(20),
+  addr_block character varying(20),
+  constraint pk_addr_id primary key (addr_id)
+);
+
 create table public.person
 (
   prsn_id serial,
@@ -49,6 +58,8 @@ create table public.person
   prsn_school_id integer,
   prsn_country_id integer,
   prsn_company_id integer,
+  prsn_home_address_id integer,
+  prsn_work_address_id integer,
   constraint pk_prsn_id primary key (prsn_id),
   constraint fk_city_id foreign key (prsn_city_id)
 	references public.city (ct_id) match simple,
@@ -57,7 +68,11 @@ create table public.person
   constraint fk_country_id foreign key (prsn_country_id)
 	references public.country (cnt_id) match simple,
   constraint fk_company_id foreign key (prsn_company_id)
-	references public.company (cmp_id) match simple
+	references public.company (cmp_id) match simple,
+  constraint fk_home_address_id foreign key (prsn_home_address_id)
+	references public.address (addr_id) match simple,
+  constraint fk_work_address_id foreign key (prsn_work_address_id)
+	references public.address (addr_id) match simple
 );
 
 create table public.unique_date_of_birth
@@ -190,3 +205,15 @@ from public.person
 group by prsn_date_of_birth 
 having count(prsn_id) > 2
 order by prsn_date_of_birth
+
+select  prsn_name, prsn_gender, prsn_age, 
+		home_address.addr_road as home_address_addr_road, 
+		home_address.addr_block as home_address_addr_block, 
+		work_address.addr_road as work_address_addr_road, 
+		work_address.addr_block as work_address_addr_block 
+from public.person as person 
+inner join public.address as home_address 
+			on prsn_home_address_id = home_address.addr_id 
+inner join public.address as work_address 
+			on prsn_work_address_id = work_address.addr_id 
+where prsn_id = 1
