@@ -8,7 +8,7 @@ public class Relation {
 	protected Restriction restriction;
 	protected Query mainQuery;
 	
-	public Relation(Join join, Table table, Query mainQuery) {
+	protected Relation(Join join, Table table, Query mainQuery) {
 		this.join = join;
 		this.table = table;
 		this.mainQuery = mainQuery;
