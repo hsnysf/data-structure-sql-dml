@@ -237,4 +237,57 @@ public class ModernPersonDAO extends Query {
 		.offset(4)
 		.executeSelect();
 	}
+	
+	public void selectPersonWithSubQuery() throws SQLException {
+		
+		select(Person.NAME, Person.GENDER, Person.AGE)
+		.from(new Query().from(Table.PERSON)
+				.where(Person.GENDER.equal('M'))).as("male_person")
+		.join(new Query().from(Table.DOCTOR)
+				.where(Doctor.HOSPITAL.equal("Alkindi")))
+				.as("alkindi_doctor")
+			.on(Doctor.CPR.equal(Person.CPR))
+		.executeSelect();
+		
+		select(Person.ID)
+		.from(
+				new Query().from(
+									new Query().from(Table.PERSON)
+									.where(Person.GENDER.equal('M'))
+								).as("person_gender")
+				.where(Person.AGE.equal(12))
+			 ).as("person_age")
+		.join(
+				new Query().from(
+									new Query().from(Table.CITY)
+									.where(City.ID.equal(1))
+								).as("city_id")
+				.where(City.NAME.equal("Manama"))
+			 ).as("city_name")
+		.on(Person.CITY_ID.equal(City.ID))
+		.where(Person.GPA.equal(3.12))
+		.executeSelect();
+	}
+	
+	public void selectPersonWithRowNumber() throws SQLException {
+		
+		select(Person.NAME, Person.GENDER, Person.AGE)
+		.select(row_number()
+				.partitionBy(Person.AGE, Person.GRADUATED)
+				.orderBy(Person.AGE.asc(), Person.CPR.desc()))
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(Person.NAME, Person.AGE)
+		.from(new Query()
+				.select(Person.NAME, Person.AGE)
+				.select(row_number()
+						.partitionBy(Person.AGE)
+						.orderBy(Person.GPA.desc())
+						.as("person_row_number"))
+				.from(Table.PERSON)
+			  ).as("person")
+		.where(row_number().alias("person_row_number").equal(1))
+		.executeSelect();
+	}
 }

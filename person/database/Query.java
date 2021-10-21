@@ -22,6 +22,7 @@ public class Query {
 	protected Connection connection;
 	protected List<Column> columns = new ArrayList<Column>();
 	protected Table table;
+	protected Query fromQuery;
 	protected List<Relation> relations = new ArrayList<Relation>();
 	protected Map<Column, Object> values = new LinkedHashMap<Column, Object>();
 	protected List<Restriction> restrictions = new ArrayList<Restriction>();
@@ -31,7 +32,7 @@ public class Query {
 	protected Integer limit;
 	protected Integer offset;
 	protected List<Entry<CombineOperator, Query>> combineQueries = new ArrayList<Map.Entry<CombineOperator,Query>>();
-	
+	protected String alias;
 	
 	public Query() {
 		
@@ -671,9 +672,113 @@ public class Query {
 		return column.copyWithFunction(Function.COALESCE, value);
 	}
 	
+	public Column row_number() {
+		
+		return new Column("row_number() over()", Types.INTEGER, "row_num");
+	}
+	
 	public Query from(Table table) {
 
 		this.table = table;
+		
+		return this;
+	}
+	
+	public Query from(Query fromQuery) {
+
+		this.fromQuery = fromQuery;
+		
+		return this;
+	}
+	
+	public Relation join(Table table){
+		
+		return innerJoin(table);
+	}
+	
+	public Relation join(Query query){
+		
+		return innerJoin(query);
+	}
+	
+	public Relation innerJoin(Table table){
+		
+		Relation relation = new Relation(Join.INNER, table, this);
+		
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Relation innerJoin(Query query){
+		
+		Relation relation = new Relation(Join.INNER, query, this);
+		
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Relation rightJoin(Table table){
+		
+		Relation relation = new Relation(Join.RIGHT, table, this);
+				
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Relation rightJoin(Query query){
+		
+		Relation relation = new Relation(Join.RIGHT, query, this);
+		
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Relation leftJoin(Table table){
+		
+		Relation relation = new Relation(Join.LEFT, table, this);
+		
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Relation leftJoin(Query query){
+		
+		Relation relation = new Relation(Join.LEFT, query, this);
+		
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Relation fullJoin(Table table){
+		
+		Relation relation = new Relation(Join.FULL, table, this);
+		
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Relation fullJoin(Query query){
+		
+		Relation relation = new Relation(Join.FULL, query, this);
+		
+		relations.add(relation);
+		
+		return relation;
+	}
+	
+	public Query as(String alias) {
+
+		if(fromQuery != null) {
+			
+			fromQuery.alias = alias;
+		}
 		
 		return this;
 	}
@@ -730,47 +835,6 @@ public class Query {
 	public static Restriction notExists(Query query) {
 		
 		return new Restriction(Criteria.NOT_EXISTS, query);
-	}
-	
-	public Relation join(Table table){
-		
-		return innerJoin(table);
-	}
-	
-	public Relation innerJoin(Table table){
-		
-		Relation relation = new Relation(Join.INNER, table, this);
-		
-		relations.add(relation);
-		
-		return relation;
-	}
-	
-	public Relation rightJoin(Table table){
-		
-		Relation relation = new Relation(Join.RIGHT, table, this);
-				
-		relations.add(relation);
-		
-		return relation;
-	}
-	
-	public Relation leftJoin(Table table){
-		
-		Relation relation = new Relation(Join.LEFT, table, this);
-		
-		relations.add(relation);
-		
-		return relation;
-	}
-	
-	public Relation fullJoin(Table table){
-		
-		Relation relation = new Relation(Join.FULL, table, this);
-		
-		relations.add(relation);
-		
-		return relation;
 	}
 	
 	public Query union(Query query) {
@@ -837,31 +901,54 @@ public class Query {
 		
 		int index = 0;
 		
-		for(Column column : columns) {
+		if(!columns.isEmpty()) {
 			
-			if(index != 0) {
+			for(Column column : columns) {
 				
-				builder.append(", ");
+				if(index != 0) {
+					
+					builder.append(", ");
+				}
+				
+				builder.append(column);
+				
+				if(column.alias != null) {
+					
+					builder.append(" as ");
+					builder.append(column.alias);
+				}
+				
+				index++;
 			}
 			
-			builder.append(column);
+		}else {
 			
-			if(column.alias != null) {
-				
-				builder.append(" as ");
-				builder.append(column.alias);
-			}
-			
-			index++;
+			builder.append("*");
 		}
 		
 		builder.append(" from ");
-		builder.append(table);
 		
-		if(table.alias != null) {
+		if(table != null) {
 			
-			builder.append(" as ");
-			builder.append(table.alias);
+			builder.append(table);
+			
+			if(table.alias != null) {
+				
+				builder.append(" as ");
+				builder.append(table.alias);
+			}
+			
+		}else if(fromQuery != null) {
+			
+			builder.append("(");
+			builder.append(fromQuery.getSelectQuery(parameters));
+			builder.append(")");
+			
+			if(fromQuery.alias != null) {
+				
+				builder.append(" as ");
+				builder.append(fromQuery.alias);
+			}
 		}
 		
 		if(!relations.isEmpty()) {
@@ -871,12 +958,28 @@ public class Query {
 				builder.append(" ");
 				builder.append(relation.join);
 				builder.append(" ");
-				builder.append(relation.table);
 				
-				if(relation.table.alias != null) {
+				if(relation.table != null) {
 					
-					builder.append(" as ");
-					builder.append(relation.table.alias);
+					builder.append(relation.table);
+					
+					if(relation.table.alias != null) {
+						
+						builder.append(" as ");
+						builder.append(relation.table.alias);
+					}
+					
+				}else if(relation.subQuery != null){
+					
+					builder.append("(");
+					builder.append(relation.subQuery.getSelectQuery(parameters));
+					builder.append(")");
+					
+					if(relation.subQuery.alias != null) {
+						
+						builder.append(" as ");
+						builder.append(relation.subQuery.alias);
+					}
 				}
 				
 				builder.append(" on");
@@ -1035,6 +1138,8 @@ public class Query {
 		offset = null;
 		
 		combineQueries.clear();
+		
+		alias = null;
 		
 		return result;
 	}

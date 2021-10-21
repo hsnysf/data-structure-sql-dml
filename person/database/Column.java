@@ -3,6 +3,11 @@ package person.database;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
@@ -14,11 +19,19 @@ public class Column {
 	protected Function function;
 	protected String tableAlias;
 	protected String alias;
+	protected List<Column> partitions = new ArrayList<Column>();
+	protected Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
 	
 	public Column(String name, int type) {
 		this.name = name;
 		this.type = type;
 		this.nameInQuery = name;
+	}
+	
+	public Column(String nameInQuery, int type, String alias) {
+		this.nameInQuery = nameInQuery;
+		this.type = type;
+		this.alias = alias;
 	}
 	
 	private Column(String name, String nameInQuery, int type, Function function, String tableAlias, String alias) {
@@ -38,6 +51,11 @@ public class Column {
 	public Column as(String alias) {
 		
 		return new Column(name, nameInQuery, type, function, tableAlias, alias);
+	}
+	
+	public Column alias(String alias) {
+		
+		return new Column(name, alias, type, function, tableAlias, alias);
 	}
 	
 	public Restriction equal(String value) {
@@ -328,6 +346,110 @@ public class Column {
 	public Restriction notIn(Query query) {
 		
 		return new Restriction(this, Criteria.NOT_IN_QUERY, query);
+	}
+	
+	public Column partitionBy(Column... columns) {
+		
+		partitions.addAll(Arrays.asList(columns));
+
+		updateRowNumberName();
+		
+		return this;
+	}
+	
+	public Column orderBy(Column... columns) {
+
+		for(Column column : columns){
+			
+			orders.put(column, Order.ASC);
+		}
+		
+		updateRowNumberName();
+		
+		return this;
+	}
+	
+	public Column orderBy(Entry<Column, Order>... entries) {
+
+		for(Entry<Column, Order> entry : entries){
+			
+			orders.put(entry.getKey(), entry.getValue());
+		}
+		
+		updateRowNumberName();
+		
+		return this;
+	}
+	
+	public Column orderByDesc(Column... columns) {
+
+		for(Column column : columns){
+			
+			orders.put(column, Order.DESC);
+		}
+		
+		updateRowNumberName();
+		
+		return this;
+	}
+	
+	public void updateRowNumberName() {
+		
+		StringBuilder builder = new StringBuilder();
+		
+		if(!partitions.isEmpty()) {
+			
+			builder.append("partition by ");
+			
+			int index = 0;
+			
+			for(Column partition : partitions) {
+				
+				if(index != 0) {
+					
+					builder.append(", ");
+				}
+				
+				builder.append(partition);
+				
+				index++;
+			}
+		}
+		
+		if (!partitions.isEmpty() && !orders.isEmpty()) {
+			
+			builder.append(" ");
+		}
+		
+		if (!orders.isEmpty()) {
+
+			builder.append("order by ");
+
+			int index = 0;
+			
+			for(Map.Entry<Column, Order> entry : orders.entrySet()){
+				
+				Column column = entry.getKey();
+				Order order = entry.getValue();
+				
+				if(index != 0){
+					
+					builder.append(", ");
+				}
+				
+				builder.append(column);
+				
+				if(order == Order.DESC){
+					
+					builder.append(" ");
+					builder.append(order);
+				}
+				
+				index++;
+			}
+		}
+		
+		nameInQuery = "row_number() over(" + builder + ")";
 	}
 	
 	public Entry<Column, Order> asc() {
