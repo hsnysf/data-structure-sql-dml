@@ -308,6 +308,16 @@ public class Query {
 		return this;
 	}
 	
+	public static Restriction exists(Query query) {
+		
+		return new Restriction(Criteria.EXISTS, query);
+	}
+	
+	public static Restriction notExists(Query query) {
+		
+		return new Restriction(Criteria.NOT_EXISTS, query);
+	}
+	
 	private StringBuilder buildRestriction(Restriction restriction, List<Entry<Column, Object>> parameters){
 		
 		StringBuilder builder = new StringBuilder();
@@ -825,16 +835,6 @@ public class Query {
 		}
 		
 		return this;
-	}
-	
-	public static Restriction exists(Query query) {
-		
-		return new Restriction(Criteria.EXISTS, query);
-	}
-	
-	public static Restriction notExists(Query query) {
-		
-		return new Restriction(Criteria.NOT_EXISTS, query);
 	}
 	
 	public Query union(Query query) {
