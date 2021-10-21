@@ -217,3 +217,50 @@ inner join public.address as home_address
 inner join public.address as work_address 
 			on prsn_work_address_id = work_address.addr_id 
 where prsn_id = 1
+
+select prsn_name, prsn_gender, prsn_age 
+from public.person
+inner join public.doctor on dctr_cpr = prsn_cpr
+where prsn_gender = 'M'
+and dctr_hospital = 'Alkindi'
+
+select prsn_name, prsn_gender, prsn_age 
+from 
+	(select * from public.person where prsn_gender = 'M') as male_person 
+inner join 
+	(select * from public.doctor where dctr_hospital = 'Alkindi') as alkindi_doctor 
+	on dctr_cpr = prsn_cpr
+
+select * 
+from 
+	(
+		select * from (
+					   select * from public.person 
+					   where prsn_gender = 'M'
+				      ) as person_gender 
+		where prsn_age = 12
+	) 	as person_age
+inner join 
+		(
+			select * from (
+							select * from public.city 
+							where ct_id = 1
+						  ) as city_id
+			where ct_name = 'Manama'
+		) as city_name
+		  on prsn_city_id = ct_id
+where prsn_gpa = 3.12
+
+select prsn_name, prsn_gender, 
+		prsn_age, row_number() over(partition by prsn_age, prsn_graduated 
+									order by prsn_age, prsn_cpr desc) as row_num 
+from public.person
+
+select prsn_name, prsn_age 
+from (
+		select prsn_name, prsn_age, 
+				row_number() over(partition by prsn_age 
+									order by prsn_gpa desc) as person_row_number 
+		from public.person
+	 ) as person 
+where person_row_number = 1
