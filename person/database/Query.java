@@ -677,7 +677,42 @@ public class Query {
 		return column.copyWithFunction(Function.MAX);
 	}
 	
+	public static Column coalesce(Column column1, Column column2) {
+		
+		return column1.copyWithFunction(Function.COALESCE, column2);
+	}
+	
 	public static Column coalesce(Column column, String value) {
+		
+		return column.copyWithFunction(Function.COALESCE, value);
+	}
+	
+	public static Column coalesce(Column column, Character value) {
+		
+		return column.copyWithFunction(Function.COALESCE, value);
+	}
+	
+	public static Column coalesce(Column column, Number value) {
+		
+		return column.copyWithFunction(Function.COALESCE, value);
+	}
+	
+	public static Column coalesce(Column column, Date value) {
+		
+		return column.copyWithFunction(Function.COALESCE, value);
+	}
+	
+	public static Column coalesce(Column column, Timestamp value) {
+		
+		return column.copyWithFunction(Function.COALESCE, value);
+	}
+	
+	public static Column coalesce(Column column, Time value) {
+		
+		return column.copyWithFunction(Function.COALESCE, value);
+	}
+	
+	public static Column coalesce(Column column, Boolean value) {
 		
 		return column.copyWithFunction(Function.COALESCE, value);
 	}
@@ -685,6 +720,250 @@ public class Query {
 	public Column row_number() {
 		
 		return new Column("row_number() over()", Types.INTEGER, "row_num");
+	}
+	
+	public int getObjectType(Object value) {
+		
+		if(value instanceof String) {
+			return Types.VARCHAR;
+		}else if(value instanceof Character) {
+			return Types.CHAR;
+		}else if(value instanceof Short) {
+			return Types.SMALLINT;
+		}else if(value instanceof Integer) {
+			return Types.INTEGER;
+		}else if(value instanceof Long) {
+			return Types.BIGINT;
+		}else if(value instanceof Float) {
+			return Types.FLOAT;
+		}else if(value instanceof Double) {
+			return Types.DOUBLE;
+		}else if(value instanceof BigDecimal) {
+			return Types.DECIMAL;
+		}else if(value instanceof Date) {
+			return Types.DATE;
+		}else if(value instanceof Timestamp) {
+			return Types.TIMESTAMP;
+		}else if(value instanceof Time) {
+			return Types.TIME;
+		}else if(value instanceof Boolean) {
+			return Types.BOOLEAN;
+		}else {
+			return Types.VARCHAR;
+		}
+	}
+
+	public Column case_(Case... cases) {
+		
+		int type = -1;
+		
+		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append("case");
+		
+		for(Case case_ : cases) {
+			
+			if(case_.restriction != null) {
+				
+				builder.append(" when");
+				builder.append(buildRestriction(case_.restriction, parameters));
+				builder.append(" then ");
+				
+				if(case_.column != null) {
+					
+					builder.append(case_.column);
+					
+					type = case_.column.type;
+					
+				}else if(case_.value != null) {
+					
+					builder.append("?");
+					
+					type = getObjectType(case_.value);
+					
+					parameters.add(new SimpleEntry<Column, Object>(new Column("case", type), case_.value));
+				}
+				
+			}else {
+				
+				builder.append(" else ");
+				
+				if(case_.column != null) {
+					
+					builder.append(case_.column);
+					
+					type = case_.column.type;
+					
+				}else if(case_.value != null) {
+					
+					builder.append("?");
+					
+					type = getObjectType(case_.value);
+					
+					parameters.add(new SimpleEntry<Column, Object>(new Column("case", type), case_.value));
+				}
+			}
+		}
+		
+		builder.append(" end");
+		
+		return new Column(builder.toString(), type, parameters);
+	}
+	
+	public Column case_(Column column, Case... cases) {
+		
+		int type = -1;
+		
+		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append("case ");
+		builder.append(column);
+		
+		for(Case case_ : cases) {
+			
+			if(case_.columnValue != null) {
+				
+				builder.append(" when ? then ");
+				
+				parameters.add(new SimpleEntry<Column, Object>(new Column("case", getObjectType(case_.columnValue)), case_.columnValue));
+				
+				if(case_.column != null) {
+					
+					builder.append(case_.column);
+					
+					type = case_.column.type;
+					
+				}else if(case_.value != null) {
+					
+					builder.append("?");
+					
+					type = getObjectType(case_.value);
+					
+					parameters.add(new SimpleEntry<Column, Object>(new Column("case", type), case_.value));
+				}
+				
+			}else {
+				
+				builder.append(" else ");
+				
+				if(case_.column != null) {
+					
+					builder.append(case_.column);
+					
+					type = case_.column.type;
+					
+				}else if(case_.value != null) {
+					
+					builder.append("?");
+					
+					type = getObjectType(case_.value);
+					
+					parameters.add(new SimpleEntry<Column, Object>(new Column("case", type), case_.value));
+				}
+			}
+		}
+		
+		builder.append(" end");
+		
+		return new Column(builder.toString(), type, parameters);
+	}
+	
+	public Case when(Restriction restriction) {
+		
+		return new Case(restriction);
+	}
+	
+	public Case when(String column_value) {
+		
+		Case case_ = new Case();
+		case_.columnValue = column_value;
+		return case_;
+	}
+	
+	public Case when(Character column_value) {
+		
+		Case case_ = new Case();
+		case_.columnValue = column_value;
+		return case_;
+	}
+	
+	public Case when(Number column_value) {
+		
+		Case case_ = new Case();
+		case_.columnValue = column_value;
+		return case_;
+	}
+	
+	public Case when(Date column_value) {
+		
+		Case case_ = new Case();
+		case_.columnValue = column_value;
+		return case_;
+	}
+	
+	public Case when(Timestamp column_value) {
+		
+		Case case_ = new Case();
+		case_.columnValue = column_value;
+		return case_;
+	}
+	
+	public Case when(Time column_value) {
+		
+		Case case_ = new Case();
+		case_.columnValue = column_value;
+		return case_;
+	}
+	
+	public Case when(Boolean column_value) {
+		
+		Case case_ = new Case();
+		case_.columnValue = column_value;
+		return case_;
+	}
+	
+	public Case else_(Column column) {
+		
+		return new Case(column);
+	}
+	
+	public Case else_(String value) {
+		
+		return new Case(value);
+	}
+	
+	public Case else_(Character value) {
+		
+		return new Case(value);
+	}
+	
+	public Case else_(Number value) {
+		
+		return new Case(value);
+	}
+	
+	public Case else_(Date value) {
+		
+		return new Case(value);
+	}
+	
+	public Case else_(Timestamp value) {
+		
+		return new Case(value);
+	}
+	
+	public Case else_(Time value) {
+		
+		return new Case(value);
+	}
+	
+	public Case else_(Boolean value) {
+		
+		return new Case(value);
 	}
 	
 	public Query from(Table table) {
@@ -919,6 +1198,8 @@ public class Query {
 				}
 				
 				index++;
+				
+				parameters.addAll(column.parameters);
 			}
 			
 		}else {

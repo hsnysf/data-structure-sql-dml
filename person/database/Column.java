@@ -21,6 +21,7 @@ public class Column {
 	protected String alias;
 	protected List<Column> partitions = new ArrayList<Column>();
 	protected Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
+	protected List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
 	
 	public Column(String name, int type) {
 		this.name = name;
@@ -28,34 +29,42 @@ public class Column {
 		this.nameInQuery = name;
 	}
 	
-	public Column(String nameInQuery, int type, String alias) {
+	protected Column(String name, int type, List<Entry<Column, Object>> parameters) {
+		this.name = name;
+		this.type = type;
+		this.parameters.addAll(parameters);
+		this.nameInQuery = name;
+	}
+	
+	protected Column(String nameInQuery, int type, String alias) {
 		this.nameInQuery = nameInQuery;
 		this.type = type;
 		this.alias = alias;
 	}
 	
-	private Column(String name, String nameInQuery, int type, Function function, String tableAlias, String alias) {
+	private Column(String name, String nameInQuery, int type, Function function, String tableAlias, String alias, List<Entry<Column, Object>> parameters) {
 		this.name = name;
 		this.nameInQuery = nameInQuery;
 		this.type = type;
 		this.function = function;
 		this.tableAlias = tableAlias;
 		this.alias = alias;
+		this.parameters.addAll(parameters);
 	}
 	
 	public Column of(String tableAlias) {
 		
-		return new Column(name, tableAlias + "." + name, type, function, tableAlias, tableAlias + "_" + name);
+		return new Column(name, tableAlias + "." + name, type, function, tableAlias, tableAlias + "_" + name, parameters);
 	}
 	
 	public Column as(String alias) {
 		
-		return new Column(name, nameInQuery, type, function, tableAlias, alias);
+		return new Column(name, nameInQuery, type, function, tableAlias, alias, parameters);
 	}
 	
 	public Column alias(String alias) {
 		
-		return new Column(name, alias, type, function, tableAlias, alias);
+		return new Column(name, alias, type, function, tableAlias, alias, parameters);
 	}
 	
 	public Restriction equal(String value) {
@@ -393,7 +402,7 @@ public class Column {
 		return this;
 	}
 	
-	public void updateRowNumberName() {
+	private void updateRowNumberName() {
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -462,14 +471,23 @@ public class Column {
 		return new SimpleEntry<Column, Order>(this, Order.DESC);
 	}
 	
-	public Column copyWithFunction(Function function) {
+	protected Column copyWithFunction(Function function) {
 		
-		return new Column(name, function + "(" + name + ")", type, function, tableAlias, name + "_" + function);
+		return new Column(name, function + "(" + nameInQuery + ")", type, function, tableAlias, name + "_" + function, parameters);
 	}
 	
-	public Column copyWithFunction(Function function, String value) {
+	protected Column copyWithFunction(Function function, Column column) {
 		
-		return new Column(name, function + "(" + name + ", '" + value + "')", type, function, tableAlias, name + "_" + function);
+		return new Column(name, function + "(" + nameInQuery + ", " + column.nameInQuery + ")", type, function, tableAlias, name + "_" + function, parameters);
+	}
+	
+	protected Column copyWithFunction(Function function, Object value) {
+		
+		Column column = new Column(name, function + "(" + nameInQuery + ", ?)", type, function, tableAlias, name + "_" + function, parameters);
+		
+		column.parameters.add(new SimpleEntry<Column, Object>(this, value));
+		
+		return column;
 	}
 	
 	@Override

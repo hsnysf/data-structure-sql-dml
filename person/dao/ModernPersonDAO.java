@@ -290,4 +290,55 @@ public class ModernPersonDAO extends Query {
 		.where(row_number().alias("person_row_number").equal(1))
 		.executeSelect();
 	}
+	
+	public void selectPersonWithCase() throws SQLException {
+		
+		select(Person.NAME, Person.GENDER)
+		.select(
+				case_(
+						when(Person.AGE.equal(12)).then("Young"),
+						when(Person.AGE.equal(13)).then("Man"),
+						else_("Baby")
+					 )
+					.as("person_age_case")
+				)
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(Person.NAME, Person.GENDER)
+		.select(
+				case_(
+						when(Person.AGE.equal(12)).then(Person.SALARY),
+						when(Person.AGE.equal(13)).then(Person.ACCOUNT_NO),
+						else_(Person.ANNUAL_INCOME)
+					 )
+					.as("person_age_case")
+				)
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(Person.NAME, Person.GENDER)
+		.select(
+				case_(Person.AGE,
+						when(12).then("Young"),
+						when(13).then("Man"),
+						else_("Baby")
+					 )
+					.as("person_age_case")
+				)
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(Person.NAME, Person.GENDER)
+		.select(
+				case_(Person.AGE,
+						when(12).then(Person.SALARY),
+						when(13).then(Person.ACCOUNT_NO),
+						else_(Person.ANNUAL_INCOME)
+					 )
+					.as("person_age_case")
+				)
+		.from(Table.PERSON)
+		.executeSelect();
+	}
 }
