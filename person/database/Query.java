@@ -877,52 +877,52 @@ public class Query {
 		return new Case(restriction);
 	}
 	
-	public Case when(String column_value) {
+	public Case when(String columnValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = column_value;
+		case_.columnValue = columnValue;
 		return case_;
 	}
 	
-	public Case when(Character column_value) {
+	public Case when(Character columnValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = column_value;
+		case_.columnValue = columnValue;
 		return case_;
 	}
 	
-	public Case when(Number column_value) {
+	public Case when(Number columnValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = column_value;
+		case_.columnValue = columnValue;
 		return case_;
 	}
 	
-	public Case when(Date column_value) {
+	public Case when(Date columnValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = column_value;
+		case_.columnValue = columnValue;
 		return case_;
 	}
 	
-	public Case when(Timestamp column_value) {
+	public Case when(Timestamp columnValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = column_value;
+		case_.columnValue = columnValue;
 		return case_;
 	}
 	
-	public Case when(Time column_value) {
+	public Case when(Time columnValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = column_value;
+		case_.columnValue = columnValue;
 		return case_;
 	}
 	
-	public Case when(Boolean column_value) {
+	public Case when(Boolean columnValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = column_value;
+		case_.columnValue = columnValue;
 		return case_;
 	}
 	
