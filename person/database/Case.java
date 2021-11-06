@@ -11,8 +11,7 @@ public class Case {
 	protected Object value;
 	protected Object columnValue;
 	
-	public Case() {
-		
+	protected Case() {
 	}
 	
 	protected Case(Restriction restriction) {

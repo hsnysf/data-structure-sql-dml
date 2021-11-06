@@ -3,12 +3,10 @@ package person.database;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 public class Column {
@@ -19,8 +17,6 @@ public class Column {
 	protected Function function;
 	protected String tableAlias;
 	protected String alias;
-	protected List<Column> partitions = new ArrayList<Column>();
-	protected Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
 	protected List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
 	
 	public Column(String name, int type) {
@@ -65,6 +61,112 @@ public class Column {
 	public Column alias(String alias) {
 		
 		return new Column(name, alias, type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column plus(Column column) {
+		
+		return new Column(name, nameInQuery + " + " + column.nameInQuery, type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column plus(Number value) {
+		
+		Column column = new Column(name, nameInQuery + " + ?", type, function, tableAlias, alias, parameters);
+		
+		column.parameters.add(new SimpleEntry<Column, Object>(this, value));
+		
+		return column;
+	}
+	
+	public Column plusMinutes(Number value) {
+		
+		return new Column(name, nameInQuery + " + interval '" + value + " minutes'", type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column plusHours(Number value) {
+		
+		return new Column(name, nameInQuery + " + interval '" + value + " hours'", type, function, tableAlias, alias, parameters);
+	}
+
+	public Column plusDays(Number value) {
+		
+		return new Column(name, nameInQuery + " + interval '" + value + " days'", type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column plusMonths(Number value) {
+		
+		return new Column(name, nameInQuery + " + interval '" + value + " months'", type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column plusYears(Number value) {
+		
+		return new Column(name, nameInQuery + " + interval '" + value + " years'", type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column minus(Column column) {
+		
+		return new Column(name, nameInQuery + " - " + column.nameInQuery, type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column minus(Number value) {
+		
+		Column column = new Column(name, nameInQuery + " - ?", type, function, tableAlias, alias, parameters);
+		
+		column.parameters.add(new SimpleEntry<Column, Object>(this, value));
+		
+		return column;
+	}
+	
+	public Column minusMinutes(Number value) {
+		
+		return new Column(name, nameInQuery + " - interval '" + value + " minutes'", type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column minusHours(Number value) {
+		
+		return new Column(name, nameInQuery + " - interval '" + value + " hours'", type, function, tableAlias, alias, parameters);
+	}
+
+	public Column minusDays(Number value) {
+		
+		return new Column(name, nameInQuery + " - interval '" + value + " days'", type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column minusMonths(Number value) {
+		
+		return new Column(name, nameInQuery + " - interval '" + value + " months'", type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column minusYears(Number value) {
+		
+		return new Column(name, nameInQuery + " - interval '" + value + " years'", type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column multiply(Column column) {
+		
+		return new Column(name, nameInQuery + " * " + column.nameInQuery, type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column multiply(Number value) {
+		
+		Column column = new Column(name, nameInQuery + " * ?", type, function, tableAlias, alias, parameters);
+		
+		column.parameters.add(new SimpleEntry<Column, Object>(this, value));
+		
+		return column;
+	}
+	
+	public Column divide(Column column) {
+		
+		return new Column(name, nameInQuery + " / " + column.nameInQuery, type, function, tableAlias, alias, parameters);
+	}
+	
+	public Column divide(Number value) {
+		
+		Column column = new Column(name, nameInQuery + " / ?", type, function, tableAlias, alias, parameters);
+		
+		column.parameters.add(new SimpleEntry<Column, Object>(this, value));
+		
+		return column;
 	}
 	
 	public Restriction equal(String value) {
@@ -357,62 +459,22 @@ public class Column {
 		return new Restriction(this, Criteria.NOT_IN_QUERY, query);
 	}
 	
-	public Column partitionBy(Column... columns) {
-		
-		partitions.addAll(Arrays.asList(columns));
-
-		updateRowNumberName();
+	public Column over() {
 		
 		return this;
 	}
 	
-	public Column orderBy(Column... columns) {
-
-		for(Column column : columns){
-			
-			orders.put(column, Order.ASC);
-		}
-		
-		updateRowNumberName();
-		
-		return this;
-	}
-	
-	public Column orderBy(Entry<Column, Order>... entries) {
-
-		for(Entry<Column, Order> entry : entries){
-			
-			orders.put(entry.getKey(), entry.getValue());
-		}
-		
-		updateRowNumberName();
-		
-		return this;
-	}
-	
-	public Column orderByDesc(Column... columns) {
-
-		for(Column column : columns){
-			
-			orders.put(column, Order.DESC);
-		}
-		
-		updateRowNumberName();
-		
-		return this;
-	}
-	
-	private void updateRowNumberName() {
+	public Column over(RowNumber rowNumber) {
 		
 		StringBuilder builder = new StringBuilder();
 		
-		if(!partitions.isEmpty()) {
+		if(!rowNumber.partitions.isEmpty()) {
 			
 			builder.append("partition by ");
 			
 			int index = 0;
 			
-			for(Column partition : partitions) {
+			for(Column partition : rowNumber.partitions) {
 				
 				if(index != 0) {
 					
@@ -425,18 +487,18 @@ public class Column {
 			}
 		}
 		
-		if (!partitions.isEmpty() && !orders.isEmpty()) {
+		if (!rowNumber.partitions.isEmpty() && !rowNumber.orders.isEmpty()) {
 			
 			builder.append(" ");
 		}
 		
-		if (!orders.isEmpty()) {
+		if (!rowNumber.orders.isEmpty()) {
 
 			builder.append("order by ");
 
 			int index = 0;
 			
-			for(Map.Entry<Column, Order> entry : orders.entrySet()){
+			for(Map.Entry<Column, Order> entry : rowNumber.orders.entrySet()){
 				
 				Column column = entry.getKey();
 				Order order = entry.getValue();
@@ -459,6 +521,8 @@ public class Column {
 		}
 		
 		nameInQuery = "row_number() over(" + builder + ")";
+		
+		return this;
 	}
 	
 	public Entry<Column, Order> asc() {

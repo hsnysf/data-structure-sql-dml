@@ -203,7 +203,11 @@ public class ModernPersonDAO extends Query {
 		.where(Person.GPA.greater(3.12))
 		.executeSelect();
 		
-		select(coalesce(Person.DATE_OF_BIRTH, "12-12-2020"))
+		select(coalesce(Person.AGE, 20))
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(coalesce(Person.ANNUAL_INCOME, Person.SALARY))
 		.from(Table.PERSON)
 		.executeSelect();
 		
@@ -272,18 +276,32 @@ public class ModernPersonDAO extends Query {
 	public void selectPersonWithRowNumber() throws SQLException {
 		
 		select(Person.NAME, Person.GENDER, Person.AGE)
-		.select(row_number()
-				.partitionBy(Person.AGE, Person.GRADUATED)
-				.orderBy(Person.AGE.asc(), Person.CPR.desc()))
+		.select(row_number().over())
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(Person.NAME, Person.GENDER, Person.AGE)
+		.select(row_number().over(partiton_by(Person.AGE, Person.GRADUATED)))
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(Person.NAME, Person.GENDER, Person.AGE)
+		.select(row_number().over(order_by(Person.AGE.asc(), Person.GRADUATED.desc())))
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(Person.NAME, Person.GENDER, Person.AGE)
+		.select(row_number().over(
+								partiton_by(Person.AGE, Person.GRADUATED)
+								.order_by(Person.AGE.asc(), Person.GRADUATED.desc())))
 		.from(Table.PERSON)
 		.executeSelect();
 		
 		select(Person.NAME, Person.AGE)
 		.from(new Query()
 				.select(Person.NAME, Person.AGE)
-				.select(row_number()
-						.partitionBy(Person.AGE)
-						.orderBy(Person.GPA.desc())
+				.select(row_number().over(partiton_by(Person.AGE)
+						.order_by(Person.GPA.desc()))
 						.as("person_row_number"))
 				.from(Table.PERSON)
 			  ).as("person")
@@ -340,5 +358,35 @@ public class ModernPersonDAO extends Query {
 				)
 		.from(Table.PERSON)
 		.executeSelect();
+	}
+	
+	public void selectPersonWithMath() throws SQLException {
+		
+		select(Person.AGE.plus(2).as("new_age"), 
+				Person.SALARY.minus(3).as("new_salary"),
+				Person.GPA.multiply(4).as("new_gpa"), 
+				Person.ANNUAL_INCOME.divide(5).as("new_income"))
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(Person.ANNUAL_INCOME.plus(Person.SALARY).as("total"))
+		.select(Person.ANNUAL_INCOME.minus(Person.SALARY).as("minus"))
+		.select(Person.ANNUAL_INCOME.multiply(Person.SALARY).as("multiply"))
+		.select(Person.ANNUAL_INCOME.divide(Person.SALARY).as("divide"))
+		.from(Table.PERSON)
+		.executeSelect();
+		
+		select(Person.DATE_OF_BIRTH.plusDays(1), CURRENT_DATE.plusHours(2))
+		.select(Person.REGISTRATION_DATE_TIME.minusMonths(2).minusDays(2))
+		.from(Table.PERSON)
+		.executeSelect();
+	}
+	
+	public void insertPersonWithSelect() throws SQLException {
+		
+		insertInto(Table.PERSON, Person.CPR, Person.NAME)
+		.from(new Query().select(Person.CPR, Person.NAME)
+				.from(Table.PERSON).where(Person.ID.equal(1)))
+		.executeInsert();
 	}
 }

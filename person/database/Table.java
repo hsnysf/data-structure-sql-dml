@@ -13,11 +13,11 @@ public class Table {
 
 	protected String name;
 	protected String alias;
-	
+
 	private Table(String name) {
 		this.name = name;
 	}
-	
+
 	private Table(String name, String alias) {
 		this.name = name;
 		this.alias = alias;

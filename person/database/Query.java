@@ -18,6 +18,12 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 public class Query {
+	
+	public final static Column _1 = new Column("1", Types.INTEGER);
+	public final static Column CURRENT_DATE = new Column("current_date", Types.DATE);
+	public final static Column CURRENT_TIMESTAMP = new Column("current_timestamp", Types.TIMESTAMP);
+	public final static Column NOW = new Column("now()", Types.TIMESTAMP);
+	public final static Column CURRENT_TIME = new Column("current_time", Types.TIME);
 
 	protected Connection connection;
 	protected List<Column> columns = new ArrayList<Column>();
@@ -42,7 +48,7 @@ public class Query {
 		this.connection = connection;
 	}
 	
-	private void setObject(PreparedStatement statement, int index, int type, Object value) throws SQLException {
+	private static void setObject(PreparedStatement statement, int index, int type, Object value) throws SQLException {
 		
 		System.out.println("Param #" + index + " :: " + value);
 		
@@ -151,6 +157,15 @@ public class Query {
 		return this;
 	}
 	
+	public Query insertInto(Table table, Column... column) {
+
+		this.table = table;
+		
+		columns.addAll(Arrays.asList(column));
+		
+		return this;
+	}
+	
 	public Query values(Column column, String value) {
 		
 		values.put(column, value);
@@ -204,47 +219,80 @@ public class Query {
 		
 		int id = 0;
 		
-		StringBuilder columnList = new StringBuilder();
-		
-		StringBuilder valueList = new StringBuilder();
-		
-		int index = 0;
-		
-		for(Column column : values.keySet()) {
-			
-			if(index != 0){
-				
-				columnList.append(", ");
-				valueList.append(", ");
-			}
-			
-			columnList.append(column);
-			
-			valueList.append("?");
-			
-			index++;
-		}
-		
 		StringBuilder builder = new StringBuilder();
 		
-		builder.append("insert into ");
-		builder.append(table);
-		builder.append(" (");
-		builder.append(columnList);
-		builder.append(") values (");
-		builder.append(valueList);
-		builder.append(")");
+		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		
+		StringBuilder columnList = new StringBuilder();
+		
+		if(!values.isEmpty()) {
+			
+			int index = 0;
+			
+			StringBuilder valueList = new StringBuilder();
+			
+			for(Map.Entry<Column, Object> entry : values.entrySet()) {
+				
+				Column column = entry.getKey();
+				Object value = entry.getValue();
+				
+				if(index != 0){
+					
+					columnList.append(", ");
+					valueList.append(", ");
+				}
+				
+				columnList.append(column);
+				
+				valueList.append("?");
+				
+				index++;
+				
+				parameters.add(new SimpleEntry<Column, Object>(column, value));
+			}
+			
+			builder.append("insert into ");
+			builder.append(table);
+			builder.append(" (");
+			builder.append(columnList);
+			builder.append(") values (");
+			builder.append(valueList);
+			builder.append(")");
+			
+		}else if(!columns.isEmpty() && fromQuery != null) {
+			
+			int index = 0;
+			
+			for(Column column : columns) {
+				
+				if(index != 0){
+					
+					columnList.append(", ");
+				}
+				
+				columnList.append(column);
+				
+				index++;
+			}
+
+			builder.append("insert into ");
+			builder.append(table);
+			builder.append(" (");
+			builder.append(columnList);
+			builder.append(") ");
+			builder.append(fromQuery.getSelectQuery(parameters));
+		}
 		
 		System.out.println("SQL Query :: " + builder);
 		
 		try(PreparedStatement statement = connection.prepareStatement(builder.toString(), PreparedStatement.RETURN_GENERATED_KEYS)){
 			
-			index = 1;
+			int index = 1;
 			
-			for(Map.Entry<Column, Object> entry : values.entrySet()){
+			for(Entry<Column, Object> parameter : parameters) {
 				
-				Column column = entry.getKey();
-				Object value = entry.getValue();
+				Column column = parameter.getKey();
+				Object value = parameter.getValue();
 				
 				setObject(statement, index, column.type, value);
 				
@@ -267,6 +315,10 @@ public class Query {
 		table = null;
 		
 		values.clear();
+		
+		columns.clear();
+		
+		fromQuery = null;
 		
 		return id;
 	}
@@ -318,7 +370,7 @@ public class Query {
 		return new Restriction(Criteria.NOT_EXISTS, query);
 	}
 	
-	private StringBuilder buildRestriction(Restriction restriction, List<Entry<Column, Object>> parameters){
+	private static StringBuilder buildRestriction(Restriction restriction, List<Entry<Column, Object>> parameters){
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -640,9 +692,9 @@ public class Query {
 		return count;
 	}
 	
-	public Query select(Column... column) {
+	public Query select(Column... columns) {
 
-		columns.addAll(Arrays.asList(column));
+		this.columns.addAll(Arrays.asList(columns));
 		
 		return this;
 	}
@@ -717,12 +769,53 @@ public class Query {
 		return column.copyWithFunction(Function.COALESCE, value);
 	}
 	
-	public Column row_number() {
+	public static Column row_number() {
 		
 		return new Column("row_number() over()", Types.INTEGER, "row_num");
 	}
 	
-	public int getObjectType(Object value) {
+	public static RowNumber partiton_by(Column... columns) {
+		
+		return new RowNumber(Arrays.asList(columns));
+	}
+	
+	public static RowNumber order_by(Column... columns) {
+
+		Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
+		
+		for(Column column : columns){
+			
+			orders.put(column, Order.ASC);
+		}
+		
+		return new RowNumber(orders);
+	}
+	
+	public static RowNumber order_by(Entry<Column, Order>... entries) {
+
+		Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
+		
+		for(Entry<Column, Order> entry : entries){
+			
+			orders.put(entry.getKey(), entry.getValue());
+		}
+		
+		return new RowNumber(orders);
+	}
+	
+	public static RowNumber order_by_desc(Column... columns) {
+
+		Map<Column, Order> orders = new LinkedHashMap<Column, Order>();
+		
+		for(Column column : columns){
+			
+			orders.put(column, Order.DESC);
+		}
+		
+		return new RowNumber(orders);
+	}
+	
+	private static int getObjectType(Object value) {
 		
 		if(value instanceof String) {
 			return Types.VARCHAR;
@@ -753,7 +846,7 @@ public class Query {
 		}
 	}
 
-	public Column case_(Case... cases) {
+	public static Column case_(Case... cases) {
 		
 		int type = -1;
 		
@@ -812,7 +905,7 @@ public class Query {
 		return new Column(builder.toString(), type, parameters);
 	}
 	
-	public Column case_(Column column, Case... cases) {
+	public static Column case_(Column column, Case... cases) {
 		
 		int type = -1;
 		
@@ -1403,6 +1496,8 @@ public class Query {
 		columns.clear();
 		
 		table = null;
+		
+		fromQuery = null;
 		
 		relations.clear();
 		
