@@ -400,6 +400,7 @@ public class Query {
 			builder.append(" ");
 			builder.append("?");
 			
+			parameters.addAll(restriction.column.parameters);
 			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
 			
 		}else if(restriction.criteria == Criteria.LIKE){
@@ -410,6 +411,7 @@ public class Query {
 			builder.append(" ");
 			builder.append("'%' || ? || '%'");
 			
+			parameters.addAll(restriction.column.parameters);
 			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
 		
 		}else if(restriction.criteria == Criteria.EQUAL_COLUMN 
@@ -425,6 +427,9 @@ public class Query {
 			builder.append(" ");
 			builder.append(restriction.column2);
 			
+			parameters.addAll(restriction.column.parameters);
+			parameters.addAll(restriction.column2.parameters);
+			
 		}else if(restriction.criteria == Criteria.IS_NULL 
 				|| restriction.criteria == Criteria.IS_NOT_NULL){
 			
@@ -432,8 +437,12 @@ public class Query {
 			builder.append(" ");
 			builder.append(restriction.criteria);
 			
+			parameters.addAll(restriction.column.parameters);
+			
 		}else if(restriction.criteria == Criteria.IN
 					|| restriction.criteria == Criteria.NOT_IN){
+			
+			parameters.addAll(restriction.column.parameters);
 			
 			builder.append(restriction.column);
 			builder.append(" ");
@@ -467,6 +476,7 @@ public class Query {
 			builder.append(Operator.AND);
 			builder.append(" ?");
 			
+			parameters.addAll(restriction.column.parameters);
 			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
 			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.to));
 		
@@ -481,9 +491,15 @@ public class Query {
 			builder.append(Operator.AND);
 			builder.append(" ");
 			builder.append(restriction.column3);
+			
+			parameters.addAll(restriction.column.parameters);
+			parameters.addAll(restriction.column2.parameters);
+			parameters.addAll(restriction.column3.parameters);
 		
 		}else if(restriction.criteria == Criteria.IN_QUERY
 					|| restriction.criteria == Criteria.NOT_IN_QUERY){
+			
+			parameters.addAll(restriction.column.parameters);
 			
 			builder.append(restriction.column);
 			builder.append(" ");
