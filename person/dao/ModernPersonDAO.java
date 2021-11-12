@@ -393,6 +393,15 @@ public class ModernPersonDAO extends Query {
 		.executeSelect();
 	}
 	
+	public void insertPersonWithSelect() throws SQLException {
+		
+		insertInto(Table.PERSON, Person.CPR, Person.NAME)
+			.from(new Query().select(Person.CPR, Person.NAME)
+					.from(Table.PERSON).where(Person.ID.equal(1)))
+			.executeInsert();
+	}
+	
+	
 	public void insertPersonWithString() throws SQLException {
 		
 		insertInto(Table.PERSON)

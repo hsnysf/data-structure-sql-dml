@@ -360,6 +360,18 @@ public class Query {
 		return this;
 	}
 	
+	public Query values(Column column, String... value) {
+		
+		try {
+			
+			values.put(column, connection.createArrayOf("varchar", value));
+		
+		} catch (SQLException e) {
+		}
+		
+		return this;
+	}
+	
 	public int executeInsert() throws SQLException {
 		
 		int id = 0;
@@ -792,6 +804,18 @@ public class Query {
 		try {
 			
 			values.put(column, connection.createArrayOf("varchar", value.toArray()));
+		
+		} catch (SQLException e) {
+		}
+		
+		return this;
+	}
+	
+	public Query set(Column column, String... value) {
+		
+		try {
+			
+			values.put(column, connection.createArrayOf("varchar", value));
 		
 		} catch (SQLException e) {
 		}
