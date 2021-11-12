@@ -49,11 +49,12 @@ create table public.person
   prsn_account_no bigint default 12345678912345,
   prsn_gpa float default 3.14,
   prsn_salary double precision default 666.55,
-  prsn_annual_income decimal default 9000.55 ,
+  prsn_annual_income decimal default 9000.55,
   prsn_date_of_birth date default '2010-10-10',
   prsn_registration_date_time timestamp default '2010-10-10 05:05:56',
   prsn_sleep_time time default '10:10:10',
   prsn_graduated boolean default true,
+  prsn_certificates character varying(100)[],
   prsn_city_id integer,
   prsn_school_id integer,
   prsn_country_id integer,
@@ -125,7 +126,7 @@ and prsn_annual_income = 100.6
 and prsn_date_of_birth = '1988-01-27'
 and prsn_registration_date_time = '2000-01-27 10:10:10'
 and prsn_sleep_time = '20:30'
-and prsn_graduated = true
+and prsn_graduated = true;
 
 select
 prsn_name, prsn_gender, prsn_age, 
@@ -164,7 +165,7 @@ and exists (select dctr_id
 and not exists (select dctr_id 
 					from public.doctor 
 					where dctr_cpr = prsn_cpr and dctr_hospital = 'Bin Hayan') 
-order by prsn_id, prsn_name desc
+order by prsn_id, prsn_name desc;
 
 select prsn_name, prsn_gender, prsn_age from public.person where prsn_id = 1
 union
@@ -186,25 +187,25 @@ select  count(prsn_id) as prsn_id_count,
 		min(prsn_cpr) as prsn_cpr_min, 
 		max(prsn_gpa) as prsn_gpa_max 
 from public.person 
-where prsn_id = ? 
+where prsn_id = 1 
 group by prsn_gender, prsn_age 
 having (count(prsn_id) > 10 and sum(prsn_salary) < 100) 
-order by prsn_gender
+order by prsn_gender;
 
 select distinct(prsn_date_of_birth) as prsn_date_of_birth_distinct 
 from public.person 
-where prsn_gpa > 3.12
+where prsn_gpa > 3.12;
 
 select coalesce(prsn_date_of_birth, '12-12-2020') 
 				as prsn_date_of_birth_coalesce 
-from public.person
+from public.person;
 
 select prsn_date_of_birth, 
 count(prsn_id) as prsn_id_count 
 from public.person 
 group by prsn_date_of_birth 
 having count(prsn_id) > 2
-order by prsn_date_of_birth
+order by prsn_date_of_birth;
 
 select  prsn_name, prsn_gender, prsn_age, 
 		home_address.addr_road as home_address_addr_road, 
@@ -216,20 +217,20 @@ inner join public.address as home_address
 			on prsn_home_address_id = home_address.addr_id 
 inner join public.address as work_address 
 			on prsn_work_address_id = work_address.addr_id 
-where prsn_id = 1
+where prsn_id = 1;
 
 select prsn_name, prsn_gender, prsn_age 
 from public.person
 inner join public.doctor on dctr_cpr = prsn_cpr
 where prsn_gender = 'M'
-and dctr_hospital = 'Alkindi'
+and dctr_hospital = 'Alkindi';
 
 select prsn_name, prsn_gender, prsn_age 
 from 
 	(select * from public.person where prsn_gender = 'M') as male_person 
 inner join 
 	(select * from public.doctor where dctr_hospital = 'Alkindi') as alkindi_doctor 
-	on dctr_cpr = prsn_cpr
+	on dctr_cpr = prsn_cpr;
 
 select * 
 from 
@@ -249,12 +250,12 @@ inner join
 			where ct_name = 'Manama'
 		) as city_name
 		  on prsn_city_id = ct_id
-where prsn_gpa = 3.12
+where prsn_gpa = 3.12;
 
 select prsn_name, prsn_gender, 
 		prsn_age, row_number() over(partition by prsn_age, prsn_graduated 
 									order by prsn_age, prsn_cpr desc) as row_num 
-from public.person
+from public.person;
 
 select prsn_name, prsn_age 
 from (
@@ -263,4 +264,4 @@ from (
 									order by prsn_gpa desc) as person_row_number 
 		from public.person
 	 ) as person 
-where person_row_number = 1
+where person_row_number = 1;
