@@ -129,6 +129,10 @@ public class GeneratorUtils {
 			 
 			 return "CHAR";
 			 
+		}else if(columnType == Types.ARRAY){
+			 
+			 return "ARRAY";
+			 
 		}else {
 			
 			return null;

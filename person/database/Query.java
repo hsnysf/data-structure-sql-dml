@@ -1,6 +1,7 @@
 package person.database;
 
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -9,12 +10,13 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 
 public class Query {
@@ -147,7 +149,131 @@ public class Query {
 			}else {
 				statement.setNull(index, Types.BOOLEAN);
 			}
+		
+		}else if(type == Types.ARRAY){
+			
+			if(value != null) {
+				statement.setArray(index, (Array)value);
+			}else {
+				statement.setNull(index, Types.ARRAY);
+			}
 		}
+	}
+	
+	protected static Object getValue(Column column, String value) {
+		
+		if(value == null || "".equals(value.trim())) {
+			
+			return null;
+			
+		}else if(column.type == Types.VARCHAR){
+			
+			return value.trim();
+			
+		}else if(column.type == Types.CHAR){
+			
+			return value.trim().charAt(0);
+			
+		}else if(column.type == Types.SMALLINT){
+			
+			return Short.parseShort(value.trim());
+			
+		}else if(column.type == Types.INTEGER){
+			
+			return Integer.parseInt(value.trim());
+			
+		}else if(column.type == Types.BIGINT){
+			
+			return Long.parseLong(value.trim());
+			
+		}else if(column.type == Types.FLOAT){
+			
+			return Float.parseFloat(value.trim());
+			
+		}else if(column.type == Types.DOUBLE){
+			
+			return Double.parseDouble(value.trim());
+			
+		}else if(column.type == Types.DECIMAL){
+			
+			return new BigDecimal(value.trim());
+			
+		}else if(column.type == Types.DATE){
+			
+			try {
+				return new Date(new SimpleDateFormat("dd-MM-yyyy").parse(value.trim()).getTime());
+			} catch (Exception e) {
+				return null;
+			}
+
+  		}else if(column.type == Types.TIMESTAMP){
+			
+ 			try {
+				return new Timestamp(new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse(value.trim()).getTime());
+			} catch (Exception e) {
+				return null;
+			}
+ 			
+		}else if(column.type == Types.TIME){
+			
+			return Time.valueOf(value.trim());
+ 			
+		}else if(column.type == Types.BOOLEAN){
+			
+			return Boolean.parseBoolean(value.trim());
+			
+		}else {
+			
+			return value;
+		}
+	}
+	
+	protected static Object[] getValues(Column column, String[] values) {
+		
+		Object[] newValues = new Object[values.length];
+		
+		for(int i=0; i<values.length; i++) {
+			
+			newValues[i] = Query.getValue(column, values[i]);
+		}
+		
+		return newValues;
+	}
+	
+	protected static Object getValue(Column column, java.util.Date value) {
+		
+		if(value == null) {
+			
+			return null;
+			
+		}else if(column.type == Types.DATE){
+			
+			return new Date(value.getTime());
+
+  		}else if(column.type == Types.TIMESTAMP){
+			
+ 			return new Timestamp(value.getTime());
+ 			
+		}else if(column.type == Types.TIME){
+			
+			return new Time(value.getTime());
+ 			
+		}else {
+			
+			return value;
+		}
+	}
+	
+	protected static Object[] getValues(Column column, java.util.Date[] values) {
+		
+		Object[] newValues = new Object[values.length];
+		
+		for(int i=0; i<values.length; i++) {
+			
+			newValues[i] = Query.getValue(column, values[i]);
+		}
+		
+		return newValues;
 	}
 	
 	public Query insertInto(Table table) {
@@ -168,7 +294,7 @@ public class Query {
 	
 	public Query values(Column column, String value) {
 		
-		values.put(column, value);
+		values.put(column, getValue(column, value));
 		
 		return this;
 	}
@@ -183,6 +309,13 @@ public class Query {
 	public Query values(Column column, Number value) {
 		
 		values.put(column, value);
+		
+		return this;
+	}
+	
+	public Query values(Column column, java.util.Date value) {
+		
+		values.put(column, getValue(column, value));
 		
 		return this;
 	}
@@ -211,6 +344,18 @@ public class Query {
 	public Query values(Column column, Boolean value) {
 		
 		values.put(column, value);
+		
+		return this;
+	}
+	
+	public Query values(Column column, List<String> value) {
+		
+		try {
+			
+			values.put(column, connection.createArrayOf("varchar", value.toArray()));
+		
+		} catch (SQLException e) {
+		}
 		
 		return this;
 	}
@@ -588,7 +733,7 @@ public class Query {
 	
 	public Query set(Column column, String value) {
 		
-		values.put(column, value);
+		values.put(column, getValue(column, value));
 		
 		return this;
 	}
@@ -603,6 +748,13 @@ public class Query {
 	public Query set(Column column, Number value) {
 		
 		values.put(column, value);
+		
+		return this;
+	}
+	
+	public Query set(Column column, java.util.Date value) {
+		
+		values.put(column, getValue(column, value));
 		
 		return this;
 	}
@@ -631,6 +783,18 @@ public class Query {
 	public Query set(Column column, Boolean value) {
 		
 		values.put(column, value);
+		
+		return this;
+	}
+	
+	public Query set(Column column, List<String> value) {
+		
+		try {
+			
+			values.put(column, connection.createArrayOf("varchar", value.toArray()));
+		
+		} catch (SQLException e) {
+		}
 		
 		return this;
 	}

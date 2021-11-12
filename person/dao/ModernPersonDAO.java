@@ -2,6 +2,8 @@ package person.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Date;
 
 import person.column.Address;
 import person.column.City;
@@ -369,6 +371,14 @@ public class ModernPersonDAO extends Query {
 		.from(Table.PERSON)
 		.executeSelect();
 		
+		select(Person.ID)
+		.from(Table.PERSON)
+		.where(Person.AGE.plus(2).equal(1))
+		.and(Person.SALARY.minus(3).equal(2))
+		.and(Person.GPA.multiply(4).equal(3))
+		.and(Person.ANNUAL_INCOME.divide(5).equal(4))
+ 		.executeSelect();
+		
 		select(Person.ANNUAL_INCOME.plus(Person.SALARY).as("total"))
 		.select(Person.ANNUAL_INCOME.minus(Person.SALARY).as("minus"))
 		.select(Person.ANNUAL_INCOME.multiply(Person.SALARY).as("multiply"))
@@ -379,14 +389,153 @@ public class ModernPersonDAO extends Query {
 		select(Person.DATE_OF_BIRTH.plusDays(1), CURRENT_DATE.plusHours(2))
 		.select(Person.REGISTRATION_DATE_TIME.minusMonths(2).minusDays(2))
 		.from(Table.PERSON)
+		.where(Person.DATE_OF_BIRTH.plusDays(1).equal(CURRENT_DATE))
 		.executeSelect();
 	}
 	
-	public void insertPersonWithSelect() throws SQLException {
+	public void insertPersonWithString() throws SQLException {
 		
-		insertInto(Table.PERSON, Person.CPR, Person.NAME)
-		.from(new Query().select(Person.CPR, Person.NAME)
-				.from(Table.PERSON).where(Person.ID.equal(1)))
+		insertInto(Table.PERSON)
+		.values(Person.NAME, "Hasan")
+		.values(Person.GENDER, "M")
+		.values(Person.AGE, "23")
+		.values(Person.CPR, "880101")
+		.values(Person.ACCOUNT_NO, "324234")
+		.values(Person.GPA, "4324")
+		.values(Person.SALARY, "400")
+		.values(Person.ANNUAL_INCOME, "500")
+		.values(Person.DATE_OF_BIRTH, "12-12-2000")
+		.values(Person.REGISTRATION_DATE_TIME, "04-04-2010 04:04:04")
+		.values(Person.SLEEP_TIME, "04:04:04")
+		.values(Person.GRADUATED, "true")
 		.executeInsert();
 	}
+	
+	public void updatePersonWithString() throws SQLException {
+		
+		update(Table.PERSON)
+		.set(Person.NAME, "Hasan")
+		.set(Person.GENDER, "M")
+		.set(Person.AGE, "23")
+		.set(Person.CPR, "880101")
+		.set(Person.ACCOUNT_NO, "324234")
+		.set(Person.GPA, "4324")
+		.set(Person.SALARY, "400")
+		.set(Person.ANNUAL_INCOME, "500")
+		.set(Person.DATE_OF_BIRTH, "12-12-2000")
+		.set(Person.REGISTRATION_DATE_TIME, "04-04-2010 04:04:04")
+		.set(Person.SLEEP_TIME, "04:04:04")
+		.set(Person.GRADUATED, "true")
+		.executeUpdate();
+ 	}
+	
+	public void selectPersonWithString() throws SQLException {
+		
+		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+		.from(Table.PERSON)
+		.where(Person.ID.equal("1"))
+		.where(Person.NAME.equal("Hasan"))
+		.and(Person.GENDER.notEqual("M"))
+		.and(Person.CPR.greater("88111111"))
+		.and(Person.ACCOUNT_NO.greaterEqual("43543553"))
+		.and(Person.GPA.less("3.12"))
+		.and(Person.SALARY.lessEqual("500"))
+		.and(Person.ANNUAL_INCOME.lessEqual("100"))
+		.and(Person.DATE_OF_BIRTH.in("12-12-2000", "13-12-2000"))
+		.and(Person.REGISTRATION_DATE_TIME.notIn("14-12-2000 05:05:05", "15-12-2000 05:05:05"))
+		.and(Person.SLEEP_TIME.between("08:10:10", "10:30:10"))
+		.executeSelect();
+	}
+	
+	public void insertPersonWithDate() throws SQLException {
+		
+		insertInto(Table.PERSON)
+		.values(Person.NAME, "Hasan")
+		.values(Person.GENDER, "M")
+		.values(Person.AGE, "23")
+		.values(Person.CPR, "880101")
+		.values(Person.ACCOUNT_NO, "324234")
+		.values(Person.GPA, "4324")
+		.values(Person.SALARY, "400")
+		.values(Person.ANNUAL_INCOME, "500")
+		.values(Person.DATE_OF_BIRTH, new Date())
+		.values(Person.REGISTRATION_DATE_TIME, new Date())
+		.values(Person.SLEEP_TIME, new Date())
+		.values(Person.GRADUATED, "true")
+		.executeInsert();
+	}
+	
+	public void updatePersonWithDate() throws SQLException {
+		
+		update(Table.PERSON)
+		.set(Person.NAME, "Hasan")
+		.set(Person.GENDER, "M")
+		.set(Person.AGE, "23")
+		.set(Person.CPR, "880101")
+		.set(Person.ACCOUNT_NO, "324234")
+		.set(Person.GPA, "4324")
+		.set(Person.SALARY, "400")
+		.set(Person.ANNUAL_INCOME, "500")
+		.set(Person.DATE_OF_BIRTH, new Date())
+		.set(Person.REGISTRATION_DATE_TIME, new Date())
+		.set(Person.SLEEP_TIME, new Date())
+		.set(Person.GRADUATED, "true")
+		.where(Person.ID.equal(1))
+		.executeUpdate();
+ 	}
+	
+	public void selectPersonWithDate() throws SQLException {
+		
+		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+		.from(Table.PERSON)
+		.where(Person.DATE_OF_BIRTH.equal(new Date()))
+		.and(Person.REGISTRATION_DATE_TIME.notEqual(new Date()))
+		.and(Person.SLEEP_TIME.greater(new Date()))
+		.and(Person.DATE_OF_BIRTH.less(new Date()))
+		.and(Person.REGISTRATION_DATE_TIME.lessEqual(new Date()))
+		.and(Person.SLEEP_TIME.greaterEqual(new Date()))
+		.and(Person.DATE_OF_BIRTH.in(new Date(), new Date()))
+		.and(Person.REGISTRATION_DATE_TIME.notIn(new Date(), new Date()))
+		.and(Person.SLEEP_TIME.between(new Date(), new Date()))
+		.executeSelect();
+	}
+	
+	public void insertPersonWithArray() throws SQLException {
+		
+		insertInto(Table.PERSON)
+		.values(Person.NAME, "Hasan")
+		.values(Person.GENDER, "M")
+		.values(Person.AGE, "23")
+		.values(Person.CPR, "880101")
+		.values(Person.ACCOUNT_NO, "324234")
+		.values(Person.GPA, "4324")
+		.values(Person.SALARY, "400")
+		.values(Person.ANNUAL_INCOME, "500")
+		.values(Person.DATE_OF_BIRTH, new Date())
+		.values(Person.REGISTRATION_DATE_TIME, new Date())
+		.values(Person.SLEEP_TIME, new Date())
+		.values(Person.GRADUATED, "true")
+		.values(Person.CERTIFICATES, Arrays.asList("DB2", "Java"))
+		.executeInsert();
+	}
+	
+	public void updatePersonWithArray() throws SQLException {
+		
+		update(Table.PERSON)
+		.set(Person.NAME, "Hasan")
+		.set(Person.GENDER, "M")
+		.set(Person.AGE, "23")
+		.set(Person.CPR, "880101")
+		.set(Person.ACCOUNT_NO, "324234")
+		.set(Person.GPA, "4324")
+		.set(Person.SALARY, "400")
+		.set(Person.ANNUAL_INCOME, "500")
+		.set(Person.DATE_OF_BIRTH, new Date())
+		.set(Person.REGISTRATION_DATE_TIME, new Date())
+		.set(Person.SLEEP_TIME, new Date())
+		.set(Person.GRADUATED, "true")
+		.set(Person.CERTIFICATES, Arrays.asList("Postgres", "JavaEE"))
+		.where(Person.ID.equal(1))
+		.executeUpdate();
+ 	}
 }

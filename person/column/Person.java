@@ -18,6 +18,7 @@ public interface Person {
 	Column REGISTRATION_DATE_TIME = new Column("prsn_registration_date_time", Types.TIMESTAMP);
 	Column SLEEP_TIME = new Column("prsn_sleep_time", Types.TIME);
 	Column GRADUATED = new Column("prsn_graduated", Types.BOOLEAN);
+	Column CERTIFICATES = new Column("prsn_certificates", Types.ARRAY);
 	Column CITY_ID = new Column("prsn_city_id", Types.INTEGER);
 	Column SCHOOL_ID = new Column("prsn_school_id", Types.INTEGER);
 	Column COUNTRY_ID = new Column("prsn_country_id", Types.INTEGER);
