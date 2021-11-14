@@ -17,7 +17,7 @@ public class Column {
 	protected Function function;
 	protected String tableAlias;
 	protected String alias;
-	protected List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+	protected List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
 	
 	public Column(String name, int type) {
 		this.name = name;
@@ -25,7 +25,7 @@ public class Column {
 		this.nameInQuery = name;
 	}
 	
-	protected Column(String name, int type, List<Entry<Column, Object>> parameters) {
+	protected Column(String name, int type, List<Entry<Integer, Object>> parameters) {
 		this.name = name;
 		this.type = type;
 		this.parameters.addAll(parameters);
@@ -38,7 +38,7 @@ public class Column {
 		this.alias = alias;
 	}
 	
-	private Column(String name, String nameInQuery, int type, Function function, String tableAlias, String alias, List<Entry<Column, Object>> parameters) {
+	private Column(String name, String nameInQuery, int type, Function function, String tableAlias, String alias, List<Entry<Integer, Object>> parameters) {
 		this.name = name;
 		this.nameInQuery = nameInQuery;
 		this.type = type;
@@ -72,7 +72,7 @@ public class Column {
 		
 		Column column = new Column(name, nameInQuery + " + ?", type, function, tableAlias, alias, parameters);
 		
-		column.parameters.add(new SimpleEntry<Column, Object>(this, value));
+		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
 		return column;
 	}
@@ -111,7 +111,7 @@ public class Column {
 		
 		Column column = new Column(name, nameInQuery + " - ?", type, function, tableAlias, alias, parameters);
 		
-		column.parameters.add(new SimpleEntry<Column, Object>(this, value));
+		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
 		return column;
 	}
@@ -150,7 +150,7 @@ public class Column {
 		
 		Column column = new Column(name, nameInQuery + " * ?", type, function, tableAlias, alias, parameters);
 		
-		column.parameters.add(new SimpleEntry<Column, Object>(this, value));
+		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
 		return column;
 	}
@@ -164,7 +164,7 @@ public class Column {
 		
 		Column column = new Column(name, nameInQuery + " / ?", type, function, tableAlias, alias, parameters);
 		
-		column.parameters.add(new SimpleEntry<Column, Object>(this, value));
+		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
 		return column;
 	}
@@ -594,7 +594,7 @@ public class Column {
 		
 		Column column = new Column(name, function + "(" + nameInQuery + ", ?)", type, function, tableAlias, name + "_" + function, parameters);
 		
-		column.parameters.add(new SimpleEntry<Column, Object>(this, value));
+		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
 		return column;
 	}

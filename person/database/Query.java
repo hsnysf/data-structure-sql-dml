@@ -378,7 +378,7 @@ public class Query {
 		
 		StringBuilder builder = new StringBuilder();
 		
-		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
 		
 		StringBuilder columnList = new StringBuilder();
 		
@@ -405,7 +405,7 @@ public class Query {
 				
 				index++;
 				
-				parameters.add(new SimpleEntry<Column, Object>(column, value));
+				parameters.add(new SimpleEntry<Integer, Object>(column.type, value));
 			}
 			
 			builder.append("insert into ");
@@ -446,12 +446,12 @@ public class Query {
 			
 			int index = 1;
 			
-			for(Entry<Column, Object> parameter : parameters) {
+			for(Entry<Integer, Object> parameter : parameters) {
 				
-				Column column = parameter.getKey();
+				Integer type = parameter.getKey();
 				Object value = parameter.getValue();
 				
-				setObject(statement, index, column.type, value);
+				setObject(statement, index, type, value);
 				
 				index++;
 			}
@@ -527,7 +527,7 @@ public class Query {
 		return new Restriction(Criteria.NOT_EXISTS, query);
 	}
 	
-	private static StringBuilder buildRestriction(Restriction restriction, List<Entry<Column, Object>> parameters){
+	private static StringBuilder buildRestriction(Restriction restriction, List<Entry<Integer, Object>> parameters){
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -558,7 +558,7 @@ public class Query {
 			builder.append("?");
 			
 			parameters.addAll(restriction.column.parameters);
-			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
+			parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.value));
 			
 		}else if(restriction.criteria == Criteria.LIKE){
 			
@@ -569,7 +569,7 @@ public class Query {
 			builder.append("'%' || ? || '%'");
 			
 			parameters.addAll(restriction.column.parameters);
-			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
+			parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.value));
 		
 		}else if(restriction.criteria == Criteria.EQUAL_COLUMN 
 				|| restriction.criteria == Criteria.NOT_EQUAL_COLUMN 
@@ -617,7 +617,7 @@ public class Query {
 				
 				builder.append("?");
 				
-				parameters.add(new SimpleEntry<Column, Object>(restriction.column, value));
+				parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, value));
 				
 				index++;
 			}
@@ -634,8 +634,8 @@ public class Query {
 			builder.append(" ?");
 			
 			parameters.addAll(restriction.column.parameters);
-			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.value));
-			parameters.add(new SimpleEntry<Column, Object>(restriction.column, restriction.to));
+			parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.value));
+			parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.to));
 		
 		}else if(restriction.criteria == Criteria.BETWEEN_COLUMNS){
 			
@@ -691,7 +691,7 @@ public class Query {
 		
 		int count = 0;
 		
-		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -714,12 +714,12 @@ public class Query {
 			
 			int index = 1;
 			
-			for(Entry<Column, Object> parameter : parameters) {
+			for(Entry<Integer, Object> parameter : parameters) {
 				
-				Column column = parameter.getKey();
+				Integer type = parameter.getKey();
 				Object value = parameter.getValue();
 				
-				setObject(statement, index, column.type, value);
+				setObject(statement, index, type, value);
 				
 				index++;
 			}
@@ -827,7 +827,7 @@ public class Query {
 		
 		int count = 0;
 		
-		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -851,7 +851,7 @@ public class Query {
 			builder.append(column);
 			builder.append(" = ?");
 			
-			parameters.add(new SimpleEntry<Column, Object>(column, value));
+			parameters.add(new SimpleEntry<Integer, Object>(column.type, value));
 			
 			index++;
 		}
@@ -872,12 +872,12 @@ public class Query {
 			
 			index = 1;
 			
-			for(Entry<Column, Object> parameter : parameters) {
+			for(Entry<Integer, Object> parameter : parameters) {
 				
-				Column column = parameter.getKey();
+				Integer type = parameter.getKey();
 				Object value = parameter.getValue();
 				
-				setObject(statement, index, column.type, value);
+				setObject(statement, index, type, value);
 				
 				index++;
 			}
@@ -1054,7 +1054,7 @@ public class Query {
 		
 		int type = -1;
 		
-		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -1080,7 +1080,7 @@ public class Query {
 					
 					type = getObjectType(case_.value);
 					
-					parameters.add(new SimpleEntry<Column, Object>(new Column("case", type), case_.value));
+					parameters.add(new SimpleEntry<Integer, Object>(type, case_.value));
 				}
 				
 			}else {
@@ -1099,7 +1099,7 @@ public class Query {
 					
 					type = getObjectType(case_.value);
 					
-					parameters.add(new SimpleEntry<Column, Object>(new Column("case", type), case_.value));
+					parameters.add(new SimpleEntry<Integer, Object>(type, case_.value));
 				}
 			}
 		}
@@ -1113,7 +1113,7 @@ public class Query {
 		
 		int type = -1;
 		
-		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -1126,7 +1126,7 @@ public class Query {
 				
 				builder.append(" when ? then ");
 				
-				parameters.add(new SimpleEntry<Column, Object>(new Column("case", getObjectType(case_.columnValue)), case_.columnValue));
+				parameters.add(new SimpleEntry<Integer, Object>(getObjectType(case_.columnValue), case_.columnValue));
 				
 				if(case_.column != null) {
 					
@@ -1140,7 +1140,7 @@ public class Query {
 					
 					type = getObjectType(case_.value);
 					
-					parameters.add(new SimpleEntry<Column, Object>(new Column("case", type), case_.value));
+					parameters.add(new SimpleEntry<Integer, Object>(type, case_.value));
 				}
 				
 			}else {
@@ -1159,7 +1159,7 @@ public class Query {
 					
 					type = getObjectType(case_.value);
 					
-					parameters.add(new SimpleEntry<Column, Object>(new Column("case", type), case_.value));
+					parameters.add(new SimpleEntry<Integer, Object>(type, case_.value));
 				}
 			}
 		}
@@ -1469,7 +1469,7 @@ public class Query {
 		return this;
 	}
 	
-	private StringBuilder getSelectQuery(List<Entry<Column, Object>> parameters) {
+	private StringBuilder getSelectQuery(List<Entry<Integer, Object>> parameters) {
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -1634,14 +1634,14 @@ public class Query {
 			
 			builder.append(" limit ?");
 
-			parameters.add(new SimpleEntry<Column, Object>(new Column("limit", Types.INTEGER), limit));
+			parameters.add(new SimpleEntry<Integer, Object>(Types.INTEGER, limit));
 		}
 		
 		if(offset != null && offset != 0) {
 			
 			builder.append(" offset ?");
 			
-			parameters.add(new SimpleEntry<Column, Object>(new Column("offset", Types.INTEGER), offset));
+			parameters.add(new SimpleEntry<Integer, Object>(Types.INTEGER, offset));
 		}
 		
 		if(!combineQueries.isEmpty()) {
@@ -1667,7 +1667,7 @@ public class Query {
 		
 		ResultSet result = null;
 		
-		List<Entry<Column, Object>> parameters = new ArrayList<Entry<Column, Object>>();
+		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
 		
 		StringBuilder builder = getSelectQuery(parameters);
 		
@@ -1677,12 +1677,12 @@ public class Query {
 			
 			int index = 1;
 			
-			for(Entry<Column, Object> parameter : parameters) {
+			for(Entry<Integer, Object> parameter : parameters) {
 				
-				Column column = parameter.getKey();
+				Integer type = parameter.getKey();
 				Object value = parameter.getValue();
 				
-				setObject(statement, index, column.type, value);
+				setObject(statement, index, type, value);
 				
 				index++;
 			}
