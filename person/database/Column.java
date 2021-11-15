@@ -171,7 +171,7 @@ public class Column {
 	
 	public Restriction equal(String value) {
 		
-		return new Restriction(this, Criteria.EQUAL, Query.getValue(this, value));
+		return new Restriction(this, Criteria.EQUAL, Query.getValue(type, value));
 	}
 	
 	public Restriction equal(Character value) {
@@ -186,7 +186,7 @@ public class Column {
 	
 	public Restriction equal(java.util.Date value) {
 		
-		return new Restriction(this, Criteria.EQUAL, Query.getValue(this, value));
+		return new Restriction(this, Criteria.EQUAL, Query.getValue(type, value));
 	}
 	
 	public Restriction equal(Date value) {
@@ -216,12 +216,12 @@ public class Column {
 	
 	public Restriction like(String value) {
 		
-		return new Restriction(this, Criteria.LIKE, Query.getValue(this, value));
+		return new Restriction(this, Criteria.LIKE, Query.getValue(type, value));
 	}
 	
 	public Restriction notEqual(String value) {
 		
-		return new Restriction(this, Criteria.NOT_EQUAL, Query.getValue(this, value));
+		return new Restriction(this, Criteria.NOT_EQUAL, Query.getValue(type, value));
 	}
 	
 	public Restriction notEqual(Character value) {
@@ -236,7 +236,7 @@ public class Column {
 	
 	public Restriction notEqual(java.util.Date value) {
 		
-		return new Restriction(this, Criteria.NOT_EQUAL, Query.getValue(this, value));
+		return new Restriction(this, Criteria.NOT_EQUAL, Query.getValue(type, value));
 	}
 
 	public Restriction notEqual(Date value) {
@@ -266,7 +266,7 @@ public class Column {
 	
 	public Restriction greater(String value) {
 		
-		return new Restriction(this, Criteria.GREATER, Query.getValue(this, value));
+		return new Restriction(this, Criteria.GREATER, Query.getValue(type, value));
 	}
 
 	public Restriction greater(Number value) {
@@ -276,7 +276,7 @@ public class Column {
 	
 	public Restriction greater(java.util.Date value) {
 		
-		return new Restriction(this, Criteria.GREATER, Query.getValue(this, value));
+		return new Restriction(this, Criteria.GREATER, Query.getValue(type, value));
 	}
 	
 	public Restriction greater(Date value) {
@@ -301,7 +301,7 @@ public class Column {
 	
 	public Restriction greaterEqual(String value) {
 		
-		return new Restriction(this, Criteria.GREATER_EQUAL, Query.getValue(this, value));
+		return new Restriction(this, Criteria.GREATER_EQUAL, Query.getValue(type, value));
 	}
 	
 	public Restriction greaterEqual(Number value) {
@@ -311,7 +311,7 @@ public class Column {
 	
 	public Restriction greaterEqual(java.util.Date value) {
 		
-		return new Restriction(this, Criteria.GREATER_EQUAL, Query.getValue(this, value));
+		return new Restriction(this, Criteria.GREATER_EQUAL, Query.getValue(type, value));
 	}
 	
 	public Restriction greaterEqual(Date value) {
@@ -336,7 +336,7 @@ public class Column {
 	
 	public Restriction less(String value) {
 		
-		return new Restriction(this, Criteria.LESS, Query.getValue(this, value));
+		return new Restriction(this, Criteria.LESS, Query.getValue(type, value));
 	}
 
 	public Restriction less(Number value) {
@@ -346,7 +346,7 @@ public class Column {
 	
 	public Restriction less(java.util.Date value) {
 		
-		return new Restriction(this, Criteria.LESS, Query.getValue(this, value));
+		return new Restriction(this, Criteria.LESS, Query.getValue(type, value));
 	}
 	
 	public Restriction less(Date value) {
@@ -371,7 +371,7 @@ public class Column {
 	
 	public Restriction lessEqual(String value) {
 		
-		return new Restriction(this, Criteria.LESS_EQUAL, Query.getValue(this, value));
+		return new Restriction(this, Criteria.LESS_EQUAL, Query.getValue(type, value));
 	}
 
 	public Restriction lessEqual(Number value) {
@@ -381,7 +381,7 @@ public class Column {
 	
 	public Restriction lessEqual(java.util.Date value) {
 		
-		return new Restriction(this, Criteria.LESS_EQUAL, Query.getValue(this, value));
+		return new Restriction(this, Criteria.LESS_EQUAL, Query.getValue(type, value));
 	}
 	
 	public Restriction lessEqual(Date value) {
@@ -416,7 +416,7 @@ public class Column {
 	
 	public Restriction in(String ...values) {
 		
-		return new Restriction(this, Criteria.IN, Query.getValues(this, values));
+		return new Restriction(this, Criteria.IN, Query.getValues(type, values));
 	}
 	
 	public Restriction in(Character ...values) {
@@ -431,7 +431,7 @@ public class Column {
 	
 	public Restriction in(java.util.Date ...values) {
 		
-		return new Restriction(this, Criteria.IN, Query.getValues(this, values));
+		return new Restriction(this, Criteria.IN, Query.getValues(type, values));
 	}
 	
 	public Restriction in(Date ...values) {
@@ -441,7 +441,7 @@ public class Column {
 	
 	public Restriction notIn(String ...values) {
 		
-		return new Restriction(this, Criteria.NOT_IN, Query.getValues(this, values));
+		return new Restriction(this, Criteria.NOT_IN, Query.getValues(type, values));
 	}
 	
 	public Restriction notIn(Character ...values) {
@@ -456,7 +456,7 @@ public class Column {
 	
 	public Restriction notIn(java.util.Date ...values) {
 		
-		return new Restriction(this, Criteria.NOT_IN, Query.getValues(this, values));
+		return new Restriction(this, Criteria.NOT_IN, Query.getValues(type, values));
 	}
 	
 	public Restriction notIn(Date ...values) {
@@ -466,7 +466,7 @@ public class Column {
 
 	public Restriction between(String value, String to) {
 		
-		return new Restriction(this, Criteria.BETWEEN, Query.getValue(this, value), Query.getValue(this, to));
+		return new Restriction(this, Criteria.BETWEEN, Query.getValue(type, value), Query.getValue(type, to));
 	}
 
 	public Restriction between(Number value, Number to) {
@@ -476,7 +476,7 @@ public class Column {
 	
 	public Restriction between(java.util.Date value, java.util.Date to) {
 		
-		return new Restriction(this, Criteria.BETWEEN, Query.getValue(this, value), Query.getValue(this, to));
+		return new Restriction(this, Criteria.BETWEEN, Query.getValue(type, value), Query.getValue(type, to));
 	}
 	
 	public Restriction between(Date value, Date to) {

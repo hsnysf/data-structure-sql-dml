@@ -160,45 +160,45 @@ public class Query {
 		}
 	}
 	
-	protected static Object getValue(Column column, String value) {
+	protected static Object getValue(Integer type, String value) {
 		
 		if(value == null || "".equals(value.trim())) {
 			
 			return null;
 			
-		}else if(column.type == Types.VARCHAR){
+		}else if(type == Types.VARCHAR){
 			
 			return value.trim();
 			
-		}else if(column.type == Types.CHAR){
+		}else if(type == Types.CHAR){
 			
 			return value.trim().charAt(0);
 			
-		}else if(column.type == Types.SMALLINT){
+		}else if(type == Types.SMALLINT){
 			
 			return Short.parseShort(value.trim());
 			
-		}else if(column.type == Types.INTEGER){
+		}else if(type == Types.INTEGER){
 			
 			return Integer.parseInt(value.trim());
 			
-		}else if(column.type == Types.BIGINT){
+		}else if(type == Types.BIGINT){
 			
 			return Long.parseLong(value.trim());
 			
-		}else if(column.type == Types.FLOAT){
+		}else if(type == Types.FLOAT){
 			
 			return Float.parseFloat(value.trim());
 			
-		}else if(column.type == Types.DOUBLE){
+		}else if(type == Types.DOUBLE){
 			
 			return Double.parseDouble(value.trim());
 			
-		}else if(column.type == Types.DECIMAL){
+		}else if(type == Types.DECIMAL){
 			
 			return new BigDecimal(value.trim());
 			
-		}else if(column.type == Types.DATE){
+		}else if(type == Types.DATE){
 			
 			try {
 				return new Date(new SimpleDateFormat("dd-MM-yyyy").parse(value.trim()).getTime());
@@ -206,7 +206,7 @@ public class Query {
 				return null;
 			}
 
-  		}else if(column.type == Types.TIMESTAMP){
+  		}else if(type == Types.TIMESTAMP){
 			
  			try {
 				return new Timestamp(new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse(value.trim()).getTime());
@@ -214,11 +214,11 @@ public class Query {
 				return null;
 			}
  			
-		}else if(column.type == Types.TIME){
+		}else if(type == Types.TIME){
 			
 			return Time.valueOf(value.trim());
  			
-		}else if(column.type == Types.BOOLEAN){
+		}else if(type == Types.BOOLEAN){
 			
 			return Boolean.parseBoolean(value.trim());
 			
@@ -228,33 +228,33 @@ public class Query {
 		}
 	}
 	
-	protected static Object[] getValues(Column column, String[] values) {
+	protected static Object[] getValues(Integer type, String[] values) {
 		
 		Object[] newValues = new Object[values.length];
 		
 		for(int i=0; i<values.length; i++) {
 			
-			newValues[i] = Query.getValue(column, values[i]);
+			newValues[i] = Query.getValue(type, values[i]);
 		}
 		
 		return newValues;
 	}
 	
-	protected static Object getValue(Column column, java.util.Date value) {
+	protected static Object getValue(Integer type, java.util.Date value) {
 		
 		if(value == null) {
 			
 			return null;
 			
-		}else if(column.type == Types.DATE){
+		}else if(type == Types.DATE){
 			
 			return new Date(value.getTime());
 
-  		}else if(column.type == Types.TIMESTAMP){
+  		}else if(type == Types.TIMESTAMP){
 			
  			return new Timestamp(value.getTime());
  			
-		}else if(column.type == Types.TIME){
+		}else if(type == Types.TIME){
 			
 			return new Time(value.getTime());
  			
@@ -264,13 +264,13 @@ public class Query {
 		}
 	}
 	
-	protected static Object[] getValues(Column column, java.util.Date[] values) {
+	protected static Object[] getValues(Integer type, java.util.Date[] values) {
 		
 		Object[] newValues = new Object[values.length];
 		
 		for(int i=0; i<values.length; i++) {
 			
-			newValues[i] = Query.getValue(column, values[i]);
+			newValues[i] = Query.getValue(type, values[i]);
 		}
 		
 		return newValues;
@@ -294,7 +294,7 @@ public class Query {
 	
 	public Query values(Column column, String value) {
 		
-		values.put(column, getValue(column, value));
+		values.put(column, getValue(column.type, value));
 		
 		return this;
 	}
@@ -315,7 +315,7 @@ public class Query {
 	
 	public Query values(Column column, java.util.Date value) {
 		
-		values.put(column, getValue(column, value));
+		values.put(column, getValue(column.type, value));
 		
 		return this;
 	}
@@ -745,7 +745,7 @@ public class Query {
 	
 	public Query set(Column column, String value) {
 		
-		values.put(column, getValue(column, value));
+		values.put(column, getValue(column.type, value));
 		
 		return this;
 	}
@@ -766,7 +766,7 @@ public class Query {
 	
 	public Query set(Column column, java.util.Date value) {
 		
-		values.put(column, getValue(column, value));
+		values.put(column, getValue(column.type, value));
 		
 		return this;
 	}
