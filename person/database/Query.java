@@ -292,7 +292,61 @@ public class Query {
 		return this;
 	}
 	
+	public Query values(Column column, Column columnValue) {
+		
+		values.put(column, columnValue);
+		
+		return this;
+	}
+	
 	public Query values(Column column, String value) {
+		
+		if(value != null 
+				&& !"".equals(value.trim()) 
+				&& !"0".equals(value.trim())
+				&& !"0.0".equals(value.trim())) {
+			
+			values.put(column, getValue(column.type, value));
+		}
+		
+		return this;
+	}
+	
+	public Query valuesNull(Column column, String value) {
+		
+		if(value != null 
+				&& !"".equals(value.trim()) 
+				&& !"0".equals(value.trim())
+				&& !"0.0".equals(value.trim())) {
+			
+			values.put(column, getValue(column.type, value));
+			
+		}else {
+			
+			values.put(column, null);
+		}
+		
+		return this;
+	}
+	
+	public Query valuesZero(Column column, String value) {
+		
+		if(value != null 
+				&& !"".equals(value.trim()) 
+				&& !"0".equals(value.trim())
+				&& !"0.0".equals(value.trim())) {
+			
+			values.put(column, getValue(column.type, value));
+			
+		}else {
+			
+			values.put(column, 0);
+		}
+		
+		return this;
+	}
+	
+	public Query valuesExact(Column column, String value) {
 		
 		values.put(column, getValue(column.type, value));
 		
@@ -301,12 +355,64 @@ public class Query {
 	
 	public Query values(Column column, Character value) {
 		
+		if(value != null) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query valuesNull(Column column, Character value) {
+		
 		values.put(column, value);
 		
 		return this;
 	}
 	
 	public Query values(Column column, Number value) {
+		
+		if(value != null
+				&& !"0".equals(value.toString())
+				&& !"0.0".equals(value.toString())) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query valuesNull(Column column, Number value) {
+		
+		if(value != null
+				&& !"0".equals(value.toString())
+				&& !"0.0".equals(value.toString())) {
+			
+			values.put(column, value);
+			
+		}else {
+			
+			values.put(column, null);
+		}
+		
+		return this;
+	}
+	
+	public Query valuesZero(Column column, Number value) {
+		
+		if(value != null) {
+			
+			values.put(column, value);
+			
+		}else {
+			
+			values.put(column, 0);
+		}
+		
+		return this;
+	}
+	
+	public Query valuesExact(Column column, Number value) {
 		
 		values.put(column, value);
 		
@@ -315,12 +421,32 @@ public class Query {
 	
 	public Query values(Column column, java.util.Date value) {
 		
+		if(value != null) {
+			
+			values.put(column, getValue(column.type, value));
+		}
+		
+		return this;
+	}
+	
+	public Query valuesNull(Column column, java.util.Date value) {
+		
 		values.put(column, getValue(column.type, value));
 		
 		return this;
 	}
 	
 	public Query values(Column column, Date value) {
+		
+		if(value != null) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query valuesNull(Column column, Date value) {
 		
 		values.put(column, value);
 		
@@ -329,12 +455,32 @@ public class Query {
 	
 	public Query values(Column column, Timestamp value) {
 		
+		if(value != null) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query valuesNull(Column column, Timestamp value) {
+		
 		values.put(column, value);
 		
 		return this;
 	}
 	
 	public Query values(Column column, Time value) {
+		
+		if(value != null) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query valuesNull(Column column, Time value) {
 		
 		values.put(column, value);
 		
@@ -343,6 +489,16 @@ public class Query {
 	
 	public Query values(Column column, Boolean value) {
 		
+		if(value != null) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query valuesNull(Column column, Boolean value) {
+		
 		values.put(column, value);
 		
 		return this;
@@ -350,11 +506,33 @@ public class Query {
 	
 	public Query values(Column column, List<String> value) {
 		
-		try {
+		if(value != null && !value.isEmpty()) {
 			
-			values.put(column, connection.createArrayOf("varchar", value.toArray()));
+			try {
+				
+				values.put(column, connection.createArrayOf("varchar", value.toArray()));
+			
+			} catch (SQLException e) {
+			}
+		}
 		
-		} catch (SQLException e) {
+		return this;
+	}
+
+	public Query valuesNull(Column column, List<String> value) {
+		
+		if(value != null && !value.isEmpty()) {
+			
+			try {
+				
+				values.put(column, connection.createArrayOf("varchar", value.toArray()));
+			
+			} catch (SQLException e) {
+			}
+			
+		}else {
+			
+			values.put(column, null);
 		}
 		
 		return this;
@@ -401,11 +579,22 @@ public class Query {
 				
 				columnList.append(column);
 				
-				valueList.append("?");
+				if(value instanceof Column) {
+					
+					Column columnValue = (Column) value;
+					
+					valueList.append(columnValue);
+					
+					parameters.addAll(columnValue.parameters);
+					
+				}else {
+					
+					valueList.append("?");
+					
+					parameters.add(new SimpleEntry<Integer, Object>(column.type, value));
+				}
 				
 				index++;
-				
-				parameters.add(new SimpleEntry<Integer, Object>(column.type, value));
 			}
 			
 			builder.append("insert into ");
@@ -495,6 +684,24 @@ public class Query {
 		}
 		
 		restrictions.add(restriction);
+		
+		return this;
+	}
+	
+	public Query search(Restriction restriction) {
+
+		if(!restrictions.isEmpty()) {
+			
+			restriction.operator = Operator.AND;
+		}
+		
+		if(restriction.value != null 
+				&& !"".equals(restriction.value.toString().trim())
+				&& !"0".equals(restriction.value.toString().trim())
+				&& !"0.0".equals(restriction.value.toString().trim())) {
+			
+			restrictions.add(restriction);
+		}
 		
 		return this;
 	}
@@ -743,7 +950,61 @@ public class Query {
 		return this;
 	}
 	
+	public Query set(Column column, Column columnValue) {
+		
+		values.put(column, columnValue);
+		
+		return this;
+	}
+	
 	public Query set(Column column, String value) {
+		
+		if(value != null 
+				&& !"".equals(value.trim()) 
+				&& !"0".equals(value.trim())
+				&& !"0.0".equals(value.trim())) {
+			
+			values.put(column, getValue(column.type, value));
+		}
+		
+		return this;
+	}
+	
+	public Query setNull(Column column, String value) {
+		
+		if(value != null 
+				&& !"".equals(value.trim()) 
+				&& !"0".equals(value.trim())
+				&& !"0.0".equals(value.trim())) {
+			
+			values.put(column, getValue(column.type, value));
+			
+		}else {
+			
+			values.put(column, null);
+		}
+		
+		return this;
+	}
+	
+	public Query setZero(Column column, String value) {
+		
+		if(value != null 
+				&& !"".equals(value.trim()) 
+				&& !"0".equals(value.trim())
+				&& !"0.0".equals(value.trim())) {
+			
+			values.put(column, getValue(column.type, value));
+			
+		}else {
+			
+			values.put(column, 0);
+		}
+		
+		return this;
+	}
+	
+	public Query setExact(Column column, String value) {
 		
 		values.put(column, getValue(column.type, value));
 		
@@ -752,12 +1013,64 @@ public class Query {
 	
 	public Query set(Column column, Character value) {
 		
+		if(value != null) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query setNull(Column column, Character value) {
+		
 		values.put(column, value);
 		
 		return this;
 	}
 	
 	public Query set(Column column, Number value) {
+		
+		if(value != null
+				&& !"0".equals(value.toString())
+				&& !"0.0".equals(value.toString())) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query setNull(Column column, Number value) {
+		
+		if(value != null
+				&& !"0".equals(value.toString())
+				&& !"0.0".equals(value.toString())) {
+			
+			values.put(column, value);
+			
+		}else {
+			
+			values.put(column, null);
+		}
+		
+		return this;
+	}
+	
+	public Query setZero(Column column, Number value) {
+		
+		if(value != null) {
+			
+			values.put(column, value);
+			
+		}else {
+			
+			values.put(column, 0);
+		}
+		
+		return this;
+	}
+	
+	public Query setExact(Column column, Number value) {
 		
 		values.put(column, value);
 		
@@ -766,12 +1079,32 @@ public class Query {
 	
 	public Query set(Column column, java.util.Date value) {
 		
+		if(value != null) {
+			
+			values.put(column, getValue(column.type, value));
+		}
+		
+		return this;
+	}
+	
+	public Query setNull(Column column, java.util.Date value) {
+		
 		values.put(column, getValue(column.type, value));
 		
 		return this;
 	}
 	
 	public Query set(Column column, Date value) {
+		
+		if(value != null) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query setNull(Column column, Date value) {
 		
 		values.put(column, value);
 		
@@ -780,12 +1113,32 @@ public class Query {
 	
 	public Query set(Column column, Timestamp value) {
 		
+		if(value != null) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query setNull(Column column, Timestamp value) {
+		
 		values.put(column, value);
 		
 		return this;
 	}
 	
 	public Query set(Column column, Time value) {
+		
+		if(value != null) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query setNull(Column column, Time value) {
 		
 		values.put(column, value);
 		
@@ -794,6 +1147,16 @@ public class Query {
 	
 	public Query set(Column column, Boolean value) {
 		
+		if(value != null) {
+			
+			values.put(column, value);
+		}
+		
+		return this;
+	}
+	
+	public Query setNull(Column column, Boolean value) {
+		
 		values.put(column, value);
 		
 		return this;
@@ -801,11 +1164,33 @@ public class Query {
 	
 	public Query set(Column column, List<String> value) {
 		
-		try {
+		if(value != null && !value.isEmpty()) {
 			
-			values.put(column, connection.createArrayOf("varchar", value.toArray()));
+			try {
+				
+				values.put(column, connection.createArrayOf("varchar", value.toArray()));
+			
+			} catch (SQLException e) {
+			}
+		}
 		
-		} catch (SQLException e) {
+		return this;
+	}
+
+	public Query setNull(Column column, List<String> value) {
+		
+		if(value != null && !value.isEmpty()) {
+			
+			try {
+				
+				values.put(column, connection.createArrayOf("varchar", value.toArray()));
+			
+			} catch (SQLException e) {
+			}
+			
+		}else {
+			
+			values.put(column, null);
 		}
 		
 		return this;
@@ -849,9 +1234,22 @@ public class Query {
 			
 			builder.append(" ");
 			builder.append(column);
-			builder.append(" = ?");
+			builder.append(" = ");
 			
-			parameters.add(new SimpleEntry<Integer, Object>(column.type, value));
+			if(value instanceof Column) {
+				
+				Column columnValue = (Column) value;
+				
+				builder.append(columnValue);
+				
+				parameters.addAll(columnValue.parameters);
+				
+			}else {
+				
+				builder.append("?");
+				
+				parameters.add(new SimpleEntry<Integer, Object>(column.type, value));
+			}
 			
 			index++;
 		}
