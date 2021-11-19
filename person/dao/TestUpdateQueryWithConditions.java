@@ -18,6 +18,7 @@ public class TestUpdateQueryWithConditions {
 		ModernPersonDAO personDAO = new ModernPersonDAO(connection);
 		
 		PersonDTO personDTO = new PersonDTO();
+		personDTO.setId(1);
 		personDTO.setName("Hasan Yusuf");
 		personDTO.setGender('M');
 		personDTO.setAge((short) 35);
@@ -34,7 +35,7 @@ public class TestUpdateQueryWithConditions {
 		personDAO.updatePersonWithConditions(personDTO);
 		
 		personDTO = new PersonDTO();
-		personDTO.setId(null);
+		personDTO.setId(1);
 		personDTO.setName(null);
 		personDTO.setGender(null);
 		personDTO.setAge(null);
@@ -51,7 +52,7 @@ public class TestUpdateQueryWithConditions {
 		personDAO.updatePersonWithConditions(personDTO);
 		
 		personDTO = new PersonDTO();
-		personDTO.setId(null);
+		personDTO.setId(1);
 		personDTO.setName("0");
 		personDTO.setGender(null);
 		personDTO.setAge((short)0);

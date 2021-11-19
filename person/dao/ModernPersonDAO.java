@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
-
 import person.column.Address;
 import person.column.City;
 import person.column.Company;
@@ -561,6 +560,7 @@ public class ModernPersonDAO extends Query {
  	}
 	
 	public void insertPersonWithConditions(PersonDTO personDTO) throws SQLException {
+		
 		/*
 		insertInto(Table.PERSON);
 		
@@ -594,7 +594,7 @@ public class ModernPersonDAO extends Query {
 			values(Person.SALARY, personDTO.getSalary());
 		}
 		
-		if(personDTO.getAnnualIncome() != null && personDTO.getAnnualIncome() != new BigDecimal(0)) {
+		if(personDTO.getAnnualIncome() != null && !personDTO.getAnnualIncome().equals(new BigDecimal(0))) {
 			values(Person.ANNUAL_INCOME, personDTO.getAnnualIncome());
 		}
 		
@@ -686,7 +686,7 @@ public class ModernPersonDAO extends Query {
 			values(Person.SALARY, empty);
 		}
 		
-		if(personDTO.getAnnualIncome() != null && personDTO.getAnnualIncome() != new BigDecimal(0)) {
+		if(personDTO.getAnnualIncome() != null && !personDTO.getAnnualIncome().equals(new BigDecimal(0))) {
 			values(Person.ANNUAL_INCOME, personDTO.getAnnualIncome());
 		}else {
 			BigDecimal empty = null;
@@ -812,9 +812,9 @@ public class ModernPersonDAO extends Query {
 	
 	public void updatePersonWithConditions(PersonDTO personDTO) throws SQLException {
 		
+		/*
 		update(Table.PERSON);
 		
-		/*
 		if(personDTO.getName() != null 
 				&& !"".equals(personDTO.getName().trim())
 				&& !"0".equals(personDTO.getName().trim())) {
@@ -845,7 +845,7 @@ public class ModernPersonDAO extends Query {
 			set(Person.SALARY, personDTO.getSalary());
 		}
 		
-		if(personDTO.getAnnualIncome() != null && personDTO.getAnnualIncome() != new BigDecimal(0)) {
+		if(personDTO.getAnnualIncome() != null  && !personDTO.getAnnualIncome().equals(new BigDecimal(0))) {
 			set(Person.ANNUAL_INCOME, personDTO.getAnnualIncome());
 		}
 		
@@ -938,7 +938,7 @@ public class ModernPersonDAO extends Query {
 			set(Person.SALARY, empty);
 		}
 		
-		if(personDTO.getAnnualIncome() != null && personDTO.getAnnualIncome() != new BigDecimal(0)) {
+		if(personDTO.getAnnualIncome() != null && !personDTO.getAnnualIncome().equals(new BigDecimal(0))) {
 			set(Person.ANNUAL_INCOME, personDTO.getAnnualIncome());
 		}else {
 			BigDecimal empty = null;
@@ -1111,7 +1111,7 @@ public class ModernPersonDAO extends Query {
 			where(Person.SALARY.equal(personDTO.getSalary()));
 		}
 		
-		if(personDTO.getAnnualIncome() != null && personDTO.getAnnualIncome() != new BigDecimal(0)) {
+		if(personDTO.getAnnualIncome() != null && !personDTO.getAnnualIncome().equals(new BigDecimal(0))) {
 			where(Person.ANNUAL_INCOME.equal(personDTO.getAnnualIncome()));
 		}
 		
