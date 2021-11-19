@@ -2,13 +2,13 @@ package person.generator;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
+import java.util.List;
 
 public class TableClassGenerator {
 
 	public static void main(String[] args) throws Exception {
 		
-		Map<String, TableConfig> tableMap = GeneratorUtils.getTableMap();
+		List<TableConfig> tableMap = GeneratorUtils.getTableMap();
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -17,7 +17,7 @@ public class TableClassGenerator {
 		builder.append("public class Table {");
 		builder.append("\r\n\r\n");
 		
-		for(TableConfig tableConfig : tableMap.values()){
+		for(TableConfig tableConfig : tableMap){
 			
 			builder.append("	public final static Table " + tableConfig.enumName + " = new Table(\"public." + tableConfig.name + "\");");
 		    builder.append("\r\n");

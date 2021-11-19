@@ -1,7 +1,7 @@
 package person.generator;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TableConfig {
 
@@ -9,7 +9,7 @@ public class TableConfig {
 	public String className;
 	public String enumName;
 	
-	public Map<String, ColumnConfig> columns = new LinkedHashMap<String, ColumnConfig>();
+	public List<ColumnConfig> columns = new ArrayList<ColumnConfig>();
 	
 	@Override
 	public String toString() {

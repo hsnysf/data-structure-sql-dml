@@ -5,8 +5,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Types;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GeneratorUtils {
 
@@ -31,9 +31,9 @@ public class GeneratorUtils {
 		}
 	}
 	
-	public static Map<String, TableConfig> getTableMap() throws Exception {
+	public static List<TableConfig> getTableMap() throws Exception {
 
-		Map<String, TableConfig> tableMap = new LinkedHashMap<String, TableConfig>();
+		List<TableConfig> tableMap = new ArrayList<TableConfig>();
 		
 		ResultSet result = databaseMetaData.getTables(null, "public", null, new String[] {"TABLE"});
 		
@@ -46,15 +46,15 @@ public class GeneratorUtils {
 			tableConfig.enumName = tableConfig.name.toUpperCase();
 			tableConfig.columns = getTableColumnMap(tableConfig.name);
 			
-			tableMap.put(tableConfig.name, tableConfig);
+			tableMap.add(tableConfig);
 		}
 		
 		return tableMap;
 	}
 	
-	public static Map<String, ColumnConfig> getTableColumnMap(String table) throws Exception {
+	public static List<ColumnConfig> getTableColumnMap(String table) throws Exception {
 		
-		Map<String, ColumnConfig> columnMap = new LinkedHashMap<String, ColumnConfig>();
+		List<ColumnConfig> columnMap = new ArrayList<ColumnConfig>();
 		
 		ResultSet columnSet = databaseMetaData.getColumns(null, null, table, null);
 		
@@ -65,7 +65,7 @@ public class GeneratorUtils {
 			column.enumName = prepareColumnEnumName(column.name);
 			column.type = getType(columnSet.getInt("DATA_TYPE"));
 
-			columnMap.put(column.name, column);
+			columnMap.add(column);
 		}
 		
 		return columnMap;

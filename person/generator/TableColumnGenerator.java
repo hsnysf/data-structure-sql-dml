@@ -2,15 +2,15 @@ package person.generator;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
+import java.util.List;
 
 public class TableColumnGenerator {
 
 	public static void main(String[] args) throws Exception {
 		
-		Map<String, TableConfig> tableMap = GeneratorUtils.getTableMap();
+		List<TableConfig> tableMap = GeneratorUtils.getTableMap();
 		
-		for (TableConfig table : tableMap.values()) {
+		for (TableConfig table : tableMap) {
 			
 			StringBuilder builder = new StringBuilder();
 			
@@ -23,7 +23,7 @@ public class TableColumnGenerator {
 			builder.append("public interface " + table.className + " {");
 		    builder.append("\r\n\r\n");
 		    
-		    for(ColumnConfig column : table.columns.values()){
+		    for(ColumnConfig column : table.columns){
 		    	
 		    	builder.append("	Column " + column.enumName + " = new Column(\"" + column.name + "\", Types." + column.type + ");");
 		    	builder.append("\r\n");
