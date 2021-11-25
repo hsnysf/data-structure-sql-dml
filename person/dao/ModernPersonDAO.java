@@ -1,9 +1,13 @@
 package person.dao;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import person.column.Address;
 import person.column.City;
 import person.column.Company;
@@ -1178,5 +1182,295 @@ public class ModernPersonDAO extends Query {
 		.set(Person.SLEEP_TIME, CURRENT_TIME.plusMinutes(1).minusHours(2))
 		.where(Person.ID.equal(1))
 		.executeUpdate();
+	}
+	
+	public void selectPersonWithResultSet() throws Exception {
+		
+		System.out.println("Delete all records");
+		
+		deleteFrom(Table.PERSON).executeDelete();
+		
+		System.out.println("Check Existance");
+		
+		System.out.println(select(_1).from(Table.PERSON).isExist());
+		
+		System.out.println("Insert Person");
+		
+		int id = insertInto(Table.PERSON)
+		.values(Person.NAME, "Hasan")
+		.values(Person.GENDER, 'M')
+		.values(Person.AGE, 33)
+		.values(Person.CPR, 870501236)
+		.values(Person.ACCOUNT_NO, 12345678901234l)
+		.values(Person.GPA, 3.12)
+		.values(Person.SALARY, 400.5)
+		.values(Person.ANNUAL_INCOME, new BigDecimal("500.40"))
+		.values(Person.DATE_OF_BIRTH, java.sql.Date.valueOf("2015-10-10"))
+		.values(Person.REGISTRATION_DATE_TIME, Timestamp.valueOf("2000-10-10 10:10:10"))
+		.values(Person.SLEEP_TIME, Time.valueOf("10:10:10"))
+		.values(Person.CERTIFICATES, "DB2", "Java")
+		.executeInsert();
+		
+		System.out.println("Check Existance");
+		
+		System.out.println(select(_1).from(Table.PERSON).where(Person.ID.equal(id)).isExist());
+		
+		System.out.println("Read All Columns as String Result");
+		
+		System.out.println(select(Person.NAME).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.GENDER).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.AGE).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.CPR).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.ACCOUNT_NO).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.GPA).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.SALARY).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.ANNUAL_INCOME).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.DATE_OF_BIRTH).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.REGISTRATION_DATE_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.SLEEP_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.GRADUATED).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		
+		System.out.println("Read All Columns as Single Result");
+		
+		System.out.println(select(Person.NAME).from(Table.PERSON).where(Person.ID.equal(id)).getStringResult());
+		System.out.println(select(Person.GENDER).from(Table.PERSON).where(Person.ID.equal(id)).getCharacterResult());
+		System.out.println(select(Person.AGE).from(Table.PERSON).where(Person.ID.equal(id)).getShortResult());
+		System.out.println(select(Person.CPR).from(Table.PERSON).where(Person.ID.equal(id)).getIntegerResult());
+		System.out.println(select(Person.ACCOUNT_NO).from(Table.PERSON).where(Person.ID.equal(id)).getLongResult());
+		System.out.println(select(Person.GPA).from(Table.PERSON).where(Person.ID.equal(id)).getFloatResult());
+		System.out.println(select(Person.SALARY).from(Table.PERSON).where(Person.ID.equal(id)).getDoubleResult());
+		System.out.println(select(Person.ANNUAL_INCOME).from(Table.PERSON).where(Person.ID.equal(id)).getDecimalResult());
+		System.out.println(select(Person.DATE_OF_BIRTH).from(Table.PERSON).where(Person.ID.equal(id)).getDateResult());
+		System.out.println(select(Person.REGISTRATION_DATE_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getTimestampResult());
+		System.out.println(select(Person.SLEEP_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getTimeResult());
+		System.out.println(select(Person.GRADUATED).from(Table.PERSON).where(Person.ID.equal(id)).getBooleanResult());
+		System.out.println(select(Person.CERTIFICATES).from(Table.PERSON).where(Person.ID.equal(id)).getArrayResult());
+		
+		System.out.println("Insert Another Person");
+		
+		insertInto(Table.PERSON)
+		.values(Person.NAME, "Fatima")
+		.values(Person.GENDER, 'F')
+		.values(Person.AGE, 20)
+		.values(Person.CPR, 910102654)
+		.values(Person.ACCOUNT_NO, 9876543219875L)
+		.values(Person.GPA, 3.8)
+		.values(Person.SALARY, 100.5)
+		.values(Person.ANNUAL_INCOME, new BigDecimal("700.45"))
+		.values(Person.DATE_OF_BIRTH, java.sql.Date.valueOf("2008-08-08"))
+		.values(Person.REGISTRATION_DATE_TIME, Timestamp.valueOf("2010-05-05 06:06:06"))
+		.values(Person.SLEEP_TIME, Time.valueOf("03:03:03"))
+		.values(Person.GRADUATED, false)
+		.values(Person.CERTIFICATES, "Postgres", "JavaEE")
+		.executeInsert();
+		
+		System.out.println("Read All Columns as String List");
+		
+		System.out.println(select(Person.NAME).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.GENDER).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.AGE).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.CPR).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.ACCOUNT_NO).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.GPA).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.SALARY).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.ANNUAL_INCOME).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.DATE_OF_BIRTH).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.SLEEP_TIME).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.GRADUATED).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.CERTIFICATES).from(Table.PERSON).getStringList());
+		
+		System.out.println("Read All Columns as List");
+		
+		System.out.println(select(Person.NAME).from(Table.PERSON).getStringList());
+		System.out.println(select(Person.GENDER).from(Table.PERSON).getCharacterList());
+		System.out.println(select(Person.AGE).from(Table.PERSON).getShortList());
+		System.out.println(select(Person.CPR).from(Table.PERSON).getIntegerList());
+		System.out.println(select(Person.ACCOUNT_NO).from(Table.PERSON).getLongList());
+		System.out.println(select(Person.GPA).from(Table.PERSON).getFloatList());
+		System.out.println(select(Person.SALARY).from(Table.PERSON).getDoubleList());
+		System.out.println(select(Person.ANNUAL_INCOME).from(Table.PERSON).getDecimalList());
+		System.out.println(select(Person.DATE_OF_BIRTH).from(Table.PERSON).getDateList());
+		System.out.println(select(Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getTimestampList());
+		System.out.println(select(Person.SLEEP_TIME).from(Table.PERSON).getTimeList());
+		System.out.println(select(Person.GRADUATED).from(Table.PERSON).getBooleanList());
+		System.out.println(select(Person.CERTIFICATES).from(Table.PERSON).getArrayList());
+		
+		System.out.println("Use get entry result");
+		
+		System.out.println(select(Person.ID, Person.NAME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.GENDER).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.AGE).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.CPR).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.ACCOUNT_NO).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.GPA).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.SALARY).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.ANNUAL_INCOME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.DATE_OF_BIRTH).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.SLEEP_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.GRADUATED).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		System.out.println(select(Person.ID, Person.CERTIFICATES).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult());
+		
+		System.out.println("Use get entry list result");
+		
+		System.out.println(select(Person.ID, Person.NAME).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.GENDER).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.AGE).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.CPR).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.ACCOUNT_NO).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.GPA).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.SALARY).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.ANNUAL_INCOME).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.DATE_OF_BIRTH).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.SLEEP_TIME).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.GRADUATED).from(Table.PERSON).getEntryList());
+		System.out.println(select(Person.ID, Person.CERTIFICATES).from(Table.PERSON).getEntryList());
+		
+		System.out.println("Use get map result");
+		
+		System.out.println(select(Person.ID, Person.NAME).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.GENDER).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.AGE).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.CPR).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.ACCOUNT_NO).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.GPA).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.SALARY).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.ANNUAL_INCOME).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.DATE_OF_BIRTH).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.SLEEP_TIME).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.GRADUATED).from(Table.PERSON).getMapResult());
+		System.out.println(select(Person.ID, Person.CERTIFICATES).from(Table.PERSON).getMapResult());
+		
+		System.out.println("Use get entry result with string");
+		
+		System.out.println(select(Person.ID, Person.NAME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GENDER).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.AGE).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.CPR).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.ACCOUNT_NO).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GPA).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.SALARY).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.ANNUAL_INCOME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.DATE_OF_BIRTH).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.SLEEP_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GRADUATED).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.CERTIFICATES).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		
+		System.out.println("Use get entry result with type");
+		
+		System.out.println(select(Person.ID, Person.NAME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GENDER).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, Character.class));
+		System.out.println(select(Person.ID, Person.AGE).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, Short.class));
+		System.out.println(select(Person.ID, Person.CPR).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, Integer.class));
+		System.out.println(select(Person.ID, Person.ACCOUNT_NO).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, Long.class));
+		System.out.println(select(Person.ID, Person.GPA).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, Float.class));
+		System.out.println(select(Person.ID, Person.SALARY).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, Double.class));
+		System.out.println(select(Person.ID, Person.ANNUAL_INCOME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, BigDecimal.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, Date.class));
+		System.out.println(select(Person.ID, Person.DATE_OF_BIRTH).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, java.sql.Date.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, Timestamp.class));
+		System.out.println(select(Person.ID, Person.SLEEP_TIME).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, Time.class));
+		System.out.println(select(Person.ID, Person.GRADUATED).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, Boolean.class));
+		System.out.println(select(Person.ID, Person.CERTIFICATES).from(Table.PERSON).where(Person.ID.equal(id)).getEntryResult(Integer.class, List.class));
+		
+		System.out.println("Use get entry list with string");
+		
+		System.out.println(select(Person.ID, Person.NAME).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GENDER).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.AGE).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.CPR).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.ACCOUNT_NO).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GPA).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.SALARY).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.ANNUAL_INCOME).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.DATE_OF_BIRTH).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.SLEEP_TIME).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GRADUATED).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.CERTIFICATES).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		
+		System.out.println("Use get entry list with type");
+		
+		System.out.println(select(Person.ID, Person.NAME).from(Table.PERSON).getEntryList(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GENDER).from(Table.PERSON).getEntryList(Integer.class, Character.class));
+		System.out.println(select(Person.ID, Person.AGE).from(Table.PERSON).getEntryList(Integer.class, Short.class));
+		System.out.println(select(Person.ID, Person.CPR).from(Table.PERSON).getEntryList(Integer.class, Integer.class));
+		System.out.println(select(Person.ID, Person.ACCOUNT_NO).from(Table.PERSON).getEntryList(Integer.class, Long.class));
+		System.out.println(select(Person.ID, Person.GPA).from(Table.PERSON).getEntryList(Integer.class, Float.class));
+		System.out.println(select(Person.ID, Person.SALARY).from(Table.PERSON).getEntryList(Integer.class, Double.class));
+		System.out.println(select(Person.ID, Person.ANNUAL_INCOME).from(Table.PERSON).getEntryList(Integer.class, BigDecimal.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getEntryList(Integer.class, Date.class));
+		System.out.println(select(Person.ID, Person.DATE_OF_BIRTH).from(Table.PERSON).getEntryList(Integer.class, java.sql.Date.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getEntryList(Integer.class, Timestamp.class));
+		System.out.println(select(Person.ID, Person.SLEEP_TIME).from(Table.PERSON).getEntryList(Integer.class, Time.class));
+		System.out.println(select(Person.ID, Person.GRADUATED).from(Table.PERSON).getEntryList(Integer.class, Boolean.class));
+		System.out.println(select(Person.ID, Person.CERTIFICATES).from(Table.PERSON).getEntryList(Integer.class, List.class));
+		
+		System.out.println("Use get map result with string");
+		
+		System.out.println(select(Person.ID, Person.NAME).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GENDER).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.AGE).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.CPR).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.ACCOUNT_NO).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GPA).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.SALARY).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.ANNUAL_INCOME).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.DATE_OF_BIRTH).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.SLEEP_TIME).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GRADUATED).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.CERTIFICATES).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		
+		System.out.println("Use get map result with type");
+		
+		System.out.println(select(Person.ID, Person.NAME).from(Table.PERSON).getMapResult(Integer.class, String.class));
+		System.out.println(select(Person.ID, Person.GENDER).from(Table.PERSON).getMapResult(Integer.class, Character.class));
+		System.out.println(select(Person.ID, Person.AGE).from(Table.PERSON).getMapResult(Integer.class, Short.class));
+		System.out.println(select(Person.ID, Person.CPR).from(Table.PERSON).getMapResult(Integer.class, Integer.class));
+		System.out.println(select(Person.ID, Person.ACCOUNT_NO).from(Table.PERSON).getMapResult(Integer.class, Long.class));
+		System.out.println(select(Person.ID, Person.GPA).from(Table.PERSON).getMapResult(Integer.class, Float.class));
+		System.out.println(select(Person.ID, Person.SALARY).from(Table.PERSON).getMapResult(Integer.class, Double.class));
+		System.out.println(select(Person.ID, Person.ANNUAL_INCOME).from(Table.PERSON).getMapResult(Integer.class, BigDecimal.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getMapResult(Integer.class, Date.class));
+		System.out.println(select(Person.ID, Person.DATE_OF_BIRTH).from(Table.PERSON).getMapResult(Integer.class, java.sql.Date.class));
+		System.out.println(select(Person.ID, Person.REGISTRATION_DATE_TIME).from(Table.PERSON).getMapResult(Integer.class, Timestamp.class));
+		System.out.println(select(Person.ID, Person.SLEEP_TIME).from(Table.PERSON).getMapResult(Integer.class, Time.class));
+		System.out.println(select(Person.ID, Person.GRADUATED).from(Table.PERSON).getMapResult(Integer.class, Boolean.class));
+		System.out.println(select(Person.ID, Person.CERTIFICATES).from(Table.PERSON).getMapResult(Integer.class, List.class));
+		
+		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
+				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
+				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED)
+				.from(Table.PERSON).where(Person.ID.equal(id)).getRecord());
+		
+		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+		.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
+		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
+		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
+		.from(Table.PERSON).getRecordList());
+		
+		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
+				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
+				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
+				.from(Table.PERSON).getRecordMap());
+		
+		Map<Column, Object> record = select(Person.SALARY.plus(2).as("salary_sum"))
+										.from(Table.PERSON)
+										.where(Person.ID.equal(id))
+										.getRecord();
+		
+		System.out.println(record);
+		
+		System.out.println(record.get(Person.SALARY.as("salary_sum")));
 	}
 }
