@@ -13,6 +13,7 @@ public class Column {
 
 	protected String name;
 	protected String nameInQuery;
+	protected String nameInResultSet;
 	protected int type;
 	protected Function function;
 	protected String tableAlias;
@@ -23,6 +24,7 @@ public class Column {
 		this.name = name;
 		this.type = type;
 		this.nameInQuery = name;
+		this.nameInResultSet = nameInQuery;
 	}
 	
 	protected Column(String name, int type, List<Entry<Integer, Object>> parameters) {
@@ -30,12 +32,14 @@ public class Column {
 		this.type = type;
 		this.parameters.addAll(parameters);
 		this.nameInQuery = name;
+		this.nameInResultSet = nameInQuery;
 	}
 	
 	protected Column(String nameInQuery, int type, String alias) {
 		this.nameInQuery = nameInQuery;
 		this.type = type;
 		this.alias = alias;
+		this.nameInResultSet = alias;
 	}
 	
 	private Column(String name, String nameInQuery, int type, Function function, String tableAlias, String alias, List<Entry<Integer, Object>> parameters) {
@@ -45,6 +49,7 @@ public class Column {
 		this.function = function;
 		this.tableAlias = tableAlias;
 		this.alias = alias;
+		this.nameInResultSet = alias;
 		this.parameters.addAll(parameters);
 	}
 	
@@ -65,12 +70,12 @@ public class Column {
 	
 	public Column plus(Column column) {
 		
-		return new Column(name, nameInQuery + " + " + column.nameInQuery, type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " + " + column.nameInQuery, type, function, tableAlias, nameInQuery + "_plus_result", parameters);
 	}
 	
 	public Column plus(Number value) {
 		
-		Column column = new Column(name, nameInQuery + " + ?", type, function, tableAlias, alias, parameters);
+		Column column = new Column(name, nameInQuery + " + ?", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
 		
 		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
@@ -79,37 +84,37 @@ public class Column {
 	
 	public Column plusMinutes(Number value) {
 		
-		return new Column(name, nameInQuery + " + interval '" + value + " minutes'", type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " + interval '" + value + " minutes'", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
 	}
 	
 	public Column plusHours(Number value) {
 		
-		return new Column(name, nameInQuery + " + interval '" + value + " hours'", type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " + interval '" + value + " hours'", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
 	}
 
 	public Column plusDays(Number value) {
 		
-		return new Column(name, nameInQuery + " + interval '" + value + " days'", type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " + interval '" + value + " days'", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
 	}
 	
 	public Column plusMonths(Number value) {
 		
-		return new Column(name, nameInQuery + " + interval '" + value + " months'", type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " + interval '" + value + " months'", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
 	}
 	
 	public Column plusYears(Number value) {
 		
-		return new Column(name, nameInQuery + " + interval '" + value + " years'", type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " + interval '" + value + " years'", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
 	}
 	
 	public Column minus(Column column) {
 		
-		return new Column(name, nameInQuery + " - " + column.nameInQuery, type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " - " + column.nameInQuery, type, function, tableAlias, nameInQuery + "_minus_result", parameters);
 	}
 	
 	public Column minus(Number value) {
 		
-		Column column = new Column(name, nameInQuery + " - ?", type, function, tableAlias, alias, parameters);
+		Column column = new Column(name, nameInQuery + " - ?", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
 		
 		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
@@ -118,37 +123,37 @@ public class Column {
 	
 	public Column minusMinutes(Number value) {
 		
-		return new Column(name, nameInQuery + " - interval '" + value + " minutes'", type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " - interval '" + value + " minutes'", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
 	}
 	
 	public Column minusHours(Number value) {
 		
-		return new Column(name, nameInQuery + " - interval '" + value + " hours'", type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " - interval '" + value + " hours'", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
 	}
 
 	public Column minusDays(Number value) {
 		
-		return new Column(name, nameInQuery + " - interval '" + value + " days'", type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " - interval '" + value + " days'", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
 	}
 	
 	public Column minusMonths(Number value) {
 		
-		return new Column(name, nameInQuery + " - interval '" + value + " months'", type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " - interval '" + value + " months'", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
 	}
 	
 	public Column minusYears(Number value) {
 		
-		return new Column(name, nameInQuery + " - interval '" + value + " years'", type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " - interval '" + value + " years'", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
 	}
 	
 	public Column multiply(Column column) {
 		
-		return new Column(name, nameInQuery + " * " + column.nameInQuery, type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " * " + column.nameInQuery, type, function, tableAlias, nameInQuery + "_multiply_result", parameters);
 	}
 	
 	public Column multiply(Number value) {
 		
-		Column column = new Column(name, nameInQuery + " * ?", type, function, tableAlias, alias, parameters);
+		Column column = new Column(name, nameInQuery + " * ?", type, function, tableAlias, nameInQuery + "_multiply_result", parameters);
 		
 		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
@@ -157,12 +162,12 @@ public class Column {
 	
 	public Column divide(Column column) {
 		
-		return new Column(name, nameInQuery + " / " + column.nameInQuery, type, function, tableAlias, alias, parameters);
+		return new Column(name, nameInQuery + " / " + column.nameInQuery, type, function, tableAlias, nameInQuery + "_divide_result", parameters);
 	}
 	
 	public Column divide(Number value) {
 		
-		Column column = new Column(name, nameInQuery + " / ?", type, function, tableAlias, alias, parameters);
+		Column column = new Column(name, nameInQuery + " / ?", type, function, tableAlias, nameInQuery + "_divide_result", parameters);
 		
 		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
@@ -597,6 +602,27 @@ public class Column {
 		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
 		return column;
+	}
+	
+	@Override
+	public boolean equals(Object object) {
+		
+		if(object != null && object instanceof Column) {
+			
+			Column column = (Column) object;
+			
+			return column.name.equals(name);
+			
+		}else {
+			
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		
+		return name.length();
 	}
 	
 	@Override

@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -158,6 +159,35 @@ public class Query {
 				statement.setNull(index, Types.ARRAY);
 			}
 		}
+	}
+	
+	private void clean() {
+		
+		columns.clear();
+		
+		table = null;
+		
+		fromQuery = null;
+		
+		relations.clear();
+		
+		values.clear();
+		
+		restrictions.clear();
+		
+		groups.clear();
+		
+		having = null;
+		
+		orders.clear();
+		
+		limit = null;
+		
+		offset = null;
+		
+		combineQueries.clear();
+		
+		alias = null;
 	}
 	
 	protected static Object getValue(Integer type, String value) {
@@ -658,13 +688,7 @@ public class Query {
 		
 		System.out.println("Generated ID :: " + id);
 		
-		table = null;
-		
-		values.clear();
-		
-		columns.clear();
-		
-		fromQuery = null;
+		clean();
 		
 		return id;
 	}
@@ -936,9 +960,7 @@ public class Query {
 		
 		System.out.println("Affected Rows :: " + count);
 		
-		table = null;
-		
-		restrictions.clear();
+		clean();
 
 		return count;
 	}
@@ -1285,11 +1307,7 @@ public class Query {
 		
 		System.out.println("Affected Rows :: " + count);
 		
-		table = null;
-		
-		values.clear();
-		
-		restrictions.clear();
+		clean();
 		
 		return count;
 	}
@@ -2061,64 +2079,792 @@ public class Query {
 	
 	public ResultSet executeSelect() throws SQLException {
 		
-		int count = 0;
-		
-		ResultSet result = null;
-		
 		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
 		
 		StringBuilder builder = getSelectQuery(parameters);
 		
 		System.out.println("SQL Query :: " + builder);
 		
-		try(PreparedStatement statement = connection.prepareStatement(builder.toString())){
+		PreparedStatement statement = connection.prepareStatement(builder.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		
+		int index = 1;
+		
+		for(Entry<Integer, Object> parameter : parameters) {
 			
-			int index = 1;
+			Integer type = parameter.getKey();
+			Object value = parameter.getValue();
 			
-			for(Entry<Integer, Object> parameter : parameters) {
-				
-				Integer type = parameter.getKey();
-				Object value = parameter.getValue();
-				
-				setObject(statement, index, type, value);
-				
-				index++;
-			}
+			setObject(statement, index, type, value);
 			
-			result = statement.executeQuery();
-			
-			while(result.next()) {
-				
-				count++;
-			}
+			index++;
 		}
+
+		ResultSet result = statement.executeQuery();
+		
+		int count = result.last() ? result.getRow() : 0;
 		
 		System.out.println("Matched Rows :: " + count);
 		
-		columns.clear();
-		
-		table = null;
-		
-		fromQuery = null;
-		
-		relations.clear();
-		
-		restrictions.clear();
-		
-		groups.clear();
-		
-		having = null;
-		
-		orders.clear();
-		
-		limit = null;
-		
-		offset = null;
-		
-		combineQueries.clear();
-		
-		alias = null;
+		result.beforeFirst();
 		
 		return result;
+	}
+	
+	private String getString(ResultSet result, Column column) throws SQLException {
+		
+		String value = null;
+		
+		if(column.type == Types.VARCHAR) {
+			
+			value = result.getString(column.nameInResultSet);
+			
+		}else if(column.type == Types.CHAR) {
+			
+			value = result.getString(column.nameInResultSet);
+			
+		}else if(column.type == Types.SMALLINT) {
+			
+			Short number = getShort(result, column);
+			
+			value = number != null ? String.valueOf(number) : null;
+			
+		}else if(column.type == Types.INTEGER) {
+			
+			Integer number = getInt(result, column);
+			
+			value = number != null ? String.valueOf(number) : null;
+			
+		}else if(column.type == Types.BIGINT) {
+			
+			Long number = getLong(result, column);
+			
+			value = number != null ? String.valueOf(number) : null;
+			
+		}else if(column.type == Types.FLOAT) {
+			
+			Float number = getFloat(result, column);
+			
+			value = number != null ? String.valueOf(number) : null;
+			
+		}else if(column.type == Types.DOUBLE) {
+			
+			Double number = getDouble(result, column);
+			
+			value = number != null ? String.valueOf(number) : null;
+			
+		}else if(column.type == Types.DECIMAL) {
+			
+			BigDecimal number = getDecimal(result, column);
+			
+			value = number != null ? String.valueOf(number) : null;
+			
+		}else if(column.type == Types.DATE) {
+			
+			Date date = getDate(result, column);
+			
+			value = date != null ? new SimpleDateFormat("dd-MM-yyyy").format(date) : null;
+			
+		}else if(column.type == Types.TIMESTAMP) {
+			
+			Timestamp timestamp = getTimestamp(result, column);
+			
+			value = timestamp != null ? new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(timestamp) : null;
+			
+		}else if(column.type == Types.TIME) {
+			
+			Time time = getTime(result, column);
+			
+			value = time != null ? String.valueOf(time) : null;
+			
+		}else if(column.type == Types.BOOLEAN) {
+			
+			Boolean bool = getBoolean(result, column);
+			
+			value = bool != null ? String.valueOf(bool) : null;
+		
+		}else if(column.type == Types.ARRAY) {
+			
+			List<String> values = getArray(result, column);
+			
+			value = values != null ? String.join(",", values) : null;
+		}
+
+		return value != null ? value.trim() : null;
+	}
+	
+	private Character getCharacter(ResultSet result, Column column) throws SQLException {
+		
+		String value = result.getString(column.nameInResultSet);
+		
+		return value != null ? value.trim().charAt(0) : null;
+	}
+	
+	private Short getShort(ResultSet result, Column column) throws SQLException {
+		
+		short value = result.getShort(column.nameInResultSet);
+		
+		return result.wasNull() ? null : value;
+	}
+	
+	private Integer getInt(ResultSet result, Column column) throws SQLException {
+		
+		int value = result.getInt(column.nameInResultSet);
+		
+		return result.wasNull() ? null : value;
+	}
+	
+	private Long getLong(ResultSet result, Column column) throws SQLException {
+		
+		long value = result.getLong(column.nameInResultSet);
+		
+		return result.wasNull() ? null : value;
+	}
+	
+	private Float getFloat(ResultSet result, Column column) throws SQLException {
+		
+		float value = result.getFloat(column.nameInResultSet);
+		
+		return result.wasNull() ? null : value;
+	}
+	
+	private Double getDouble(ResultSet result, Column column) throws SQLException {
+		
+		double value = result.getDouble(column.nameInResultSet);
+		
+		return result.wasNull() ? null : value;
+	}
+	
+	private BigDecimal getDecimal(ResultSet result, Column column) throws SQLException {
+		
+		return result.getBigDecimal(column.nameInResultSet);
+	}
+	
+	private Date getDate(ResultSet result, Column column) throws SQLException {
+		
+		return result.getDate(column.nameInResultSet);
+	}
+	
+	private Timestamp getTimestamp(ResultSet result, Column column) throws SQLException {
+		
+		return result.getTimestamp(column.nameInResultSet);
+	}
+	
+	private Time getTime(ResultSet result, Column column) throws SQLException {
+		
+		return result.getTime(column.nameInResultSet);
+	}
+	
+	private Boolean getBoolean(ResultSet result, Column column) throws SQLException {
+		
+		boolean value = result.getBoolean(column.nameInResultSet);
+		
+		return result.wasNull() ? null : value;
+	}
+	
+	private List<String> getArray(ResultSet result, Column column) throws SQLException {
+		
+		Array value = result.getArray(column.nameInResultSet);
+		
+		return value != null ? Arrays.asList((String[])value.getArray()) : null;
+	}
+	
+	private Object getObject(ResultSet result, Column column) throws SQLException {
+		
+		if(column.type == Types.VARCHAR){
+			
+			return getString(result, column);
+			
+		}else if(column.type == Types.CHAR){
+			
+			return getCharacter(result, column);
+		
+		}else if(column.type == Types.SMALLINT){
+			
+			return getShort(result, column);
+			
+		}else if(column.type == Types.INTEGER){
+			
+			return getInt(result, column);
+			
+		}else if(column.type == Types.BIGINT){
+			
+			return getLong(result, column);
+			
+		}else if(column.type == Types.FLOAT){
+			
+			return getFloat(result, column);
+		
+		}else if(column.type == Types.DOUBLE){
+			
+			return getDouble(result, column);
+			
+		}else if(column.type == Types.DECIMAL){
+			
+			return getDecimal(result, column);
+		
+		}else if(column.type == Types.DATE){
+			
+			return getDate(result, column);
+		
+		}else if(column.type == Types.TIMESTAMP){
+			
+			return getTimestamp(result, column);
+		
+		}else if(column.type == Types.TIME){
+			
+			return getTime(result, column);
+			
+		}else if(column.type == Types.BOOLEAN){
+			
+			return getBoolean(result, column);
+		
+		}else if(column.type == Types.ARRAY){
+			
+			return getArray(result, column);
+		
+		}else{
+			
+			return null;
+		}
+	}
+	
+	private <T> T getObject(ResultSet result, Column column, Class<T> className) throws SQLException {
+		
+		if(className == Object.class) {
+			
+			return className.cast(getObject(result, column));
+		
+		}else if(className == String.class){
+			
+			return className.cast(getString(result, column));
+			
+		}else if(className == Character.class){
+			
+			return className.cast(getCharacter(result, column));
+		
+		}else if(className == Short.class){
+			
+			return className.cast(getShort(result, column));
+			
+		}else if(className == Integer.class){
+			
+			return className.cast(getInt(result, column));
+			
+		}else if(className == Long.class){
+			
+			return className.cast(getLong(result, column));
+			
+		}else if(className == Float.class){
+			
+			return className.cast(getFloat(result, column));
+		
+		}else if(className == Double.class){
+			
+			return className.cast(getDouble(result, column));
+			
+		}else if(className == BigDecimal.class){
+			
+			return className.cast(getDecimal(result, column));
+		
+		}else if(className == Date.class){
+			
+			return className.cast(getDate(result, column));
+		
+		}else if(className == Timestamp.class || className == java.util.Date.class){
+			
+			return className.cast(getTimestamp(result, column));
+		
+		}else if(className == Time.class){
+			
+			return className.cast(getTime(result, column));
+			
+		}else if(className == Boolean.class){
+			
+			return className.cast(getBoolean(result, column));
+		
+		}else if(className == List.class){
+			
+			return className.cast(getArray(result, column));
+		
+		}else{
+			
+			return null;
+		}
+	}
+	
+	public boolean isExist() throws SQLException {
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				return result.next();
+			}
+		
+		}finally {
+			
+			clean();
+		}
+	}
+	
+	private <T> T getObjectResult(Class<T> className) throws SQLException {
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				if(result.next() && columns.size() >= 1) {
+					
+					Column column = columns.get(0);
+					
+					return getObject(result, column, className);
+				}
+			}
+			
+		}finally {
+			
+			clean();
+		}
+		
+		return null;
+	}
+	
+	private <T> List<T> getObjectList(Class<T> className) throws SQLException {
+		
+		List<T> list = new ArrayList<T>();
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				while(result.next() && columns.size() >= 1) {
+					
+					Column column = columns.get(0);
+					
+					list.add(getObject(result, column, className));
+				}
+			}
+			
+		}finally {
+			
+			clean();
+		}
+		
+		return list;
+	}
+	
+	public String getStringResult() throws SQLException {
+		
+		return getObjectResult(String.class);
+	}
+	
+	public List<String> getStringList() throws SQLException {
+		
+		return getObjectList(String.class);
+	}
+	
+	public Character getCharacterResult() throws SQLException {
+		
+		return getObjectResult(Character.class);
+	}
+	
+	public List<Character> getCharacterList() throws SQLException {
+		
+		return getObjectList(Character.class);
+	}
+	
+	public Short getShortResult() throws SQLException {
+		
+		return getObjectResult(Short.class);
+	}
+	
+	public List<Short> getShortList() throws SQLException {
+		
+		return getObjectList(Short.class);
+	}
+	
+	public Integer getIntegerResult() throws SQLException {
+		
+		return getObjectResult(Integer.class);
+	}
+	
+	public List<Integer> getIntegerList() throws SQLException {
+		
+		return getObjectList(Integer.class);
+	}
+	
+	public Long getLongResult() throws SQLException {
+		
+		return getObjectResult(Long.class);
+	}
+	
+	public List<Long> getLongList() throws SQLException {
+		
+		return getObjectList(Long.class);
+	}
+	
+	public Float getFloatResult() throws SQLException {
+		
+		return getObjectResult(Float.class);
+	}
+	
+	public List<Float> getFloatList() throws SQLException {
+		
+		return getObjectList(Float.class);
+	}
+	
+	public Double getDoubleResult() throws SQLException {
+		
+		return getObjectResult(Double.class);
+	}
+	
+	public List<Double> getDoubleList() throws SQLException {
+		
+		return getObjectList(Double.class);
+	}
+	
+	public BigDecimal getDecimalResult() throws SQLException {
+		
+		return getObjectResult(BigDecimal.class);
+	}
+	
+	public List<BigDecimal> getDecimalList() throws SQLException {
+		
+		return getObjectList(BigDecimal.class);
+	}
+	
+	public Date getDateResult() throws SQLException {
+		
+		return getObjectResult(Date.class);
+	}
+	
+	public List<Date> getDateList() throws SQLException {
+		
+		return getObjectList(Date.class);
+	}
+	
+	public Timestamp getTimestampResult() throws SQLException {
+		
+		return getObjectResult(Timestamp.class);
+	}
+	
+	public List<Timestamp> getTimestampList() throws SQLException {
+		
+		return getObjectList(Timestamp.class);
+	}
+	
+	public Time getTimeResult() throws SQLException {
+		
+		return getObjectResult(Time.class);
+	}
+	
+	public List<Time> getTimeList() throws SQLException {
+		
+		return getObjectList(Time.class);
+	}
+	
+	public Boolean getBooleanResult() throws SQLException {
+		
+		return getObjectResult(Boolean.class);
+	}
+	
+	public List<Boolean> getBooleanList() throws SQLException {
+		
+		return getObjectList(Boolean.class);
+	}
+	
+	public List<String> getArrayResult() throws SQLException {
+		
+		return getObjectResult(List.class);
+	}
+	
+	public List<List> getArrayList() throws SQLException {
+		
+		return getObjectList(List.class);
+	}
+	
+	public <K, V> Entry<K, V> getEntryResult(Class<K> keyClass, Class<V> valueClass) throws SQLException{
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				if(result.next() && columns.size() >= 2) {
+					
+					Column keyColumn = columns.get(0);
+					Column valueColumn = columns.get(1);
+					
+					K key = getObject(result, keyColumn, keyClass);
+					V value = getObject(result, valueColumn, valueClass);
+					
+					return new SimpleEntry<K, V>(key, value);
+				}
+			}
+			
+		}finally {
+			
+			clean();
+		}
+
+		return null;
+	}
+	
+	public <K, V> List<Entry<K, V>> getEntryList(Class<K> keyClass, Class<V> valueClass) throws SQLException{
+		
+		List<Entry<K, V>> list = new ArrayList<Map.Entry<K, V>>();
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				while(result.next() && columns.size() >= 2) {
+				
+					Column keyColumn = columns.get(0);
+					Column valueColumn = columns.get(1);
+					
+					K key = getObject(result, keyColumn, keyClass);
+					V value = getObject(result, valueColumn, valueClass);
+					
+					list.add(new SimpleEntry<K, V>(key, value));
+				}
+			}
+
+		}finally {
+			
+			clean();
+		}
+
+		return list;
+	}
+	
+	public <K, V> Map<K, V> getMapResult(Class<K> keyClass, Class<V> valueClass) throws SQLException{
+		
+		Map<K, V> map = new LinkedHashMap<K, V>();
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				while(result.next() && columns.size() >= 2) {
+					
+					Column keyColumn = columns.get(0);
+					Column valueColumn = columns.get(1);
+					
+					K key = getObject(result, keyColumn, keyClass);
+					V value = getObject(result, valueColumn, valueClass);
+					
+					map.put(key, value);
+				}
+			}
+
+		}finally {
+			
+			clean();
+		}
+
+		return map;
+	}
+	
+	public Entry<Object, Object> getEntryResult() throws SQLException{
+		
+		return getEntryResult(Object.class, Object.class);
+	}
+	
+	public List<Entry<Object, Object>> getEntryList() throws SQLException{
+		
+		return getEntryList(Object.class, Object.class);
+	}
+	
+	public Map<Object, Object> getMapResult() throws SQLException{
+		
+		return getMapResult(Object.class, Object.class);
+	}
+	
+	public int getRecordCount() throws SQLException {
+		
+		int count = 0;
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				while(result.next()) {
+					
+					count++;
+				}
+			}
+			
+		}finally {
+			
+			clean();
+		}
+		
+		return count;
+	}
+	
+	public Map<Column, Object> getRecord() throws SQLException{
+		
+		Map<Column, Object> record = new LinkedHashMap<Column, Object>();
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				if(result.next() && !columns.isEmpty()) {
+					
+					for(Column column : columns) {
+						
+						record.put(column, getObject(result, column));
+					}
+				}
+			}
+
+		}finally {
+			
+			clean();
+		}
+		
+		return record;
+	}
+	
+	public List<Map<Column, Object>> getRecordList() throws SQLException{
+		
+		List<Map<Column, Object>> list = new ArrayList<Map<Column, Object>>();
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				while(result.next() && !columns.isEmpty()) {
+					
+					Map<Column, Object> record = new LinkedHashMap<Column, Object>();
+					
+					for(Column column : columns) {
+						
+						record.put(column, getObject(result, column));
+					}
+					
+					list.add(record);
+				}
+			}
+
+		}finally {
+			
+			clean();
+		}
+
+		return list;
+	}
+
+	public Map<Object, Map<Column, Object>> getRecordMap() throws SQLException{
+		
+		Map<Object, Map<Column, Object>> map = new LinkedHashMap<Object, Map<Column, Object>>();
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				while(result.next() && !columns.isEmpty()) {
+					
+					Map<Column, Object> record = new LinkedHashMap<Column, Object>();
+					
+					for(Column column : columns) {
+						
+						record.put(column, getObject(result, column));
+					}
+					
+					Column column = columns.get(0);
+					
+					map.put(getObject(result, column), record);
+				}
+			}
+
+		}finally {
+			
+			clean();
+		}
+
+		return map;
+	}
+	
+	public <T> T getRecord(Class<T> className) throws Exception{
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				if(result.next() && !columns.isEmpty()) {
+					
+					//read all columns to class object properties
+				}
+			}
+
+		}finally {
+			
+			clean();
+		}
+
+		return null;
+	}
+	
+	public <T> T getRecord(T dto) throws Exception{
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				if(result.next() && !columns.isEmpty()) {
+					//read all columns to class object properties
+				}
+			}
+
+		}finally {
+			
+			clean();
+		}
+
+		return dto;
+	}
+	
+	public <T> List<T> getRecordList(Class<T> className) throws Exception{
+		
+		List<T> list = new ArrayList<T>();
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				while(result.next() && !columns.isEmpty()) {
+					//read all columns to class object properties
+				}
+			}
+			
+		}finally {
+			
+			clean();
+		}
+
+		return list;
+	}
+	
+	public <T> Map<Integer, T> getRecordMap(Class<T> className) throws Exception{
+		
+		Map<Integer, T> map = new LinkedHashMap<Integer, T>();
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				while(result.next() && !columns.isEmpty()) {
+					//read all columns to class object properties
+				}
+			}
+
+		}finally {
+			
+			clean();
+		}
+		
+		return map;
 	}
 }
