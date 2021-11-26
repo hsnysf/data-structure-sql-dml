@@ -2126,31 +2126,31 @@ public class Query {
 			
 			Short number = getShort(result, column);
 			
-			value = number != null ? String.valueOf(number) : null;
+			value = number != null ? Short.toString(number) : null;
 			
 		}else if(column.type == Types.INTEGER) {
 			
 			Integer number = getInt(result, column);
 			
-			value = number != null ? String.valueOf(number) : null;
+			value = number != null ? Integer.toString(number) : null;
 			
 		}else if(column.type == Types.BIGINT) {
 			
 			Long number = getLong(result, column);
 			
-			value = number != null ? String.valueOf(number) : null;
+			value = number != null ? Long.toString(number) : null;
 			
 		}else if(column.type == Types.FLOAT) {
 			
 			Float number = getFloat(result, column);
 			
-			value = number != null ? String.valueOf(number) : null;
+			value = number != null ? Float.toString(number) : null;
 			
 		}else if(column.type == Types.DOUBLE) {
 			
 			Double number = getDouble(result, column);
 			
-			value = number != null ? String.valueOf(number) : null;
+			value = number != null ? Double.toString(number) : null;
 			
 		}else if(column.type == Types.DECIMAL) {
 			
@@ -2180,7 +2180,7 @@ public class Query {
 			
 			Boolean bool = getBoolean(result, column);
 			
-			value = bool != null ? String.valueOf(bool) : null;
+			value = bool != null ? Boolean.toString(bool) : null;
 		
 		}else if(column.type == Types.ARRAY) {
 			
@@ -2795,7 +2795,6 @@ public class Query {
 				
 				if(result.next() && !columns.isEmpty()) {
 					
-					//read all columns to class object properties
 				}
 			}
 
@@ -2814,7 +2813,7 @@ public class Query {
 			try(Statement statement = result.getStatement()){
 				
 				if(result.next() && !columns.isEmpty()) {
-					//read all columns to class object properties
+					
 				}
 			}
 
@@ -2835,7 +2834,7 @@ public class Query {
 			try(Statement statement = result.getStatement()){
 				
 				while(result.next() && !columns.isEmpty()) {
-					//read all columns to class object properties
+					
 				}
 			}
 			
@@ -2856,7 +2855,7 @@ public class Query {
 			try(Statement statement = result.getStatement()){
 				
 				while(result.next() && !columns.isEmpty()) {
-					//read all columns to class object properties
+					
 				}
 			}
 
