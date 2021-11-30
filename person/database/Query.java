@@ -2366,11 +2366,15 @@ public class Query {
 			
 			return className.cast(getDecimal(result, column));
 		
+		}else if(className == java.util.Date.class){
+			
+			return className.cast(getObject(result, column));
+		
 		}else if(className == Date.class){
 			
 			return className.cast(getDate(result, column));
 		
-		}else if(className == Timestamp.class || className == java.util.Date.class){
+		}else if(className == Timestamp.class){
 			
 			return className.cast(getTimestamp(result, column));
 		
