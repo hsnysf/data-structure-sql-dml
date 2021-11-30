@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PersonDTO {
 
@@ -20,6 +22,7 @@ public class PersonDTO {
 	private Timestamp registrationDateTime;
 	private Time sleepTime;
 	private Boolean graduated;
+	private List<String> certificates = new ArrayList<String>();
 	
 	public Integer getId() {
 		return id;
@@ -98,5 +101,11 @@ public class PersonDTO {
 	}
 	public void setGraduated(Boolean graduated) {
 		this.graduated = graduated;
+	}
+	public List<String> getCertificates() {
+		return certificates;
+	}
+	public void setCertificates(List<String> certificates) {
+		this.certificates = certificates;
 	}
 }
