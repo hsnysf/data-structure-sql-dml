@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 
@@ -2350,7 +2349,7 @@ public class Query {
 			
 			Character value = getCharacter(result, column);
 			
-			return className.cast(value != null ? value : ' ');
+			return (T) Character.class.cast(value != null ? value : ' ');
 		
 		}else if(className == Short.class){
 			
@@ -2360,7 +2359,7 @@ public class Query {
 			
 			Short value = getShort(result, column);
 			
-			return className.cast(value != null ? value : 0);
+			return (T) Short.class.cast(value != null ? value : 0);
 		
 		}else if(className == Integer.class){
 			
@@ -2370,7 +2369,7 @@ public class Query {
 			
 			Integer value = getInt(result, column);
 			
-			return className.cast(value != null ? value : 0);
+			return (T) Integer.class.cast(value != null ? value : 0);
 		
 		}else if(className == Long.class){
 			
@@ -2380,7 +2379,7 @@ public class Query {
 			
 			Long value = getLong(result, column);
 			
-			return className.cast(value != null ? value : 0);
+			return (T) Long.class.cast(value != null ? value : 0);
 		
 		}else if(className == Float.class){
 			
@@ -2390,7 +2389,7 @@ public class Query {
 			
 			Float value = getFloat(result, column);
 			
-			return className.cast(value != null ? value : 0);
+			return (T) Float.class.cast(value != null ? value : 0);
 		
 		}else if(className == Double.class){
 			
@@ -2400,7 +2399,7 @@ public class Query {
 			
 			Double value = getDouble(result, column);
 			
-			return className.cast(value != null ? value : 0);
+			return (T) Double.class.cast(value != null ? value : 0);
 		
 		}else if(className == BigDecimal.class){
 			
@@ -2430,7 +2429,7 @@ public class Query {
 			
 			Boolean value = getBoolean(result, column);
 			
-			return className.cast(value != null ? value : false);
+			return (T) Boolean.class.cast(value != null ? value : false);
 		
 		}else if(className == List.class){
 			
@@ -2850,7 +2849,7 @@ public class Query {
 		Field[] fields = className.getDeclaredFields();
 		
 		for(Field field : fields) {
-			
+		
 			person.annotation.Column column = field.getAnnotation(person.annotation.Column.class);
 			
 			if(column != null) {
