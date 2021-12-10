@@ -9,12 +9,16 @@ create table public.city
   constraint pk_ct_id primary key (ct_id)
 );
 
+insert into public.city(ct_name) values('Manama');
+
 create table public.school
 (
   sch_id serial,
   sch_name character varying(100),
   constraint pk_sch_id primary key (sch_id)
 );
+
+insert into public.school(sch_name) values('Bin Khuldon');
 
 create table public.country
 (
@@ -23,12 +27,16 @@ create table public.country
   constraint pk_cnt_id primary key (cnt_id)
 );
 
+insert into public.country(cnt_name) values('Kuwait');
+
 create table public.company
 (
   cmp_id serial,
   cmp_name character varying(100),
   constraint pk_cmp_id primary key (cmp_id)
 );
+
+insert into public.company(cmp_name) values('Maraei');
 
 create table public.address
 (
@@ -98,11 +106,12 @@ prsn_name, prsn_gender,
 prsn_age, prsn_cpr, prsn_account_no, 
 prsn_gpa, prsn_salary, prsn_annual_income, 
 prsn_date_of_birth, prsn_registration_date_time, 
-prsn_sleep_time, prsn_graduated
+prsn_sleep_time, prsn_graduated, prsn_certificates,
+prsn_city_id, prsn_school_id, prsn_country_id, prsn_company_id
 )
 values 
 ('Hasan Yusuf', 'M', 33, 880101261, 123456789012345, 
-3.12, 50.45, 100.6, '1988-01-27', '2000-01-27 10:10:10', '20:30', true);
+3.12, 50.45, 100.6, '1988-01-27', '2000-01-27 10:10:10', '20:30', true, '{DB2, Java}', 1, 1, 1, 1);
 
 update public.person
 set
@@ -265,3 +274,24 @@ from (
 		from public.person
 	 ) as person 
 where person_row_number = 1;
+
+insert into public.person 
+(prsn_date_of_birth, 
+prsn_registration_date_time, 
+prsn_sleep_time) 
+values 
+(current_date + interval '1 days' - interval '2 months', 
+current_timestamp - interval '1 hours' + interval '2 years', 
+current_timestamp + interval '1 minutes' - interval '2 hours');
+
+update public.person 
+set prsn_age = prsn_age + 1, 
+prsn_cpr = prsn_cpr - 2, 
+prsn_account_no = prsn_account_no * 3, 
+prsn_gpa = prsn_gpa / 4, 
+prsn_salary = prsn_salary * prsn_salary, 
+prsn_annual_income = prsn_annual_income + prsn_annual_income, 
+prsn_date_of_birth = current_date + interval '1 days' - interval '2 months', 
+prsn_registration_date_time = current_timestamp - interval '1 hours' + interval '2 years', 
+prsn_sleep_time = current_timestamp + interval '1 minutes' - interval '2 hours' 
+where prsn_id = 1;
