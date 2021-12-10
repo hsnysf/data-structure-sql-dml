@@ -5,8 +5,8 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
-
 import person.annotation.Column;
+import person.annotation.JoinColumn;
 
 public class PersonDTO {
 
@@ -38,6 +38,15 @@ public class PersonDTO {
 	private Boolean graduated;
 	@Column("prsn_certificates")
 	private List<String> certificates;
+	
+	@JoinColumn(name="prsn_city_id", on="ct_id")
+	private CityDTO city;
+	@JoinColumn(name="prsn_school_id", on="sch_id")
+	private SchoolDTO school;
+	@JoinColumn(name="prsn_country_id", on="cnt_id")
+	private CountryDTO country;
+	@JoinColumn(name="prsn_company_id", on="cmp_id")
+	private CompanyDTO company;
 	
 	public Integer getId() {
 		return id;
@@ -123,11 +132,37 @@ public class PersonDTO {
 	public void setCertificates(List<String> certificates) {
 		this.certificates = certificates;
 	}
+	
+	public CityDTO getCity() {
+		return city;
+	}
+	public void setCity(CityDTO city) {
+		this.city = city;
+	}
+	public SchoolDTO getSchool() {
+		return school;
+	}
+	public void setSchool(SchoolDTO school) {
+		this.school = school;
+	}
+	public CountryDTO getCountry() {
+		return country;
+	}
+	public void setCountry(CountryDTO country) {
+		this.country = country;
+	}
+	public CompanyDTO getCompany() {
+		return company;
+	}
+	public void setCompany(CompanyDTO company) {
+		this.company = company;
+	}
 	@Override
 	public String toString() {
 		return "[id=" + id + ", name=" + name + ", gender=" + gender + ", age=" + age + ", cpr=" + cpr
 				+ ", accountNo=" + accountNo + ", gpa=" + gpa + ", salary=" + salary + ", annualIncome=" + annualIncome
 				+ ", dateOfBirth=" + dateOfBirth + ", registrationDateTime=" + registrationDateTime + ", sleepTime="
-				+ sleepTime + ", graduated=" + graduated + ", certificates=" + certificates + "]";
+				+ sleepTime + ", graduated=" + graduated + ", certificates=" + certificates + ", city=" + city
+				+ ", school=" + school + ", country=" + country + ", company=" + company + "]";
 	}
 }
