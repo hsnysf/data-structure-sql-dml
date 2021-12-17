@@ -14,12 +14,17 @@ import person.column.City;
 import person.column.Company;
 import person.column.Country;
 import person.column.Doctor;
+import person.column.Governorate;
 import person.column.Person;
 import person.column.School;
+import person.column.Student;
 import person.column.UniqueDateOfBirth;
 import person.database.Query;
 import person.database.Table;
 import person.dto.PersonDTO;
+import person.dto.PersonPrimitiveDateDTO;
+import person.dto.PersonStringDTO;
+import person.dto.StudentDTO;
 
 public class ModernPersonDAO extends Query {
 
@@ -1467,8 +1472,7 @@ public class ModernPersonDAO extends Query {
 	}
 	
 	public void selectPersonWithResultSetToClassObject() throws Exception {
-		
-		/*
+
 		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
@@ -1499,12 +1503,6 @@ public class ModernPersonDAO extends Query {
 				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
-				.from(Table.PERSON).where(Person.ID.equal(1)).getRecord(PersonStringDTO.class));
-		
-		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
-				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
-				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
-				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
 				.from(Table.PERSON).where(Person.ID.equal(1)).getRecord(PersonPrimitiveDateDTO.class));
 		
 		System.out.println(select(Person.ID, Person.NAME)
@@ -1519,17 +1517,16 @@ public class ModernPersonDAO extends Query {
 				.join(Table.SCHOOL).on(Person.SCHOOL_ID.equal(School.ID))
 				.where(Person.ID.equal(1))
 				.getRecord(PersonDTO.class));
-
+				
 		System.out.println(select(Person.NAME, Person.GENDER, Person.AGE)
 				.select(Address.ID, Address.BUILDING, 
-						Address.ROAD, Address.BLOCK)
+						Address.ROAD.as("person_road"), Address.BLOCK.as("person_block"))
 				.from(Table.PERSON)
 				.join(Table.ADDRESS)
 					.on(Person.HOME_ADDRESS_ID.equal(Address.ID))
 				.where(Person.ID.equal(1))
 				.getRecord(PersonDTO.class));
-		*/
-		
+				
 		System.out.println(select(Person.NAME, Person.GENDER, Person.AGE)
 				.select(Address.ROAD.of("home_address").as("home_address_road")
 						, Address.BLOCK.of("home_address"))
@@ -1541,5 +1538,41 @@ public class ModernPersonDAO extends Query {
 					.on(Person.WORK_ADDRESS_ID.equal(Address.ID.of("work_address")))
 				.where(Person.ID.equal(1))
 				.getRecord(PersonDTO.class));
+		
+		System.out.println(select(Person.AGE.plus(2).as("new_age"), 
+				Person.SALARY.minus(3).as("new_salary"),
+				Person.GPA.multiply(4).as("new_gpa"), 
+				Person.ANNUAL_INCOME.divide(5).as("new_income"))
+			.from(Table.PERSON).getRecord(PersonDTO.class));
+		
+		System.out.println(
+				select(Student.ID, Person.NAME.as("person_name"))
+				.select(Student.COLLEGE_NAME, Student.CURRENT_YEAR)
+				.from(Table.PERSON)
+				.join(Table.STUDENT).on(Student.ID.equal(Person.ID))
+				.where(Person.ID.equal(1))
+				.getRecord(StudentDTO.class));
+		
+		System.out.println(select(Person.ID, Governorate.ID, 
+				Governorate.NAME)
+				.from(Table.PERSON)
+				.join(Table.CITY)
+					.on(Person.CITY_ID.equal(City.ID))
+				.join(Table.GOVERNORATE)
+					.on(City.GOVERNORATE_ID.equal(Governorate.ID))
+				.where(Person.ID.equal(1))
+				.getRecord(PersonDTO.class));
+				
+		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
+				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
+				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
+				.from(Table.PERSON).where(Person.ID.equal(1)).getRecord(PersonPrimitiveDateDTO.class));
+		
+		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
+				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
+				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
+				.from(Table.PERSON).where(Person.ID.equal(1)).getRecord(PersonStringDTO.class));
 	}
 }
