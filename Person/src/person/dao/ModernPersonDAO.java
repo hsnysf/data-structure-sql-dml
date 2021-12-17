@@ -1468,6 +1468,7 @@ public class ModernPersonDAO extends Query {
 	
 	public void selectPersonWithResultSetToClassObject() throws Exception {
 		
+		/*
 		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
@@ -1493,5 +1494,52 @@ public class ModernPersonDAO extends Query {
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
 				.from(Table.PERSON).getRecordMap(PersonDTO.class));
+		
+		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
+				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
+				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
+				.from(Table.PERSON).where(Person.ID.equal(1)).getRecord(PersonStringDTO.class));
+		
+		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
+				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
+				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
+				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
+				.from(Table.PERSON).where(Person.ID.equal(1)).getRecord(PersonPrimitiveDateDTO.class));
+		
+		System.out.println(select(Person.ID, Person.NAME)
+				.select(Person.CITY_ID, City.ID, City.NAME)
+				.select(Person.COMPANY_ID, Company.ID, Company.NAME)
+				.select(Person.COUNTRY_ID, Country.ID, Country.NAME)
+				.select(Person.SCHOOL_ID, School.ID, School.NAME)
+				.from(Table.PERSON)
+				.join(Table.CITY).on(Person.CITY_ID.equal(City.ID))
+				.join(Table.COMPANY).on(Person.COMPANY_ID.equal(Company.ID))
+				.join(Table.COUNTRY).on(Person.COUNTRY_ID.equal(Country.ID))
+				.join(Table.SCHOOL).on(Person.SCHOOL_ID.equal(School.ID))
+				.where(Person.ID.equal(1))
+				.getRecord(PersonDTO.class));
+
+		System.out.println(select(Person.NAME, Person.GENDER, Person.AGE)
+				.select(Address.ID, Address.BUILDING, 
+						Address.ROAD, Address.BLOCK)
+				.from(Table.PERSON)
+				.join(Table.ADDRESS)
+					.on(Person.HOME_ADDRESS_ID.equal(Address.ID))
+				.where(Person.ID.equal(1))
+				.getRecord(PersonDTO.class));
+		*/
+		
+		System.out.println(select(Person.NAME, Person.GENDER, Person.AGE)
+				.select(Address.ROAD.of("home_address").as("home_address_road")
+						, Address.BLOCK.of("home_address"))
+				.select(Address.ROAD.of("work_address"), Address.BLOCK.of("work_address"))
+				.from(Table.PERSON.as("person"))
+				.join(Table.ADDRESS.as("home_address"))
+					.on(Person.HOME_ADDRESS_ID.equal(Address.ID.of("home_address")))
+				.join(Table.ADDRESS.as("work_address"))
+					.on(Person.WORK_ADDRESS_ID.equal(Address.ID.of("work_address")))
+				.where(Person.ID.equal(1))
+				.getRecord(PersonDTO.class));
 	}
 }
