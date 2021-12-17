@@ -2,11 +2,11 @@ package person.dto;
 
 import person.annotation.Column;
 
-public class CountryDTO extends CommonDTO {
+public class GovernorateDTO extends CommonDTO {
 
-	@Column("cnt_id")
+	@Column("gvn_id")
 	private Integer id;
-	@Column("cnt_name")
+	@Column("gvn_name")
 	private String name;
 	
 	public Integer getId() {

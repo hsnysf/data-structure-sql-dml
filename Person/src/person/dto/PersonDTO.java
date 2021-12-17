@@ -8,7 +8,7 @@ import java.util.List;
 import person.annotation.Column;
 import person.annotation.JoinColumn;
 
-public class PersonDTO {
+public class PersonDTO extends CommonDTO {
 
 	@Column("prsn_id")
 	private Integer id;
@@ -48,87 +48,119 @@ public class PersonDTO {
 	@JoinColumn(name="prsn_company_id", on="cmp_id")
 	private CompanyDTO company;
 	
+	@JoinColumn(name="prsn_home_address_id", on="addr_id")
+	private AddressDTO homeAddress;
+	@JoinColumn(name="prsn_work_address_id", on="addr_id")
+	private AddressDTO workAddress;
+	
 	public Integer getId() {
 		return id;
 	}
+	
 	public void setId(Integer id) {
 		this.id = id;
 	}
+	
 	public String getName() {
 		return name;
 	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	public Character getGender() {
 		return gender;
 	}
+	
 	public void setGender(Character gender) {
 		this.gender = gender;
 	}
+	
 	public Short getAge() {
 		return age;
 	}
+	
 	public void setAge(Short age) {
 		this.age = age;
 	}
+	
 	public Integer getCpr() {
 		return cpr;
 	}
+	
 	public void setCpr(Integer cpr) {
 		this.cpr = cpr;
 	}
+	
 	public Long getAccountNo() {
 		return accountNo;
 	}
+	
 	public void setAccountNo(Long accountNo) {
 		this.accountNo = accountNo;
 	}
+	
 	public Float getGpa() {
 		return gpa;
 	}
+	
 	public void setGpa(Float gpa) {
 		this.gpa = gpa;
 	}
+	
 	public Double getSalary() {
 		return salary;
 	}
+	
 	public void setSalary(Double salary) {
 		this.salary = salary;
 	}
+	
 	public BigDecimal getAnnualIncome() {
 		return annualIncome;
 	}
+	
 	public void setAnnualIncome(BigDecimal annualIncome) {
 		this.annualIncome = annualIncome;
 	}
+	
 	public Date getDateOfBirth() {
 		return dateOfBirth;
 	}
+	
 	public void setDateOfBirth(Date dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
+	
 	public Timestamp getRegistrationDateTime() {
 		return registrationDateTime;
 	}
+	
 	public void setRegistrationDateTime(Timestamp registrationDateTime) {
 		this.registrationDateTime = registrationDateTime;
 	}
+	
 	public Time getSleepTime() {
 		return sleepTime;
 	}
+	
 	public void setSleepTime(Time sleepTime) {
 		this.sleepTime = sleepTime;
 	}
+	
 	public Boolean getGraduated() {
 		return graduated;
 	}
+	
 	public void setGraduated(Boolean graduated) {
 		this.graduated = graduated;
 	}
+	
 	public List<String> getCertificates() {
 		return certificates;
 	}
+	
 	public void setCertificates(List<String> certificates) {
 		this.certificates = certificates;
 	}
@@ -136,33 +168,48 @@ public class PersonDTO {
 	public CityDTO getCity() {
 		return city;
 	}
+	
 	public void setCity(CityDTO city) {
 		this.city = city;
 	}
+	
 	public SchoolDTO getSchool() {
 		return school;
 	}
+	
 	public void setSchool(SchoolDTO school) {
 		this.school = school;
 	}
+	
 	public CountryDTO getCountry() {
 		return country;
 	}
+	
 	public void setCountry(CountryDTO country) {
 		this.country = country;
 	}
+	
 	public CompanyDTO getCompany() {
 		return company;
 	}
+	
 	public void setCompany(CompanyDTO company) {
 		this.company = company;
 	}
-	@Override
-	public String toString() {
-		return "[id=" + id + ", name=" + name + ", gender=" + gender + ", age=" + age + ", cpr=" + cpr
-				+ ", accountNo=" + accountNo + ", gpa=" + gpa + ", salary=" + salary + ", annualIncome=" + annualIncome
-				+ ", dateOfBirth=" + dateOfBirth + ", registrationDateTime=" + registrationDateTime + ", sleepTime="
-				+ sleepTime + ", graduated=" + graduated + ", certificates=" + certificates + ", city=" + city
-				+ ", school=" + school + ", country=" + country + ", company=" + company + "]";
+	
+	public AddressDTO getHomeAddress() {
+		return homeAddress;
+	}
+	
+	public void setHomeAddress(AddressDTO homeAddress) {
+		this.homeAddress = homeAddress;
+	}
+	
+	public AddressDTO getWorkAddress() {
+		return workAddress;
+	}
+	
+	public void setWorkAddress(AddressDTO workAddress) {
+		this.workAddress = workAddress;
 	}
 }
