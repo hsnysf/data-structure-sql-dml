@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+
+import person.annotation.ExtendJoinColumns;
 
 public class Query {
 	
@@ -2872,11 +2875,27 @@ public class Query {
 				if(relation.table.alias != null) {
 					
 					joinColumns.put(column, relation.table.alias);
+				
+				}else {
+					
+					joinColumns.put(column, relation.table.name);
 				}
 			}
 		}
 		
 		return joinColumns;
+	}
+	
+	private Map<String, String> getSelectColumns(){
+		
+		Map<String, String> selectColumns = new LinkedHashMap<String, String>();
+		
+		for(Column column : columns) {
+			
+			selectColumns.put(column.name, column.nameInResultSet);
+		}
+		
+		return selectColumns;
 	}
 	
 	private Map<String, String> getSelectColumnsByTableAlias(String tableAlias){
@@ -2893,13 +2912,15 @@ public class Query {
 		return selectColumns;
 	}
 	
-	private Map<String, String> getClassPropertyColumn(Class className) throws SQLException {
+	private Map<String, String> getClassPropertyColumn(Class className, boolean root) throws SQLException {
 		
 		Map<String, String> properties = new LinkedHashMap<String, String>();
 		
+		Map<String, String> selectColumns = getSelectColumns();
+		
 		Map<String, String> joinColumns = getJoinColumns();
 		
-		Field[] fields = className.getDeclaredFields();
+		Field[] fields = FieldUtils.getAllFields(className);
 		
 		for(Field field : fields) {
 		
@@ -2907,9 +2928,24 @@ public class Query {
 			
 			person.annotation.JoinColumn joinColumn = field.getAnnotation(person.annotation.JoinColumn.class);
 			
+			person.annotation.ExtendJoinColumns extendJoinColumns = (ExtendJoinColumns) className.getAnnotation(person.annotation.ExtendJoinColumns.class);
+			
+			if(extendJoinColumns != null) {
+				
+				Class superClass = className.getSuperclass();
+				
+				Map<String, String> superProperties = getClassPropertyColumn(superClass, true);
+				
+				properties.put(extendJoinColumns.name(), superProperties.get(extendJoinColumns.on()));
+			}
+			
 			if(column != null) {
 				
-				properties.put(column.value(), field.getName());
+				if(root && selectColumns.containsKey(column.value())) {
+					properties.put(selectColumns.get(column.value()), field.getName());
+				}else {
+					properties.put(column.value(), field.getName());
+				}
 				
 			}else if(joinColumn != null && joinColumns.containsKey(joinColumn.name())) {
 				
@@ -2917,7 +2953,7 @@ public class Query {
 				
 				Map<String, String> tableColumns = getSelectColumnsByTableAlias(tableAlias);
 				
-				Map<String, String> joinProperties = getClassPropertyColumn(field.getType());
+				Map<String, String> joinProperties = getClassPropertyColumn(field.getType(), false);
 				
 				properties.put(joinColumn.name(), field.getName() + "." + joinProperties.get(joinColumn.on()));
 				
@@ -2928,6 +2964,8 @@ public class Query {
 					
 					if(tableColumns.containsKey(propertyColumn)) {
 						properties.put(tableColumns.get(propertyColumn), propertyName);
+					}else if(selectColumns.containsKey(propertyColumn)) {
+						properties.put(selectColumns.get(propertyColumn), propertyName);
 					}else {
 						properties.put(propertyColumn, propertyName);
 					}
@@ -2940,9 +2978,7 @@ public class Query {
 	
 	private void populateDTO(ResultSet result, Object dto) throws Exception {
 		
-		Map<String, String> properties = getClassPropertyColumn(dto.getClass());
-		
-		System.out.println(properties);
+		Map<String, String> properties = getClassPropertyColumn(dto.getClass(), true);
 		
 		for(Column column : columns) {
 			
