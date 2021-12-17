@@ -2842,9 +2842,62 @@ public class Query {
 		return map;
 	}
 	
-	private static Map<String, String> getClassPropertyColumn(Class className) throws SQLException {
+	private List<String> getRestrictionColumns(Restriction restriction){
+		
+		List<String> columns = new ArrayList<String>();
+		
+		if(restriction.column != null && restriction.column2 != null) {
+			columns.add(restriction.column.name);
+			columns.add(restriction.column2.name);
+		}
+		
+		for(Restriction nestedRestriction : restriction.restrictions) {
+			
+			columns.addAll(getRestrictionColumns(nestedRestriction));
+		}
+		
+		return columns;
+	}
+	
+	private Map<String, String> getJoinColumns(){
+		
+		Map<String, String> joinColumns = new LinkedHashMap<String, String>();
+		
+		for(Relation relation : relations) {
+			
+			List<String> columns = getRestrictionColumns(relation.restriction);
+			
+			for(String column : columns) {
+				
+				if(relation.table.alias != null) {
+					
+					joinColumns.put(column, relation.table.alias);
+				}
+			}
+		}
+		
+		return joinColumns;
+	}
+	
+	private Map<String, String> getSelectColumnsByTableAlias(String tableAlias){
+		
+		Map<String, String> selectColumns = new LinkedHashMap<String, String>();
+		
+		for(Column column : columns) {
+			
+			if(tableAlias.equals(column.tableAlias)) {
+				selectColumns.put(column.name, column.nameInResultSet);
+			}
+		}
+		
+		return selectColumns;
+	}
+	
+	private Map<String, String> getClassPropertyColumn(Class className) throws SQLException {
 		
 		Map<String, String> properties = new LinkedHashMap<String, String>();
+		
+		Map<String, String> joinColumns = getJoinColumns();
 		
 		Field[] fields = className.getDeclaredFields();
 		
@@ -2852,9 +2905,33 @@ public class Query {
 		
 			person.annotation.Column column = field.getAnnotation(person.annotation.Column.class);
 			
+			person.annotation.JoinColumn joinColumn = field.getAnnotation(person.annotation.JoinColumn.class);
+			
 			if(column != null) {
 				
 				properties.put(column.value(), field.getName());
+				
+			}else if(joinColumn != null && joinColumns.containsKey(joinColumn.name())) {
+				
+				String tableAlias = joinColumns.get(joinColumn.name());
+				
+				Map<String, String> tableColumns = getSelectColumnsByTableAlias(tableAlias);
+				
+				Map<String, String> joinProperties = getClassPropertyColumn(field.getType());
+				
+				properties.put(joinColumn.name(), field.getName() + "." + joinProperties.get(joinColumn.on()));
+				
+				for(Entry<String, String> property : joinProperties.entrySet()) {
+					
+					String propertyColumn = property.getKey();
+					String propertyName = field.getName() + "." + property.getValue();
+					
+					if(tableColumns.containsKey(propertyColumn)) {
+						properties.put(tableColumns.get(propertyColumn), propertyName);
+					}else {
+						properties.put(propertyColumn, propertyName);
+					}
+				}
 			}
 		}
 		
@@ -2865,13 +2942,42 @@ public class Query {
 		
 		Map<String, String> properties = getClassPropertyColumn(dto.getClass());
 		
+		System.out.println(properties);
+		
 		for(Column column : columns) {
 			
-			String property = properties.get(column.nameInResultSet);
-			Class type = PropertyUtils.getPropertyType(dto, property);
-			Object value = getObject(result, column, type);
-			
-			BeanUtils.setProperty(dto, property, value);
+			if(properties.containsKey(column.nameInResultSet)) {
+				
+				String property = properties.get(column.nameInResultSet);
+				
+				String[] tokens = property.split("\\.");
+				
+				if(tokens.length != 1) {
+					
+					String name = "";
+					
+					for(int i=0; i<tokens.length-1; i++) {
+						
+						if(!name.equals("")) {
+							name += ".";
+						}
+						
+						name += tokens[i];
+						
+						if(BeanUtils.getProperty(dto, name) == null) {
+							
+							Class type = PropertyUtils.getPropertyType(dto, name);
+							
+							BeanUtils.setProperty(dto, name, type.newInstance());
+						}
+					}
+				}
+				
+				Class type = PropertyUtils.getPropertyType(dto, property);
+				Object value = getObject(result, column, type);
+				
+				BeanUtils.setProperty(dto, property, value);
+			}
 		}
 	}
 	
