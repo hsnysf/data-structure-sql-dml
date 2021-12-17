@@ -11,7 +11,7 @@ public interface Person {
 	Column AGE = new Column("prsn_age", Types.SMALLINT);
 	Column CPR = new Column("prsn_cpr", Types.INTEGER);
 	Column ACCOUNT_NO = new Column("prsn_account_no", Types.BIGINT);
-	Column GPA = new Column("prsn_gpa", Types.FLOAT);
+	Column GPA = new Column("prsn_gpa", Types.DOUBLE);
 	Column SALARY = new Column("prsn_salary", Types.DOUBLE);
 	Column ANNUAL_INCOME = new Column("prsn_annual_income", Types.DECIMAL);
 	Column DATE_OF_BIRTH = new Column("prsn_date_of_birth", Types.DATE);
