@@ -8,16 +8,18 @@ public class TableClassGenerator {
 
 	public static void main(String[] args) throws Exception {
 		
-		List<TableConfig> tableMap = GeneratorUtils.getTableMap();
+		List<TableConfig> tableList = GeneratorUtils.getTableList();
 		
 		StringBuilder builder = new StringBuilder();
 		
 		builder.append("package person.database;");
+		
 		builder.append("\r\n\r\n");
 		builder.append("public class Table {");
+		
 		builder.append("\r\n\r\n");
 		
-		for(TableConfig tableConfig : tableMap){
+		for(TableConfig tableConfig : tableList){
 			
 			builder.append("	public final static Table " + tableConfig.enumName + " = new Table(\"public." + tableConfig.name + "\");");
 		    builder.append("\r\n");

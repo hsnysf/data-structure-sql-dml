@@ -8,7 +8,6 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
 import person.column.Address;
 import person.column.City;
 import person.column.Company;
@@ -57,7 +56,8 @@ public class ModernPersonDAO extends Query {
 	public int deletePerson(PersonDTO personDTO) throws SQLException {
 		
 		return deleteFrom(Table.PERSON)
-					.where(Person.NAME.like(personDTO.getName()))
+					.where(Person.ID.equal(personDTO.getId()))
+					.and(Person.NAME.like(personDTO.getName()))
 					.and(Person.GENDER.equal(personDTO.getGender()))
 					.and(Person.AGE.equal(personDTO.getAge()))
 					.and(Person.CPR.equal(personDTO.getCpr()))
@@ -69,7 +69,6 @@ public class ModernPersonDAO extends Query {
 					.and(Person.REGISTRATION_DATE_TIME.equal(personDTO.getRegistrationDateTime()))
 					.and(Person.SLEEP_TIME.equal(personDTO.getSleepTime()))
 					.and(Person.GRADUATED.equal(personDTO.getGraduated()))
-					.and(Person.ID.equal(personDTO.getId()))
 					.executeDelete();
 	}
 	
@@ -89,7 +88,19 @@ public class ModernPersonDAO extends Query {
 				.set(Person.SLEEP_TIME, personDTO.getSleepTime())
 				.set(Person.GRADUATED, personDTO.getGraduated())
 				.where(Person.ID.equal(personDTO.getId()))
-					.executeUpdate();
+				.and(Person.NAME.like(personDTO.getName()))
+				.and(Person.GENDER.equal(personDTO.getGender()))
+				.and(Person.AGE.equal(personDTO.getAge()))
+				.and(Person.CPR.equal(personDTO.getCpr()))
+				.and(Person.ACCOUNT_NO.equal(personDTO.getAccountNo()))
+				.and(Person.GPA.equal(personDTO.getGpa()))
+				.and(Person.SALARY.equal(personDTO.getSalary()))
+				.and(Person.ANNUAL_INCOME.equal(personDTO.getAnnualIncome()))
+				.and(Person.DATE_OF_BIRTH.equal(personDTO.getDateOfBirth()))
+				.and(Person.REGISTRATION_DATE_TIME.equal(personDTO.getRegistrationDateTime()))
+				.and(Person.SLEEP_TIME.equal(personDTO.getSleepTime()))
+				.and(Person.GRADUATED.equal(personDTO.getGraduated()))
+				.executeUpdate();
 	}
 	
 	public PersonDTO getPerson(PersonDTO personDTO) throws SQLException {
@@ -99,7 +110,8 @@ public class ModernPersonDAO extends Query {
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED)
 		.from(Table.PERSON)
-		.where(Person.NAME.like(personDTO.getName()))
+		.where(Person.ID.equal(personDTO.getId()))
+		.and(Person.NAME.like(personDTO.getName()))
 		.and(Person.GENDER.equal(personDTO.getGender()))
 		.and(Person.AGE.equal(personDTO.getAge()))
 		.and(Person.CPR.equal(personDTO.getCpr()))
@@ -111,9 +123,8 @@ public class ModernPersonDAO extends Query {
 		.and(Person.REGISTRATION_DATE_TIME.equal(personDTO.getRegistrationDateTime()))
 		.and(Person.SLEEP_TIME.equal(personDTO.getSleepTime()))
 		.and(Person.GRADUATED.equal(personDTO.getGraduated()))
-		.and(Person.ID.equal(personDTO.getId()))
 		.orderBy(Person.NAME.asc(), Person.ID.desc())
-			.executeSelect();
+		.getRecordList();
 		
 		return personDTO;
 	}
@@ -143,7 +154,7 @@ public class ModernPersonDAO extends Query {
 		.and(notExists(new Query().select(Doctor.ID)
 				.from(Table.DOCTOR).where(Doctor.CPR.equal(Person.CPR)).and(Doctor.HOSPITAL.equal("Bin Hayan"))))
 		.orderBy(Person.ID.asc(), Person.NAME.desc())
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void selectPersonWithNestedRestrictions() throws SQLException {
@@ -153,7 +164,7 @@ public class ModernPersonDAO extends Query {
 		.where(Person.GENDER.equal('M'))
 		.and(Person.ID.equal(1).and(Person.NAME.like("Hasan").or(Person.NAME.like("Ali"))))
 		.and(Person.CPR.notEqual(88111111).or(Person.GENDER.isNull()))
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void selectPersonWithJoins() throws SQLException {
@@ -169,7 +180,7 @@ public class ModernPersonDAO extends Query {
 		.leftJoin(Table.COUNTRY).on(Person.COUNTRY_ID.equal(Country.ID))
 		.fullJoin(Table.SCHOOL).on(Person.SCHOOL_ID.equal(School.ID).and(School.NAME.equal("Microsoft")))
 		.where(Person.ID.equal(1))
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void selectPersonWithCombinedQueries() throws SQLException {
@@ -207,7 +218,7 @@ public class ModernPersonDAO extends Query {
 			.from(Table.PERSON)
 			.where(Person.ID.equal(7))
 		)
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void selectPersonWithFunctions() throws SQLException {
@@ -219,27 +230,27 @@ public class ModernPersonDAO extends Query {
 		.groupBy(Person.GENDER, Person.AGE)
 		.having(count(Person.ID).greater(10).and(sum(Person.SALARY).less(100)))
 		.orderBy(Person.GENDER)
-		.executeSelect();
+		.getRecordList();
 		
 		select(distinct(Person.DATE_OF_BIRTH))
 		.from(Table.PERSON)
 		.where(Person.GPA.greater(3.12))
-		.executeSelect();
+		.getRecordList();
 		
 		select(coalesce(Person.AGE, 20))
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(coalesce(Person.ANNUAL_INCOME, Person.SALARY))
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.DATE_OF_BIRTH, count(Person.ID))
 		.from(Table.PERSON)
 		.groupBy(Person.DATE_OF_BIRTH)
 		.having(count(Person.ID).greater(2))
 		.orderBy(Person.DATE_OF_BIRTH)
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void selectPersonWithAlias() throws SQLException {
@@ -253,7 +264,7 @@ public class ModernPersonDAO extends Query {
 		.join(Table.ADDRESS.as("work_address"))
 			.on(Person.WORK_ADDRESS_ID.equal(Address.ID.of("work_address")))
 		.where(Person.ID.equal(1))
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void selectPersonWithPagination() throws SQLException {
@@ -262,7 +273,7 @@ public class ModernPersonDAO extends Query {
 		.from(Table.PERSON)
 		.limit(2)
 		.offset(4)
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void selectPersonWithSubQuery() throws SQLException {
@@ -274,7 +285,7 @@ public class ModernPersonDAO extends Query {
 				.where(Doctor.HOSPITAL.equal("Alkindi")))
 				.as("alkindi_doctor")
 			.on(Doctor.CPR.equal(Person.CPR))
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.ID)
 		.from(
@@ -293,7 +304,7 @@ public class ModernPersonDAO extends Query {
 			 ).as("city_name")
 		.on(Person.CITY_ID.equal(City.ID))
 		.where(Person.GPA.equal(3.12))
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void selectPersonWithRowNumber() throws SQLException {
@@ -301,35 +312,35 @@ public class ModernPersonDAO extends Query {
 		select(Person.NAME, Person.GENDER, Person.AGE)
 		.select(row_number().over())
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.NAME, Person.GENDER, Person.AGE)
-		.select(row_number().over(partiton_by(Person.AGE, Person.GRADUATED)))
+		.select(row_number().over(partition_by(Person.AGE, Person.GRADUATED)))
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.NAME, Person.GENDER, Person.AGE)
 		.select(row_number().over(order_by(Person.AGE.asc(), Person.GRADUATED.desc())))
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.NAME, Person.GENDER, Person.AGE)
 		.select(row_number().over(
-								partiton_by(Person.AGE, Person.GRADUATED)
+								partition_by(Person.AGE, Person.GRADUATED)
 								.order_by(Person.AGE.asc(), Person.GRADUATED.desc())))
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.NAME, Person.AGE)
 		.from(new Query()
 				.select(Person.NAME, Person.AGE)
-				.select(row_number().over(partiton_by(Person.AGE)
+				.select(row_number().over(partition_by(Person.AGE)
 						.order_by(Person.GPA.desc()))
 						.as("person_row_number"))
 				.from(Table.PERSON)
 			  ).as("person")
 		.where(row_number().alias("person_row_number").equal(1))
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void selectPersonWithCase() throws SQLException {
@@ -344,7 +355,7 @@ public class ModernPersonDAO extends Query {
 					.as("person_age_case")
 				)
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.NAME, Person.GENDER)
 		.select(
@@ -356,7 +367,7 @@ public class ModernPersonDAO extends Query {
 					.as("person_age_case")
 				)
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.NAME, Person.GENDER)
 		.select(
@@ -368,7 +379,7 @@ public class ModernPersonDAO extends Query {
 					.as("person_age_case")
 				)
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.NAME, Person.GENDER)
 		.select(
@@ -380,7 +391,7 @@ public class ModernPersonDAO extends Query {
 					.as("person_age_case")
 				)
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void selectPersonWithMath() throws SQLException {
@@ -390,7 +401,7 @@ public class ModernPersonDAO extends Query {
 				Person.GPA.multiply(4).as("new_gpa"), 
 				Person.ANNUAL_INCOME.divide(5).as("new_income"))
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.ID)
 		.from(Table.PERSON)
@@ -398,20 +409,20 @@ public class ModernPersonDAO extends Query {
 		.and(Person.SALARY.minus(3).equal(2))
 		.and(Person.GPA.multiply(4).equal(3))
 		.and(Person.ANNUAL_INCOME.divide(5).equal(4))
- 		.executeSelect();
+ 		.getRecordList();
 		
 		select(Person.ANNUAL_INCOME.plus(Person.SALARY).as("total"))
 		.select(Person.ANNUAL_INCOME.minus(Person.SALARY).as("minus"))
 		.select(Person.ANNUAL_INCOME.multiply(Person.SALARY).as("multiply"))
 		.select(Person.ANNUAL_INCOME.divide(Person.SALARY).as("divide"))
 		.from(Table.PERSON)
-		.executeSelect();
+		.getRecordList();
 		
 		select(Person.DATE_OF_BIRTH.plusDays(1), CURRENT_DATE.plusHours(2))
 		.select(Person.REGISTRATION_DATE_TIME.minusMonths(2).minusDays(2))
 		.from(Table.PERSON)
 		.where(Person.DATE_OF_BIRTH.plusDays(1).equal(CURRENT_DATE))
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void insertPersonWithSelect() throws SQLException {
@@ -464,7 +475,7 @@ public class ModernPersonDAO extends Query {
 		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 		.from(Table.PERSON)
 		.where(Person.ID.equal("1"))
-		.where(Person.NAME.equal("Hasan"))
+		.and(Person.NAME.equal("Hasan"))
 		.and(Person.GENDER.notEqual("M"))
 		.and(Person.CPR.greater("88111111"))
 		.and(Person.ACCOUNT_NO.greaterEqual("43543553"))
@@ -474,7 +485,7 @@ public class ModernPersonDAO extends Query {
 		.and(Person.DATE_OF_BIRTH.in("12-12-2000", "13-12-2000"))
 		.and(Person.REGISTRATION_DATE_TIME.notIn("14-12-2000 05:05:05", "15-12-2000 05:05:05"))
 		.and(Person.SLEEP_TIME.between("08:10:10", "10:30:10"))
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void insertPersonWithDate() throws SQLException {
@@ -527,7 +538,7 @@ public class ModernPersonDAO extends Query {
 		.and(Person.DATE_OF_BIRTH.in(new Date(), new Date()))
 		.and(Person.REGISTRATION_DATE_TIME.notIn(new Date(), new Date()))
 		.and(Person.SLEEP_TIME.between(new Date(), new Date()))
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void insertPersonWithArray() throws SQLException {
@@ -1141,7 +1152,7 @@ public class ModernPersonDAO extends Query {
 			where(Person.GRADUATED.equal(personDTO.getGraduated()));
 		}
 		
-		executeSelect();
+		getRecordList();
 		*/
 		
 		select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
@@ -1162,7 +1173,7 @@ public class ModernPersonDAO extends Query {
 		.search(Person.REGISTRATION_DATE_TIME.equal(personDTO.getRegistrationDateTime()))
 		.search(Person.SLEEP_TIME.equal(personDTO.getSleepTime()))
 		.search(Person.GRADUATED.equal(personDTO.getGraduated()))
-		.executeSelect();
+		.getRecordList();
 	}
 	
 	public void insertPersonWithColumn() throws SQLException {
@@ -1205,10 +1216,10 @@ public class ModernPersonDAO extends Query {
 		int id = insertInto(Table.PERSON)
 		.values(Person.NAME, "Hasan")
 		.values(Person.GENDER, 'M')
-		.values(Person.AGE, 33)
+		.values(Person.AGE, (short)33)
 		.values(Person.CPR, 870501236)
 		.values(Person.ACCOUNT_NO, 12345678901234l)
-		.values(Person.GPA, 3.12)
+		.values(Person.GPA, 3.12f)
 		.values(Person.SALARY, 400.5)
 		.values(Person.ANNUAL_INCOME, new BigDecimal("500.40"))
 		.values(Person.DATE_OF_BIRTH, java.sql.Date.valueOf("2015-10-10"))
@@ -1478,33 +1489,33 @@ public class ModernPersonDAO extends Query {
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
 				.from(Table.PERSON).where(Person.ID.equal(1)).getRecord(PersonDTO.class));
-		
+
 		PersonDTO personDTO = new PersonDTO();
-		
+
 		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
 				.from(Table.PERSON).where(Person.ID.equal(1)).getRecord(personDTO));
-		
+
 		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
 				.from(Table.PERSON).getRecordList(PersonDTO.class));
-		
+
 		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
 				.from(Table.PERSON).getRecordMap(PersonDTO.class));
-		
+
 		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
 				.from(Table.PERSON).where(Person.ID.equal(1)).getRecord(PersonPrimitiveDateDTO.class));
-		
+
 		System.out.println(select(Person.ID, Person.NAME)
 				.select(Person.CITY_ID, City.ID, City.NAME)
 				.select(Person.COMPANY_ID, Company.ID, Company.NAME)
@@ -1517,7 +1528,7 @@ public class ModernPersonDAO extends Query {
 				.join(Table.SCHOOL).on(Person.SCHOOL_ID.equal(School.ID))
 				.where(Person.ID.equal(1))
 				.getRecord(PersonDTO.class));
-				
+
 		System.out.println(select(Person.NAME, Person.GENDER, Person.AGE)
 				.select(Address.ID, Address.BUILDING, 
 						Address.ROAD.as("person_road"), Address.BLOCK.as("person_block"))
@@ -1526,7 +1537,7 @@ public class ModernPersonDAO extends Query {
 					.on(Person.HOME_ADDRESS_ID.equal(Address.ID))
 				.where(Person.ID.equal(1))
 				.getRecord(PersonDTO.class));
-				
+
 		System.out.println(select(Person.NAME, Person.GENDER, Person.AGE)
 				.select(Address.ROAD.of("home_address").as("home_address_road")
 						, Address.BLOCK.of("home_address"))
@@ -1538,13 +1549,13 @@ public class ModernPersonDAO extends Query {
 					.on(Person.WORK_ADDRESS_ID.equal(Address.ID.of("work_address")))
 				.where(Person.ID.equal(1))
 				.getRecord(PersonDTO.class));
-		
+
 		System.out.println(select(Person.AGE.plus(2).as("new_age"), 
 				Person.SALARY.minus(3).as("new_salary"),
 				Person.GPA.multiply(4).as("new_gpa"), 
 				Person.ANNUAL_INCOME.divide(5).as("new_income"))
 			.from(Table.PERSON).getRecord(PersonDTO.class));
-		
+
 		System.out.println(
 				select(Student.ID, Person.NAME.as("person_name"))
 				.select(Student.COLLEGE_NAME, Student.CURRENT_YEAR)
@@ -1552,7 +1563,7 @@ public class ModernPersonDAO extends Query {
 				.join(Table.STUDENT).on(Student.ID.equal(Person.ID))
 				.where(Person.ID.equal(1))
 				.getRecord(StudentDTO.class));
-		
+
 		System.out.println(select(Person.ID, Governorate.ID, 
 				Governorate.NAME)
 				.from(Table.PERSON)
@@ -1562,13 +1573,13 @@ public class ModernPersonDAO extends Query {
 					.on(City.GOVERNORATE_ID.equal(Governorate.ID))
 				.where(Person.ID.equal(1))
 				.getRecord(PersonDTO.class));
-				
+
 		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 				.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME, Person.GRADUATED, Person.CERTIFICATES)
 				.from(Table.PERSON).where(Person.ID.equal(1)).getRecord(PersonPrimitiveDateDTO.class));
-		
+
 		System.out.println(select(Person.ID, Person.NAME, Person.GENDER, Person.AGE)
 				.select(Person.CPR, Person.ACCOUNT_NO, Person.GPA)
 				.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)

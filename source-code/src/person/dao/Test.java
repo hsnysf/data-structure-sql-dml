@@ -35,7 +35,7 @@ public class Test {
 		
 		personDAO.getPerson(personDTO);
 		
-		//personDAO.updatePerson(personDTO);
+		personDAO.updatePerson(personDTO);
 		
 		personDAO.deletePerson(personDTO);
 		

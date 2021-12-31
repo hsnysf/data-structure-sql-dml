@@ -31,143 +31,111 @@ public class GeneratorUtils {
 		}
 	}
 	
-	public static List<TableConfig> getTableMap() throws Exception {
+	public static List<TableConfig> getTableList() throws Exception {
 
-		List<TableConfig> tableMap = new ArrayList<TableConfig>();
+		List<TableConfig> tableList = new ArrayList<TableConfig>();
 		
-		ResultSet result = databaseMetaData.getTables(null, "public", null, new String[] {"TABLE"});
-		
-		while (result.next()) {
+		try(ResultSet result = databaseMetaData.getTables(null, "public", null, new String[] {"TABLE"})){
 			
-			TableConfig tableConfig = new TableConfig();
-			
-			tableConfig.name = result.getString("TABLE_NAME");
-			tableConfig.className = prepareTableClassName(tableConfig.name);
-			tableConfig.enumName = tableConfig.name.toUpperCase();
-			tableConfig.columns = getTableColumnMap(tableConfig.name);
-			
-			tableMap.add(tableConfig);
-		}
-		
-		return tableMap;
-	}
-	
-	public static List<ColumnConfig> getTableColumnMap(String table) throws Exception {
-		
-		List<ColumnConfig> columnMap = new ArrayList<ColumnConfig>();
-		
-		ResultSet columnSet = databaseMetaData.getColumns(null, null, table, null);
-		
-		while (columnSet.next()) {
-			
-			ColumnConfig column = new ColumnConfig();
-			column.name = columnSet.getString("COLUMN_NAME");
-			column.enumName = prepareColumnEnumName(column.name);
-			column.type = getType(columnSet.getInt("DATA_TYPE"));
+			while (result.next()) {
+				
+				TableConfig tableConfig = new TableConfig();
+				
+				tableConfig.name = result.getString("table_name");
+				tableConfig.className = getTableClassName(tableConfig.name);
+				tableConfig.enumName = tableConfig.name.toUpperCase();
+				
+				try(ResultSet columnSet = databaseMetaData.getColumns(null, null, tableConfig.name, null)){
+					
+					for(int i=1; i<=columnSet.getMetaData().getColumnCount(); i++) {
+						System.out.println(columnSet.getMetaData().getColumnName(i));
+					}
+					
+					while (columnSet.next()) {
+						
+						for(int i=1; i<=columnSet.getMetaData().getColumnCount(); i++) {
+							System.out.println(columnSet.getObject(i));
+						}
+						System.out.println();
+						
+						ColumnConfig column = new ColumnConfig();
+						column.name = columnSet.getString("column_name");
+						column.enumName = getColumnEnumName(column.name);
+						column.type = getType(columnSet.getInt("data_type"));
 
-			columnMap.add(column);
+						tableConfig.columns.add(column);
+					}
+				}
+				
+				tableList.add(tableConfig);
+			}
 		}
-		
-		return columnMap;
+
+		return tableList;
 	}
 	
 	public static String getType(int columnType){
 		
-		if(columnType == Types.INTEGER){
-		 
-			return "INTEGER";
-			 
-		}else if(columnType == Types.VARCHAR){
-			 
+		if(columnType == Types.VARCHAR){
 			 return "VARCHAR";
-			 
-		}else if(columnType == Types.BOOLEAN){
-			 
-			 return "BOOLEAN";
-			 
-		}else if(columnType == Types.DECIMAL){
-			 
-			 return "DECIMAL";
-			 
-		}else if(columnType == Types.NUMERIC){
-	   		 
-			return "DECIMAL";
-	   	 
-	   	 }else if(columnType == Types.BIGINT){
-			 
-			 return "BIGINT";
-			 
-		}else if(columnType == Types.DATE){
-			 
-			 return "DATE";
-			 
-		}else if(columnType == Types.TIMESTAMP){
-			 
-			 return "TIMESTAMP";
-		 
-		}else if(columnType == Types.TIME){
-			 
-			 return "TIME";
-		 
-		}else if(columnType == Types.FLOAT){
-			 
-			 return "FLOAT";
-		 
-		}else if(columnType == Types.DOUBLE){
-			 
-			 return "DOUBLE";
-		 
-		}else if(columnType == Types.BIT){
-			 
-			 return "BOOLEAN";
-		 
-		}else if(columnType == Types.SMALLINT){
-			 
-			 return "SMALLINT";
-			 
 		}else if(columnType == Types.CHAR){
-			 
 			 return "CHAR";
-			 
+		}else if(columnType == Types.SMALLINT){
+			 return "SMALLINT";
+		}else if(columnType == Types.INTEGER){
+			return "INTEGER";
+		}else if(columnType == Types.BIGINT){
+			 return "BIGINT";
+		}else if(columnType == Types.FLOAT){
+			 return "FLOAT";
+		}else if(columnType == Types.REAL){
+			 return "FLOAT";
+		}else if(columnType == Types.DECIMAL){
+			 return "DECIMAL";
+		}else if(columnType == Types.NUMERIC){
+			return "DECIMAL";
+	   	}else if(columnType == Types.DATE){
+			 return "DATE";
+		}else if(columnType == Types.TIMESTAMP){
+			 return "TIMESTAMP";
+		}else if(columnType == Types.TIME){
+			 return "TIME";
+		}else if(columnType == Types.DOUBLE){
+			 return "DOUBLE";
+		}else if(columnType == Types.BOOLEAN){
+			 return "BOOLEAN";
+		}else if(columnType == Types.BIT){
+			 return "BOOLEAN";
 		}else if(columnType == Types.ARRAY){
-			 
 			 return "ARRAY";
-			 
 		}else {
-			
 			return null;
 		}
 	}
 	
-	public static String prepareTableClassName(String name) {
+	public static String getTableClassName(String name) {
 
 		char[] chars = name.toCharArray();
 
 		for (int i = 0; i < chars.length; i++) {
-
 			if (i == 0 || chars[i - 1] == '_') {
-
 				chars[i] = Character.toUpperCase(chars[i]);
-
 			} else {
-
 				chars[i] = Character.toLowerCase(chars[i]);
 			}
 		}
 
 		name = new String(chars);
-
 		name = name.replaceAll("_", "");
 
 		return name;
 	}
 	
-	public static String prepareColumnEnumName(String name) {
+	public static String getColumnEnumName(String name) {
 
 		int index = name.indexOf("_") + 1;
 
 		if (index != 0) {
-
 			name = name.substring(index);
 		}
 
@@ -176,6 +144,6 @@ public class GeneratorUtils {
 	
 	public static void main(String[] args) throws Exception {
 		
-		System.out.println(getTableMap());
+		System.out.println(getTableList());
 	}
 }

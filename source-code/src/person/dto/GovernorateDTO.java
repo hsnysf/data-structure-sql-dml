@@ -24,4 +24,27 @@ public class GovernorateDTO extends CommonDTO {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	@Override
+	public boolean equals(Object object) {
+		
+		if(object != null && object instanceof GovernorateDTO) {
+			
+			GovernorateDTO governorate = (GovernorateDTO) object;
+			
+			return id != null 
+					&& governorate.id != null 
+					&& governorate.id.equals(id);
+			
+		}else {
+			
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		
+		return id != null ? id : 0;
+	}
 }

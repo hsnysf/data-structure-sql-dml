@@ -24,4 +24,27 @@ public class SchoolDTO extends CommonDTO {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	@Override
+	public boolean equals(Object object) {
+		
+		if(object != null && object instanceof SchoolDTO) {
+			
+			SchoolDTO school = (SchoolDTO) object;
+			
+			return id != null 
+					&& school.id != null 
+					&& school.id.equals(id);
+			
+		}else {
+			
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		
+		return id != null ? id : 0;
+	}
 }

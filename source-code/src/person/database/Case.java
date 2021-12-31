@@ -7,11 +7,12 @@ import java.sql.Timestamp;
 public class Case {
 
 	protected Restriction restriction;
-	protected Column column;
-	protected Object value;
-	protected Object columnValue;
+	protected Column thenColumn;
+	protected Object thenValue;
+	protected Object whenValue;
 	
 	protected Case() {
+		
 	}
 	
 	protected Case(Restriction restriction) {
@@ -19,68 +20,68 @@ public class Case {
 		this.restriction = restriction;
 	}
 	
-	protected Case(Column column) {
+	protected Case(Column thenColumn) {
 
-		this.column = column;
+		this.thenColumn = thenColumn;
 	}
 	
-	protected Case(Object value) {
+	protected Case(Object thenValue) {
 
-		this.value = value;
+		this.thenValue = thenValue;
 	}
 	
-	public Case then(Column column) {
+	public Case then(Column thenColumn) {
 
-		this.column = column;
+		this.thenColumn = thenColumn;
 		
 		return this;
 	}
 	
-	public Case then(String value) {
+	public Case then(String thenValue) {
 
-		this.value = value;
+		this.thenValue = thenValue;
 		
 		return this;
 	}
 	
-	public Case then(Character value) {
+	public Case then(Character thenValue) {
 
-		this.value = value;
+		this.thenValue = thenValue;
 		
 		return this;
 	}
 	
-	public Case then(Number value) {
+	public Case then(Number thenValue) {
 
-		this.value = value;
+		this.thenValue = thenValue;
 		
 		return this;
 	}
 	
-	public Case then(Date value) {
+	public Case then(Date thenValue) {
 
-		this.value = value;
+		this.thenValue = thenValue;
 		
 		return this;
 	}
 	
-	public Case then(Timestamp value) {
+	public Case then(Timestamp thenValue) {
 
-		this.value = value;
+		this.thenValue = thenValue;
 		
 		return this;
 	}
 	
-	public Case then(Time value) {
+	public Case then(Time thenValue) {
 
-		this.value = value;
+		this.thenValue = thenValue;
 		
 		return this;
 	}
 	
-	public Case then(Boolean value) {
+	public Case then(Boolean thenValue) {
 
-		this.value = value;
+		this.thenValue = thenValue;
 		
 		return this;
 	}

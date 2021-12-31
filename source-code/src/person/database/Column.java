@@ -3,6 +3,7 @@ package person.database;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,12 +71,12 @@ public class Column {
 	
 	public Column plus(Column column) {
 		
-		return new Column(name, nameInQuery + " + " + column.nameInQuery, type, function, tableAlias, nameInQuery + "_plus_result", parameters);
+		return new Column(name, nameInQuery + " + " + column.nameInQuery, type, function, tableAlias, name + "_plus", parameters);
 	}
 	
 	public Column plus(Number value) {
 		
-		Column column = new Column(name, nameInQuery + " + ?", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
+		Column column = new Column(name, nameInQuery + " + ?", type, function, tableAlias, name + "_plus", parameters);
 		
 		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
@@ -84,37 +85,37 @@ public class Column {
 	
 	public Column plusMinutes(Number value) {
 		
-		return new Column(name, nameInQuery + " + interval '" + value + " minutes'", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
+		return new Column(name, nameInQuery + " + interval '" + value + " minutes'", type, function, tableAlias, name + "_plus", parameters);
 	}
 	
 	public Column plusHours(Number value) {
 		
-		return new Column(name, nameInQuery + " + interval '" + value + " hours'", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
+		return new Column(name, nameInQuery + " + interval '" + value + " hours'", type, function, tableAlias, name + "_plus", parameters);
 	}
 
 	public Column plusDays(Number value) {
 		
-		return new Column(name, nameInQuery + " + interval '" + value + " days'", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
+		return new Column(name, nameInQuery + " + interval '" + value + " days'", type, function, tableAlias, name + "_plus", parameters);
 	}
 	
 	public Column plusMonths(Number value) {
 		
-		return new Column(name, nameInQuery + " + interval '" + value + " months'", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
+		return new Column(name, nameInQuery + " + interval '" + value + " months'", type, function, tableAlias, name + "_plus", parameters);
 	}
 	
 	public Column plusYears(Number value) {
 		
-		return new Column(name, nameInQuery + " + interval '" + value + " years'", type, function, tableAlias, nameInQuery + "_plus_result", parameters);
+		return new Column(name, nameInQuery + " + interval '" + value + " years'", type, function, tableAlias, name + "_plus", parameters);
 	}
 	
 	public Column minus(Column column) {
 		
-		return new Column(name, nameInQuery + " - " + column.nameInQuery, type, function, tableAlias, nameInQuery + "_minus_result", parameters);
+		return new Column(name, nameInQuery + " - " + column.nameInQuery, type, function, tableAlias, name + "_minus", parameters);
 	}
 	
 	public Column minus(Number value) {
 		
-		Column column = new Column(name, nameInQuery + " - ?", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
+		Column column = new Column(name, nameInQuery + " - ?", type, function, tableAlias, name + "_minus", parameters);
 		
 		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
@@ -123,37 +124,37 @@ public class Column {
 	
 	public Column minusMinutes(Number value) {
 		
-		return new Column(name, nameInQuery + " - interval '" + value + " minutes'", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
+		return new Column(name, nameInQuery + " - interval '" + value + " minutes'", type, function, tableAlias, name + "_minus", parameters);
 	}
 	
 	public Column minusHours(Number value) {
 		
-		return new Column(name, nameInQuery + " - interval '" + value + " hours'", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
+		return new Column(name, nameInQuery + " - interval '" + value + " hours'", type, function, tableAlias, name + "_minus", parameters);
 	}
 
 	public Column minusDays(Number value) {
 		
-		return new Column(name, nameInQuery + " - interval '" + value + " days'", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
+		return new Column(name, nameInQuery + " - interval '" + value + " days'", type, function, tableAlias, name + "_minus", parameters);
 	}
 	
 	public Column minusMonths(Number value) {
 		
-		return new Column(name, nameInQuery + " - interval '" + value + " months'", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
+		return new Column(name, nameInQuery + " - interval '" + value + " months'", type, function, tableAlias, name + "_minus", parameters);
 	}
 	
 	public Column minusYears(Number value) {
 		
-		return new Column(name, nameInQuery + " - interval '" + value + " years'", type, function, tableAlias, nameInQuery + "_minus_result", parameters);
+		return new Column(name, nameInQuery + " - interval '" + value + " years'", type, function, tableAlias, name + "_minus", parameters);
 	}
 	
 	public Column multiply(Column column) {
 		
-		return new Column(name, nameInQuery + " * " + column.nameInQuery, type, function, tableAlias, nameInQuery + "_multiply_result", parameters);
+		return new Column(name, nameInQuery + " * " + column.nameInQuery, type, function, tableAlias, name + "_multiply", parameters);
 	}
 	
 	public Column multiply(Number value) {
 		
-		Column column = new Column(name, nameInQuery + " * ?", type, function, tableAlias, nameInQuery + "_multiply_result", parameters);
+		Column column = new Column(name, nameInQuery + " * ?", type, function, tableAlias, name + "_multiply", parameters);
 		
 		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
@@ -162,12 +163,12 @@ public class Column {
 	
 	public Column divide(Column column) {
 		
-		return new Column(name, nameInQuery + " / " + column.nameInQuery, type, function, tableAlias, nameInQuery + "_divide_result", parameters);
+		return new Column(name, nameInQuery + " / " + column.nameInQuery, type, function, tableAlias, name + "_divide", parameters);
 	}
 	
 	public Column divide(Number value) {
 		
-		Column column = new Column(name, nameInQuery + " / ?", type, function, tableAlias, nameInQuery + "_divide_result", parameters);
+		Column column = new Column(name, nameInQuery + " / ?", type, function, tableAlias, name + "_divide", parameters);
 		
 		column.parameters.add(new SimpleEntry<Integer, Object>(type, value));
 		
@@ -469,34 +470,34 @@ public class Column {
 		return new Restriction(this, Criteria.NOT_IN, values);
 	}
 
-	public Restriction between(String value, String to) {
+	public Restriction between(String from, String to) {
 		
-		return new Restriction(this, Criteria.BETWEEN, Query.getValue(type, value), Query.getValue(type, to));
+		return new Restriction(this, Criteria.BETWEEN, Query.getValue(type, from), Query.getValue(type, to));
 	}
 
-	public Restriction between(Number value, Number to) {
+	public Restriction between(Number from, Number to) {
 		
-		return new Restriction(this, Criteria.BETWEEN, value, to);
+		return new Restriction(this, Criteria.BETWEEN, from, to);
 	}
 	
-	public Restriction between(java.util.Date value, java.util.Date to) {
+	public Restriction between(java.util.Date from, java.util.Date to) {
 		
-		return new Restriction(this, Criteria.BETWEEN, Query.getValue(type, value), Query.getValue(type, to));
+		return new Restriction(this, Criteria.BETWEEN, Query.getValue(type, from), Query.getValue(type, to));
 	}
 	
-	public Restriction between(Date value, Date to) {
+	public Restriction between(Date from, Date to) {
 		
-		return new Restriction(this, Criteria.BETWEEN, value, to);
+		return new Restriction(this, Criteria.BETWEEN, from, to);
 	}
 	
-	public Restriction between(Timestamp value, Timestamp to) {
+	public Restriction between(Timestamp from, Timestamp to) {
 		
-		return new Restriction(this, Criteria.BETWEEN, value, to);
+		return new Restriction(this, Criteria.BETWEEN, from, to);
 	}
 	
-	public Restriction between(Time value, Time to) {
+	public Restriction between(Time from, Time to) {
 		
-		return new Restriction(this, Criteria.BETWEEN, value, to);
+		return new Restriction(this, Criteria.BETWEEN, from, to);
 	}
 	
 	public Restriction in(Query query) {
@@ -590,6 +591,11 @@ public class Column {
 		return new Column(name, function + "(" + nameInQuery + ")", type, function, tableAlias, name + "_" + function, parameters);
 	}
 	
+	protected Column copyDateWithFunction(Function function) {
+		
+		return new Column(name, "date_part('" + function + "', " + nameInQuery + ")", Types.INTEGER, function, tableAlias, name + "_" + function, parameters);
+	}
+	
 	protected Column copyWithFunction(Function function, Column column) {
 		
 		return new Column(name, function + "(" + nameInQuery + ", " + column.nameInQuery + ")", type, function, tableAlias, name + "_" + function, parameters);
@@ -611,7 +617,7 @@ public class Column {
 			
 			Column column = (Column) object;
 			
-			return column.name.equals(name);
+			return column.nameInQuery.equals(nameInQuery);
 			
 		}else {
 			
@@ -621,8 +627,7 @@ public class Column {
 	
 	@Override
 	public int hashCode() {
-		
-		return name.length();
+		return nameInQuery.length();
 	}
 	
 	@Override

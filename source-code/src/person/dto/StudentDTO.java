@@ -1,9 +1,9 @@
 package person.dto;
 
 import person.annotation.Column;
-import person.annotation.ExtendJoinColumns;
+import person.annotation.PrimaryJoinColumn;
 
-@ExtendJoinColumns(name = "std_id", on = "prsn_id")
+@PrimaryJoinColumn(name = "std_id", on = "prsn_id")
 public class StudentDTO extends PersonDTO {
 
 	@Column("std_college_name")
@@ -25,5 +25,28 @@ public class StudentDTO extends PersonDTO {
 	
 	public void setCurrentYear(String currentYear) {
 		this.currentYear = currentYear;
+	}
+	
+	@Override
+	public boolean equals(Object object) {
+		
+		if(object != null && object instanceof StudentDTO) {
+			
+			StudentDTO student = (StudentDTO) object;
+			
+			return getId() != null 
+					&& student.getId() != null 
+					&& student.getId().equals(getId());
+			
+		}else {
+			
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		
+		return getId() != null ? getId() : 0;
 	}
 }

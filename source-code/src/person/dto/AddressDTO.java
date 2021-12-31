@@ -44,4 +44,27 @@ public class AddressDTO extends CommonDTO{
 	public void setBlock(String block) {
 		this.block = block;
 	}
+	
+	@Override
+	public boolean equals(Object object) {
+		
+		if(object != null && object instanceof AddressDTO) {
+			
+			AddressDTO address = (AddressDTO) object;
+			
+			return id != null 
+					&& address.id != null 
+					&& address.id.equals(id);
+			
+		}else {
+			
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		
+		return id != null ? id : 0;
+	}
 }

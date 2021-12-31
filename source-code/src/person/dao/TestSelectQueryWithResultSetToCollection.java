@@ -1,7 +1,6 @@
 package person.dao;
 
 import java.sql.Connection;
-
 import person.generator.GeneratorUtils;
 
 public class TestSelectQueryWithResultSetToCollection {

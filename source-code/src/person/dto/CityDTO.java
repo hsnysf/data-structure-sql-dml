@@ -35,4 +35,27 @@ public class CityDTO extends CommonDTO {
 	public void setGovernorate(GovernorateDTO governorate) {
 		this.governorate = governorate;
 	}
+	
+	@Override
+	public boolean equals(Object object) {
+		
+		if(object != null && object instanceof CityDTO) {
+			
+			CityDTO city = (CityDTO) object;
+			
+			return id != null 
+					&& city.id != null 
+					&& city.id.equals(id);
+			
+		}else {
+			
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		
+		return id != null ? id : 0;
+	}
 }

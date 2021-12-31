@@ -8,13 +8,14 @@ public class TableColumnGenerator {
 
 	public static void main(String[] args) throws Exception {
 		
-		List<TableConfig> tableMap = GeneratorUtils.getTableMap();
+		List<TableConfig> tableMap = GeneratorUtils.getTableList();
 		
 		for (TableConfig table : tableMap) {
 			
 			StringBuilder builder = new StringBuilder();
 			
 			builder.append("package person.column;");
+			
 			builder.append("\r\n\r\n");
 			builder.append("import java.sql.Types;");
 			builder.append("\r\n");

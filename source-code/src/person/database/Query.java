@@ -23,8 +23,7 @@ import java.util.Map.Entry;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-
-import person.annotation.ExtendJoinColumns;
+import person.annotation.PrimaryJoinColumn;
 
 public class Query {
 	
@@ -57,7 +56,7 @@ public class Query {
 		this.connection = connection;
 	}
 	
-	private static void setObject(PreparedStatement statement, int index, int type, Object value) throws SQLException {
+	private void setObject(PreparedStatement statement, int index, int type, Object value) throws SQLException {
 		
 		System.out.println("Param #" + index + " :: " + value);
 		
@@ -126,7 +125,7 @@ public class Query {
 			}
 		
 		}else if(type == Types.DATE){
-			
+
 			if(value != null && !"".equals(value.toString().trim())) {
 				statement.setDate(index, Date.valueOf(value.toString().trim()));
 			}else {
@@ -160,7 +159,10 @@ public class Query {
 		}else if(type == Types.ARRAY){
 			
 			if(value != null) {
-				statement.setArray(index, (Array)value);
+				
+				List<String> list = (List<String>) value;
+				statement.setArray(index, connection.createArrayOf("varchar", list.toArray()));
+				
 			}else {
 				statement.setNull(index, Types.ARRAY);
 			}
@@ -257,6 +259,10 @@ public class Query {
 		}else if(type == Types.BOOLEAN){
 			
 			return Boolean.parseBoolean(value.trim());
+			
+		}else if(type == Types.ARRAY){
+			
+			return Arrays.asList(value.trim().split(","));
 			
 		}else {
 			
@@ -544,12 +550,7 @@ public class Query {
 		
 		if(value != null && !value.isEmpty()) {
 			
-			try {
-				
-				values.put(column, connection.createArrayOf("varchar", value.toArray()));
-			
-			} catch (SQLException e) {
-			}
+			values.put(column, value);
 		}
 		
 		return this;
@@ -559,12 +560,7 @@ public class Query {
 		
 		if(value != null && !value.isEmpty()) {
 			
-			try {
-				
-				values.put(column, connection.createArrayOf("varchar", value.toArray()));
-			
-			} catch (SQLException e) {
-			}
+			values.put(column, value);
 			
 		}else {
 			
@@ -576,23 +572,14 @@ public class Query {
 	
 	public Query values(Column column, String... value) {
 		
-		try {
-			
-			values.put(column, connection.createArrayOf("varchar", value));
-		
-		} catch (SQLException e) {
-		}
+		values.put(column, Arrays.asList(value));
 		
 		return this;
 	}
 	
-	public int executeInsert() throws SQLException {
-		
-		int id = 0;
+	public String getInsertQuery(List<Entry<Integer, Object>> parameters) throws SQLException {
 		
 		StringBuilder builder = new StringBuilder();
-		
-		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
 		
 		StringBuilder columnList = new StringBuilder();
 		
@@ -665,9 +652,20 @@ public class Query {
 			builder.append(fromQuery.getSelectQuery(parameters));
 		}
 		
-		System.out.println("SQL Query :: " + builder);
+		return builder.toString();
+	}
+	
+	public int executeInsert() throws SQLException {
 		
-		try(PreparedStatement statement = connection.prepareStatement(builder.toString(), PreparedStatement.RETURN_GENERATED_KEYS)){
+		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
+		
+		int id = 0;
+		
+		String query = getInsertQuery(parameters);
+		
+		System.out.println("SQL Query :: " + query);
+		
+		try(PreparedStatement statement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)){
 			
 			int index = 1;
 			
@@ -690,11 +688,13 @@ public class Query {
 					id = result.getInt(1);
 				}
 			}
+			
+		}finally {
+			
+			clean();
 		}
 		
 		System.out.println("Generated ID :: " + id);
-		
-		clean();
 		
 		return id;
 	}
@@ -764,7 +764,7 @@ public class Query {
 		return new Restriction(Criteria.NOT_EXISTS, query);
 	}
 	
-	private static StringBuilder buildRestriction(Restriction restriction, List<Entry<Integer, Object>> parameters){
+	private static String buildRestriction(Restriction restriction, List<Entry<Integer, Object>> parameters){
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -921,14 +921,10 @@ public class Query {
 			builder.append(")");
 		}
 		
-		return builder;
+		return builder.toString();
 	}
 	
-	public int executeDelete() throws SQLException {
-		
-		int count = 0;
-		
-		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
+	public String getDeleteQuery(List<Entry<Integer, Object>> parameters) throws SQLException {
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -945,9 +941,20 @@ public class Query {
 			}
 		}
 		
-		System.out.println("SQL Query :: " + builder);
+		return builder.toString();
+	}
+	
+	public int executeDelete() throws SQLException {
 		
-		try(PreparedStatement statement = connection.prepareStatement(builder.toString())){
+		int count = 0;
+		
+		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
+		
+		String query = getDeleteQuery(parameters);
+		
+		System.out.println("SQL Query :: " + query);
+		
+		try(PreparedStatement statement = connection.prepareStatement(query)){
 			
 			int index = 1;
 			
@@ -962,12 +969,14 @@ public class Query {
 			}
 			
 			count = statement.executeUpdate();
+			
+		}finally {
+			
+			clean();
 		}
 		
 		System.out.println("Affected Rows :: " + count);
 		
-		clean();
-
 		return count;
 	}
 	
@@ -1194,12 +1203,7 @@ public class Query {
 		
 		if(value != null && !value.isEmpty()) {
 			
-			try {
-				
-				values.put(column, connection.createArrayOf("varchar", value.toArray()));
-			
-			} catch (SQLException e) {
-			}
+			values.put(column, value);
 		}
 		
 		return this;
@@ -1209,12 +1213,7 @@ public class Query {
 		
 		if(value != null && !value.isEmpty()) {
 			
-			try {
-				
-				values.put(column, connection.createArrayOf("varchar", value.toArray()));
-			
-			} catch (SQLException e) {
-			}
+			values.put(column, value);
 			
 		}else {
 			
@@ -1226,21 +1225,12 @@ public class Query {
 	
 	public Query set(Column column, String... value) {
 		
-		try {
-			
-			values.put(column, connection.createArrayOf("varchar", value));
-		
-		} catch (SQLException e) {
-		}
+		values.put(column, Arrays.asList(value));
 		
 		return this;
 	}
 	
-	public int executeUpdate() throws SQLException {
-		
-		int count = 0;
-		
-		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
+	public String getUpdateQuery(List<Entry<Integer, Object>> parameters) throws SQLException {
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -1292,11 +1282,22 @@ public class Query {
 			}
 		}
 		
-		System.out.println("SQL Query :: " + builder);
+		return builder.toString();
+	}
+	
+	public int executeUpdate() throws SQLException {
 		
-		try(PreparedStatement statement = connection.prepareStatement(builder.toString())){
+		int count = 0;
+		
+		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
+		
+		String query = getUpdateQuery(parameters);
+		
+		System.out.println("SQL Query :: " + query);
+		
+		try(PreparedStatement statement = connection.prepareStatement(query)){
 			
-			index = 1;
+			int index = 1;
 			
 			for(Entry<Integer, Object> parameter : parameters) {
 				
@@ -1309,11 +1310,13 @@ public class Query {
 			}
 			
 			count = statement.executeUpdate();
+			
+		}finally {
+			
+			clean();
 		}
 		
 		System.out.println("Affected Rows :: " + count);
-		
-		clean();
 		
 		return count;
 	}
@@ -1395,12 +1398,52 @@ public class Query {
 		return column.copyWithFunction(Function.COALESCE, value);
 	}
 	
+	public static Column date(Column column){
+		
+		return column.copyWithFunction(Function.DATE);
+	}
+	
+	public static Column time(Column column){
+		
+		return column.copyWithFunction(Function.TIME);
+	}
+	
+	public static Column year(Column column){
+		
+		return column.copyDateWithFunction(Function.YEAR);
+	}
+	
+	public static Column month(Column column){
+		
+		return column.copyDateWithFunction(Function.MONTH);
+	}
+	
+	public static Column day(Column column){
+		
+		return column.copyDateWithFunction(Function.DAY);
+	}
+	
+	public static Column hour(Column column){
+		
+		return column.copyDateWithFunction(Function.HOUR);
+	}
+	
+	public static Column minute(Column column){
+		
+		return column.copyDateWithFunction(Function.MINUTE);
+	}
+	
+	public static Column second(Column column){
+		
+		return column.copyDateWithFunction(Function.SECOND);
+	}
+	
 	public static Column row_number() {
 		
 		return new Column("row_number() over()", Types.INTEGER, "row_num");
 	}
 	
-	public static RowNumber partiton_by(Column... columns) {
+	public static RowNumber partition_by(Column... columns) {
 		
 		return new RowNumber(Arrays.asList(columns));
 	}
@@ -1490,38 +1533,42 @@ public class Query {
 				builder.append(buildRestriction(case_.restriction, parameters));
 				builder.append(" then ");
 				
-				if(case_.column != null) {
+				if(case_.thenColumn != null) {
 					
-					builder.append(case_.column);
+					builder.append(case_.thenColumn);
 					
-					type = case_.column.type;
+					parameters.addAll(case_.thenColumn.parameters);
 					
-				}else if(case_.value != null) {
+					type = case_.thenColumn.type;
+					
+				}else if(case_.thenValue != null) {
 					
 					builder.append("?");
 					
-					type = getObjectType(case_.value);
+					type = getObjectType(case_.thenValue);
 					
-					parameters.add(new SimpleEntry<Integer, Object>(type, case_.value));
+					parameters.add(new SimpleEntry<Integer, Object>(type, case_.thenValue));
 				}
 				
 			}else {
 				
 				builder.append(" else ");
 				
-				if(case_.column != null) {
+				if(case_.thenColumn != null) {
 					
-					builder.append(case_.column);
+					builder.append(case_.thenColumn);
 					
-					type = case_.column.type;
+					parameters.addAll(case_.thenColumn.parameters);
 					
-				}else if(case_.value != null) {
+					type = case_.thenColumn.type;
+					
+				}else if(case_.thenValue != null) {
 					
 					builder.append("?");
 					
-					type = getObjectType(case_.value);
+					type = getObjectType(case_.thenValue);
 					
-					parameters.add(new SimpleEntry<Integer, Object>(type, case_.value));
+					parameters.add(new SimpleEntry<Integer, Object>(type, case_.thenValue));
 				}
 			}
 		}
@@ -1544,44 +1591,48 @@ public class Query {
 		
 		for(Case case_ : cases) {
 			
-			if(case_.columnValue != null) {
+			if(case_.whenValue != null) {
 				
 				builder.append(" when ? then ");
 				
-				parameters.add(new SimpleEntry<Integer, Object>(getObjectType(case_.columnValue), case_.columnValue));
+				parameters.add(new SimpleEntry<Integer, Object>(getObjectType(case_.whenValue), case_.whenValue));
 				
-				if(case_.column != null) {
+				if(case_.thenColumn != null) {
 					
-					builder.append(case_.column);
+					builder.append(case_.thenColumn);
 					
-					type = case_.column.type;
+					parameters.addAll(case_.thenColumn.parameters);
 					
-				}else if(case_.value != null) {
+					type = case_.thenColumn.type;
+					
+				}else if(case_.thenValue != null) {
 					
 					builder.append("?");
 					
-					type = getObjectType(case_.value);
+					type = getObjectType(case_.thenValue);
 					
-					parameters.add(new SimpleEntry<Integer, Object>(type, case_.value));
+					parameters.add(new SimpleEntry<Integer, Object>(type, case_.thenValue));
 				}
 				
 			}else {
 				
 				builder.append(" else ");
 				
-				if(case_.column != null) {
+				if(case_.thenColumn != null) {
 					
-					builder.append(case_.column);
+					builder.append(case_.thenColumn);
 					
-					type = case_.column.type;
+					parameters.addAll(case_.thenColumn.parameters);
 					
-				}else if(case_.value != null) {
+					type = case_.thenColumn.type;
+					
+				}else if(case_.thenValue != null) {
 					
 					builder.append("?");
 					
-					type = getObjectType(case_.value);
+					type = getObjectType(case_.thenValue);
 					
-					parameters.add(new SimpleEntry<Integer, Object>(type, case_.value));
+					parameters.add(new SimpleEntry<Integer, Object>(type, case_.thenValue));
 				}
 			}
 		}
@@ -1596,52 +1647,52 @@ public class Query {
 		return new Case(restriction);
 	}
 	
-	public Case when(String columnValue) {
+	public Case when(String whenValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = columnValue;
+		case_.whenValue = whenValue;
 		return case_;
 	}
 	
-	public Case when(Character columnValue) {
+	public Case when(Character whenValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = columnValue;
+		case_.whenValue = whenValue;
 		return case_;
 	}
 	
-	public Case when(Number columnValue) {
+	public Case when(Number whenValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = columnValue;
+		case_.whenValue = whenValue;
 		return case_;
 	}
 	
 	public Case when(Date columnValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = columnValue;
+		case_.whenValue = columnValue;
 		return case_;
 	}
 	
-	public Case when(Timestamp columnValue) {
+	public Case when(Timestamp whenValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = columnValue;
+		case_.whenValue = whenValue;
 		return case_;
 	}
 	
-	public Case when(Time columnValue) {
+	public Case when(Time whenValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = columnValue;
+		case_.whenValue = whenValue;
 		return case_;
 	}
 	
-	public Case when(Boolean columnValue) {
+	public Case when(Boolean whenValue) {
 		
 		Case case_ = new Case();
-		case_.columnValue = columnValue;
+		case_.whenValue = whenValue;
 		return case_;
 	}
 	
@@ -1891,7 +1942,7 @@ public class Query {
 		return this;
 	}
 	
-	private StringBuilder getSelectQuery(List<Entry<Integer, Object>> parameters) {
+	protected String getSelectQuery(List<Entry<Integer, Object>> parameters) {
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -2080,18 +2131,18 @@ public class Query {
 			}
 		}
 		
-		return builder;
+		return builder.toString();
 	}
 	
 	public ResultSet executeSelect() throws SQLException {
 		
 		List<Entry<Integer, Object>> parameters = new ArrayList<Entry<Integer, Object>>();
 		
-		StringBuilder builder = getSelectQuery(parameters);
+		String query = getSelectQuery(parameters);
 		
-		System.out.println("SQL Query :: " + builder);
+		System.out.println("SQL Query :: " + query);
 		
-		PreparedStatement statement = connection.prepareStatement(builder.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		PreparedStatement statement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		
 		int index = 1;
 		
@@ -2464,6 +2515,28 @@ public class Query {
 			clean();
 		}
 	}
+	
+	public Object getObjectResult() throws SQLException {
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				if(result.next() && columns.size() >= 1) {
+					
+					Column column = columns.get(0);
+					
+					return getObject(result, column);
+				}
+			}
+			
+		}finally {
+			
+			clean();
+		}
+		
+		return null;
+	}
 
 	private <T> T getObjectResult(Class<T> className) throws SQLException {
 		
@@ -2485,6 +2558,30 @@ public class Query {
 		}
 		
 		return null;
+	}
+	
+	public List<Object> getObjectList() throws SQLException {
+		
+		List<Object> list = new ArrayList<Object>();
+		
+		try(ResultSet result = executeSelect()){
+			
+			try(Statement statement = result.getStatement()){
+				
+				while(result.next() && columns.size() >= 1) {
+					
+					Column column = columns.get(0);
+					
+					list.add(getObject(result, column));
+				}
+			}
+			
+		}finally {
+			
+			clean();
+		}
+		
+		return list;
 	}
 	
 	private <T> List<T> getObjectList(Class<T> className) throws SQLException {
@@ -2872,13 +2969,17 @@ public class Query {
 			
 			for(String column : columns) {
 				
-				if(relation.table.alias != null) {
+				if(relation.table != null) {
 					
-					joinColumns.put(column, relation.table.alias);
-				
-				}else {
+					if(relation.table.alias != null) {
+						joinColumns.put(column, relation.table.alias);
+					}else {
+						joinColumns.put(column, relation.table.name);
+					}
 					
-					joinColumns.put(column, relation.table.name);
+				}else if(relation.subQuery != null && relation.subQuery.alias != null) {
+					
+					joinColumns.put(column, relation.subQuery.alias);
 				}
 			}
 		}
@@ -2928,15 +3029,15 @@ public class Query {
 			
 			person.annotation.JoinColumn joinColumn = field.getAnnotation(person.annotation.JoinColumn.class);
 			
-			person.annotation.ExtendJoinColumns extendJoinColumns = (ExtendJoinColumns) className.getAnnotation(person.annotation.ExtendJoinColumns.class);
+			person.annotation.PrimaryJoinColumn primaryJoinColumn = (PrimaryJoinColumn) className.getAnnotation(person.annotation.PrimaryJoinColumn.class);
 			
-			if(extendJoinColumns != null) {
+			if(primaryJoinColumn != null) {
 				
 				Class superClass = className.getSuperclass();
 				
 				Map<String, String> superProperties = getClassPropertyColumn(superClass, true);
 				
-				properties.put(extendJoinColumns.name(), superProperties.get(extendJoinColumns.on()));
+				properties.put(primaryJoinColumn.name(), superProperties.get(primaryJoinColumn.on()));
 			}
 			
 			if(column != null) {

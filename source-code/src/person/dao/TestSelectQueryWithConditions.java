@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-
 import person.dto.PersonDTO;
 import person.generator.GeneratorUtils;
 
@@ -13,7 +12,7 @@ public class TestSelectQueryWithConditions {
 
 	public static void main(String[] args) throws Exception {
 		
-Connection connection = GeneratorUtils.getConnection();
+		Connection connection = GeneratorUtils.getConnection();
 		
 		ModernPersonDAO personDAO = new ModernPersonDAO(connection);
 		

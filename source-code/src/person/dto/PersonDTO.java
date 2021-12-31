@@ -212,4 +212,27 @@ public class PersonDTO extends CommonDTO {
 	public void setWorkAddress(AddressDTO workAddress) {
 		this.workAddress = workAddress;
 	}
+	
+	@Override
+	public boolean equals(Object object) {
+		
+		if(object != null && object instanceof PersonDTO) {
+			
+			PersonDTO person = (PersonDTO) object;
+			
+			return id != null 
+					&& person.id != null 
+					&& person.id.equals(id);
+			
+		}else {
+			
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		
+		return id != null ? id : 0;
+	}
 }
