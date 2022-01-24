@@ -334,6 +334,13 @@ public class Query {
 		return this;
 	}
 	
+	public Query values(Column column, Query query) {
+		
+		values.put(column, query);
+		
+		return this;
+	}
+	
 	public Query values(Column column, Column columnValue) {
 		
 		values.put(column, columnValue);
@@ -602,7 +609,15 @@ public class Query {
 				
 				columnList.append(column);
 				
-				if(value instanceof Column) {
+				if(value instanceof Query) {
+					
+					Query query = (Query) value;
+					
+					valueList.append("(");
+					valueList.append(query.getSelectQuery(parameters));
+					valueList.append(")");
+					
+				}else if(value instanceof Column) {
 					
 					Column columnValue = (Column) value;
 					
@@ -987,6 +1002,13 @@ public class Query {
 		return this;
 	}
 	
+	public Query set(Column column, Query query) {
+		
+		values.put(column, query);
+		
+		return this;
+	}
+	
 	public Query set(Column column, Column columnValue) {
 		
 		values.put(column, columnValue);
@@ -1254,7 +1276,15 @@ public class Query {
 			builder.append(column);
 			builder.append(" = ");
 			
-			if(value instanceof Column) {
+			if(value instanceof Query) {
+				
+				Query query = (Query) value;
+				
+				builder.append("(");
+				builder.append(query.getSelectQuery(parameters));
+				builder.append(")");
+				
+			}else if(value instanceof Column) {
 				
 				Column columnValue = (Column) value;
 				
