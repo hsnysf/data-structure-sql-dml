@@ -1185,6 +1185,13 @@ public class ModernPersonDAO extends Query {
 		.executeInsert();
 	}
 	
+	public void insertPersonWithQuery() throws SQLException {
+		
+		insertInto(Table.PERSON)
+		.values(Person.DATE_OF_BIRTH, new Query().select(Person.DATE_OF_BIRTH).from(Table.PERSON).where(Person.ID.equal(1)))
+		.executeInsert();
+	}
+	
 	public void updatePersonWithColumn() throws SQLException {
 		
 		update(Table.PERSON)
@@ -1198,6 +1205,14 @@ public class ModernPersonDAO extends Query {
 		.set(Person.REGISTRATION_DATE_TIME, CURRENT_TIMESTAMP.minusHours(1).plusYears(2))
 		.set(Person.SLEEP_TIME, CURRENT_TIME.plusMinutes(1).minusHours(2))
 		.where(Person.ID.equal(1))
+		.executeUpdate();
+	}
+	
+	public void updatePersonWithQuery() throws SQLException {
+		
+		update(Table.PERSON)
+		.set(Person.DATE_OF_BIRTH, new Query().select(Person.DATE_OF_BIRTH).from(Table.PERSON).where(Person.ID.equal(1)))
+		.where(Person.ID.equal(2))
 		.executeUpdate();
 	}
 	
