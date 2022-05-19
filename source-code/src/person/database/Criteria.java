@@ -5,6 +5,7 @@ public enum Criteria {
 	EQUAL("="),
 	EQUAL_COLUMN("="),
 	LIKE("ilike"),
+	NOT_LIKE("not ilike"),
 	NOT_EQUAL("<>"),
 	NOT_EQUAL_COLUMN("<>"),
 	GREATER(">"),

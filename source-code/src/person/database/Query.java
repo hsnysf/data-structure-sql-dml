@@ -23,6 +23,8 @@ import java.util.Map.Entry;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+
+import person.annotation.JoinColumn;
 import person.annotation.PrimaryJoinColumn;
 
 public class Query {
@@ -357,6 +359,13 @@ public class Query {
 			
 			values.put(column, getValue(column.type, value));
 		}
+		
+		return this;
+	}
+	
+	public Query valuesNull(Column column) {
+		
+		values.put(column, null);
 		
 		return this;
 	}
@@ -812,7 +821,8 @@ public class Query {
 			parameters.addAll(restriction.column.parameters);
 			parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.value));
 			
-		}else if(restriction.criteria == Criteria.LIKE){
+		}else if(restriction.criteria == Criteria.LIKE
+					|| restriction.criteria == Criteria.NOT_LIKE){
 			
 			builder.append(restriction.column);
 			builder.append(" ");
@@ -1025,6 +1035,13 @@ public class Query {
 			
 			values.put(column, getValue(column.type, value));
 		}
+		
+		return this;
+	}
+	
+	public Query setNull(Column column) {
+		
+		values.put(column, null);
 		
 		return this;
 	}
@@ -3055,13 +3072,9 @@ public class Query {
 		
 		for(Field field : fields) {
 		
-			person.annotation.Column column = field.getAnnotation(person.annotation.Column.class);
-			
-			person.annotation.JoinColumn joinColumn = field.getAnnotation(person.annotation.JoinColumn.class);
-			
-			person.annotation.PrimaryJoinColumn primaryJoinColumn = (PrimaryJoinColumn) className.getAnnotation(person.annotation.PrimaryJoinColumn.class);
-			
-			if(primaryJoinColumn != null) {
+			if(className.isAnnotationPresent(PrimaryJoinColumn.class)) {
+				
+				person.annotation.PrimaryJoinColumn primaryJoinColumn = (PrimaryJoinColumn) className.getAnnotation(person.annotation.PrimaryJoinColumn.class);
 				
 				Class superClass = className.getSuperclass();
 				
@@ -3070,7 +3083,9 @@ public class Query {
 				properties.put(primaryJoinColumn.name(), superProperties.get(primaryJoinColumn.on()));
 			}
 			
-			if(column != null) {
+			if(field.isAnnotationPresent(person.annotation.Column.class)) {
+				
+				person.annotation.Column column = field.getAnnotation(person.annotation.Column.class);
 				
 				if(root && selectColumns.containsKey(column.value())) {
 					properties.put(selectColumns.get(column.value()), field.getName());
@@ -3078,27 +3093,32 @@ public class Query {
 					properties.put(column.value(), field.getName());
 				}
 				
-			}else if(joinColumn != null && joinColumns.containsKey(joinColumn.name())) {
+			}else if(field.isAnnotationPresent(JoinColumn.class)) {
 				
-				String tableAlias = joinColumns.get(joinColumn.name());
+				JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
 				
-				Map<String, String> tableColumns = getSelectColumnsByTableAlias(tableAlias);
-				
-				Map<String, String> joinProperties = getClassPropertyColumn(field.getType(), false);
-				
-				properties.put(joinColumn.name(), field.getName() + "." + joinProperties.get(joinColumn.on()));
-				
-				for(Entry<String, String> property : joinProperties.entrySet()) {
+				if(joinColumns.containsKey(joinColumn.name())) {
 					
-					String propertyColumn = property.getKey();
-					String propertyName = field.getName() + "." + property.getValue();
+					String tableAlias = joinColumns.get(joinColumn.name());
 					
-					if(tableColumns.containsKey(propertyColumn)) {
-						properties.put(tableColumns.get(propertyColumn), propertyName);
-					}else if(selectColumns.containsKey(propertyColumn)) {
-						properties.put(selectColumns.get(propertyColumn), propertyName);
-					}else {
-						properties.put(propertyColumn, propertyName);
+					Map<String, String> tableColumns = getSelectColumnsByTableAlias(tableAlias);
+					
+					Map<String, String> joinProperties = getClassPropertyColumn(field.getType(), false);
+					
+					properties.put(joinColumn.name(), field.getName() + "." + joinProperties.get(joinColumn.on()));
+					
+					for(Entry<String, String> property : joinProperties.entrySet()) {
+						
+						String propertyColumn = property.getKey();
+						String propertyName = field.getName() + "." + property.getValue();
+						
+						if(tableColumns.containsKey(propertyColumn)) {
+							properties.put(tableColumns.get(propertyColumn), propertyName);
+						}else if(selectColumns.containsKey(propertyColumn)) {
+							properties.put(selectColumns.get(propertyColumn), propertyName);
+						}else {
+							properties.put(propertyColumn, propertyName);
+						}
 					}
 				}
 			}
