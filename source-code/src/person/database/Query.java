@@ -788,7 +788,7 @@ public class Query {
 		return new Restriction(Criteria.NOT_EXISTS, query);
 	}
 	
-	private static String buildRestriction(Restriction restriction, List<Entry<Integer, Object>> parameters){
+	private String buildRestriction(Restriction restriction, List<Entry<Integer, Object>> parameters){
 		
 		StringBuilder builder = new StringBuilder();
 		
@@ -816,10 +816,31 @@ public class Query {
 			builder.append(" ");
 			builder.append(restriction.criteria);
 			builder.append(" ");
-			builder.append("?");
 			
 			parameters.addAll(restriction.column.parameters);
-			parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.value));
+			
+			if(restriction.value instanceof Query) {
+				
+				Query query = (Query) restriction.value;
+				
+				builder.append("(");
+				builder.append(query.getSelectQuery(parameters));
+				builder.append(")");
+				
+			}else if(restriction.value instanceof Column) {
+				
+				Column column = (Column) restriction.value;
+				
+				builder.append(column);
+				
+				parameters.addAll(column.parameters);
+				
+			}else {
+				
+				builder.append("?");
+				
+				parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.value));
+			}
 			
 		}else if(restriction.criteria == Criteria.LIKE
 					|| restriction.criteria == Criteria.NOT_LIKE){
@@ -831,24 +852,9 @@ public class Query {
 			builder.append("'%' || ? || '%'");
 			
 			parameters.addAll(restriction.column.parameters);
+			
 			parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.value));
 		
-		}else if(restriction.criteria == Criteria.EQUAL_COLUMN 
-				|| restriction.criteria == Criteria.NOT_EQUAL_COLUMN 
-				|| restriction.criteria == Criteria.GREATER_COLUMN 
-				|| restriction.criteria == Criteria.GREATER_EQUAL_COLUMN 
-				|| restriction.criteria == Criteria.LESS_COLUMN 
-				|| restriction.criteria == Criteria.LESS_EQUAL_COLUMN){
-
-			builder.append(restriction.column);
-			builder.append(" ");
-			builder.append(restriction.criteria);
-			builder.append(" ");
-			builder.append(restriction.column2);
-			
-			parameters.addAll(restriction.column.parameters);
-			parameters.addAll(restriction.column2.parameters);
-			
 		}else if(restriction.criteria == Criteria.IS_NULL 
 				|| restriction.criteria == Criteria.IS_NOT_NULL){
 			
@@ -861,27 +867,36 @@ public class Query {
 		}else if(restriction.criteria == Criteria.IN
 					|| restriction.criteria == Criteria.NOT_IN){
 			
-			parameters.addAll(restriction.column.parameters);
-			
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
 			builder.append(" (");
 			
-			int index = 0;
+			parameters.addAll(restriction.column.parameters);
 			
-			for(Object value : restriction.values){
+			if(restriction.values != null) {
 				
-				if(index != 0){
+				int index = 0;
+				
+				for(Object value : restriction.values){
 					
-					builder.append(", ");
+					if(index != 0){
+						
+						builder.append(", ");
+					}
+					
+					builder.append("?");
+					
+					parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, value));
+					
+					index++;
 				}
 				
-				builder.append("?");
+			}else if(restriction.value instanceof Query) {
 				
-				parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, value));
+				Query query = (Query) restriction.value;
 				
-				index++;
+				builder.append(query.getSelectQuery(parameters));
 			}
 			
 			builder.append(")");
@@ -891,48 +906,57 @@ public class Query {
 			builder.append(restriction.column);
 			builder.append(" ");
 			builder.append(restriction.criteria);
-			builder.append(" ? ");
+			builder.append(" ");
+			
+			parameters.addAll(restriction.column.parameters);
+			
+			if(restriction.value instanceof Column) {
+				
+				Column column = (Column) restriction.value;
+				
+				builder.append(column);
+				
+				parameters.addAll(column.parameters);
+				
+			}else {
+				
+				builder.append("?");
+				
+				parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.value));
+			}
+
+			builder.append(" ");
 			builder.append(Operator.AND);
-			builder.append(" ?");
-			
-			parameters.addAll(restriction.column.parameters);
-			parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.value));
-			parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.to));
-		
-		}else if(restriction.criteria == Criteria.BETWEEN_COLUMNS){
-			
-			builder.append(restriction.column);
 			builder.append(" ");
-			builder.append(restriction.criteria);
-			builder.append(" ");
-			builder.append(restriction.column2);
-			builder.append(" ");
-			builder.append(Operator.AND);
-			builder.append(" ");
-			builder.append(restriction.column3);
 			
-			parameters.addAll(restriction.column.parameters);
-			parameters.addAll(restriction.column2.parameters);
-			parameters.addAll(restriction.column3.parameters);
-		
-		}else if(restriction.criteria == Criteria.IN_QUERY
-					|| restriction.criteria == Criteria.NOT_IN_QUERY){
-			
-			parameters.addAll(restriction.column.parameters);
-			
-			builder.append(restriction.column);
-			builder.append(" ");
-			builder.append(restriction.criteria);
-			builder.append(" (");
-			builder.append(restriction.query.getSelectQuery(parameters));
-			builder.append(")");
-		
+			if(restriction.to instanceof Column) {
+				
+				Column column = (Column) restriction.to;
+				
+				builder.append(column);
+				
+				parameters.addAll(column.parameters);
+				
+			}else {
+				
+				builder.append("?");
+				
+				parameters.add(new SimpleEntry<Integer, Object>(restriction.column.type, restriction.to));
+			}
+
 		}else if(restriction.criteria == Criteria.EXISTS
 				|| restriction.criteria == Criteria.NOT_EXISTS){
 			
 			builder.append(restriction.criteria);
 			builder.append(" (");
-			builder.append(restriction.query.getSelectQuery(parameters));
+			
+			if(restriction.value instanceof Query) {
+				
+				Query query = (Query) restriction.value;
+				
+				builder.append(query.getSelectQuery(parameters));
+			}
+
 			builder.append(")");
 		}
 		
@@ -1562,7 +1586,7 @@ public class Query {
 		}
 	}
 
-	public static Column case_(Case... cases) {
+	public Column case_(Case... cases) {
 		
 		int type = -1;
 		
@@ -2993,9 +3017,12 @@ public class Query {
 		
 		List<String> columns = new ArrayList<String>();
 		
-		if(restriction.column != null && restriction.column2 != null) {
+		if(restriction.column != null 
+				&& restriction.value != null 
+				&& restriction.value instanceof Column) {
+			
 			columns.add(restriction.column.name);
-			columns.add(restriction.column2.name);
+			columns.add(((Column)restriction.value).name);
 		}
 		
 		for(Restriction nestedRestriction : restriction.restrictions) {

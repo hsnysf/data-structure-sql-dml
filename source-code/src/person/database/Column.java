@@ -217,7 +217,12 @@ public class Column {
 	
 	public Restriction equal(Column column) {
 		
-		return new Restriction(this, Criteria.EQUAL_COLUMN, column);
+		return new Restriction(this, Criteria.EQUAL, column);
+	}
+	
+	public Restriction equal(Query query) {
+		
+		return new Restriction(this, Criteria.EQUAL, query);
 	}
 	
 	public Restriction like(String value) {
@@ -267,7 +272,12 @@ public class Column {
 	
 	public Restriction notEqual(Column column) {
 		
-		return new Restriction(this, Criteria.NOT_EQUAL_COLUMN, column);
+		return new Restriction(this, Criteria.NOT_EQUAL, column);
+	}
+	
+	public Restriction notEqual(Query query) {
+		
+		return new Restriction(this, Criteria.NOT_EQUAL, query);
 	}
 	
 	public Restriction greater(String value) {
@@ -302,7 +312,12 @@ public class Column {
 	
 	public Restriction greater(Column column) {
 		
-		return new Restriction(this, Criteria.GREATER_COLUMN, column);
+		return new Restriction(this, Criteria.GREATER, column);
+	}
+	
+	public Restriction greater(Query query) {
+		
+		return new Restriction(this, Criteria.GREATER, query);
 	}
 	
 	public Restriction greaterEqual(String value) {
@@ -337,7 +352,12 @@ public class Column {
 	
 	public Restriction greaterEqual(Column column) {
 		
-		return new Restriction(this, Criteria.GREATER_EQUAL_COLUMN, column);
+		return new Restriction(this, Criteria.GREATER_EQUAL, column);
+	}
+	
+	public Restriction greaterEqual(Query query) {
+		
+		return new Restriction(this, Criteria.GREATER_EQUAL, query);
 	}
 	
 	public Restriction less(String value) {
@@ -372,7 +392,12 @@ public class Column {
 	
 	public Restriction less(Column column) {
 		
-		return new Restriction(this, Criteria.LESS_COLUMN, column);
+		return new Restriction(this, Criteria.LESS, column);
+	}
+	
+	public Restriction less(Query query) {
+		
+		return new Restriction(this, Criteria.LESS, query);
 	}
 	
 	public Restriction lessEqual(String value) {
@@ -407,7 +432,12 @@ public class Column {
 	
 	public Restriction lessEqual(Column column) {
 		
-		return new Restriction(this, Criteria.LESS_EQUAL_COLUMN, column);
+		return new Restriction(this, Criteria.LESS_EQUAL, column);
+	}
+	
+	public Restriction lessEqual(Query query) {
+		
+		return new Restriction(this, Criteria.LESS_EQUAL, query);
 	}
 	
 	public Restriction isNull() {
@@ -502,12 +532,12 @@ public class Column {
 	
 	public Restriction in(Query query) {
 		
-		return new Restriction(this, Criteria.IN_QUERY, query);
+		return new Restriction(this, Criteria.IN, query);
 	}
 	
 	public Restriction notIn(Query query) {
 		
-		return new Restriction(this, Criteria.NOT_IN_QUERY, query);
+		return new Restriction(this, Criteria.NOT_IN, query);
 	}
 	
 	public Column over() {

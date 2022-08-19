@@ -11,9 +11,6 @@ public class Restriction {
 	protected Object value;
 	protected Object values[];
 	protected Object to;
-	protected Column column2;
-	protected Column column3;
-	protected Query query;
 	protected List<Restriction> restrictions = new ArrayList<Restriction>();
 	
 	protected Restriction(Column column, Criteria criteria, Object value) {
@@ -28,24 +25,11 @@ public class Restriction {
 		this.values = values;
 	}
 	
-	protected Restriction(Column column, Criteria criteria, Column column2) {
-		this.column = column;
-		this.criteria = criteria;
-		this.column2 = column2;
-	}
-	
 	protected Restriction(Column column, Criteria criteria, Object value, Object to) {
 		this.column = column;
 		this.criteria = criteria;
 		this.value = value;
 		this.to = to;
-	}
-	
-	protected Restriction(Column column, Criteria criteria, Column column2, Column column3) {
-		this.column = column;
-		this.criteria = criteria;
-		this.column2 = column2;
-		this.column3 = column3;
 	}
 	
 	protected Restriction(Column column, Criteria criteria) {
@@ -55,13 +39,7 @@ public class Restriction {
 	
 	protected Restriction(Criteria criteria, Query query) {
 		this.criteria = criteria;
-		this.query = query;
-	}
-	
-	protected Restriction(Column column, Criteria criteria, Query query) {
-		this.column = column;
-		this.criteria = criteria;
-		this.query = query;
+		this.value = query;
 	}
 	
 	public Restriction and(Restriction restriction) {
