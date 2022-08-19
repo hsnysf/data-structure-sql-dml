@@ -1,8 +1,6 @@
 package person.database;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.util.Date;
 
 public class Case {
 
@@ -64,21 +62,7 @@ public class Case {
 		
 		return this;
 	}
-	
-	public Case then(Timestamp thenValue) {
-
-		this.thenValue = thenValue;
 		
-		return this;
-	}
-	
-	public Case then(Time thenValue) {
-
-		this.thenValue = thenValue;
-		
-		return this;
-	}
-	
 	public Case then(Boolean thenValue) {
 
 		this.thenValue = thenValue;

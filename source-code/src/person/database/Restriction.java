@@ -11,6 +11,7 @@ public class Restriction {
 	protected Object value;
 	protected Object values[];
 	protected Object to;
+	protected Query query;
 	protected List<Restriction> restrictions = new ArrayList<Restriction>();
 	
 	protected Restriction(Column column, Criteria criteria, Object value) {
@@ -39,7 +40,7 @@ public class Restriction {
 	
 	protected Restriction(Criteria criteria, Query query) {
 		this.criteria = criteria;
-		this.value = query;
+		this.query = query;
 	}
 	
 	public Restriction and(Restriction restriction) {

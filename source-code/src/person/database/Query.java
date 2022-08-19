@@ -494,57 +494,6 @@ public class Query {
 		return this;
 	}
 	
-	public Query values(Column column, Date value) {
-		
-		if(value != null) {
-			
-			values.put(column, value);
-		}
-		
-		return this;
-	}
-	
-	public Query valuesNull(Column column, Date value) {
-		
-		values.put(column, value);
-		
-		return this;
-	}
-	
-	public Query values(Column column, Timestamp value) {
-		
-		if(value != null) {
-			
-			values.put(column, value);
-		}
-		
-		return this;
-	}
-	
-	public Query valuesNull(Column column, Timestamp value) {
-		
-		values.put(column, value);
-		
-		return this;
-	}
-	
-	public Query values(Column column, Time value) {
-		
-		if(value != null) {
-			
-			values.put(column, value);
-		}
-		
-		return this;
-	}
-	
-	public Query valuesNull(Column column, Time value) {
-		
-		values.put(column, value);
-		
-		return this;
-	}
-	
 	public Query values(Column column, Boolean value) {
 		
 		if(value != null) {
@@ -949,14 +898,7 @@ public class Query {
 			
 			builder.append(restriction.criteria);
 			builder.append(" (");
-			
-			if(restriction.value instanceof Query) {
-				
-				Query query = (Query) restriction.value;
-				
-				builder.append(query.getSelectQuery(parameters));
-			}
-
+			builder.append(restriction.query.getSelectQuery(parameters));
 			builder.append(")");
 		}
 		
@@ -1194,57 +1136,6 @@ public class Query {
 		return this;
 	}
 	
-	public Query set(Column column, Date value) {
-		
-		if(value != null) {
-			
-			values.put(column, value);
-		}
-		
-		return this;
-	}
-	
-	public Query setNull(Column column, Date value) {
-		
-		values.put(column, value);
-		
-		return this;
-	}
-	
-	public Query set(Column column, Timestamp value) {
-		
-		if(value != null) {
-			
-			values.put(column, value);
-		}
-		
-		return this;
-	}
-	
-	public Query setNull(Column column, Timestamp value) {
-		
-		values.put(column, value);
-		
-		return this;
-	}
-	
-	public Query set(Column column, Time value) {
-		
-		if(value != null) {
-			
-			values.put(column, value);
-		}
-		
-		return this;
-	}
-	
-	public Query setNull(Column column, Time value) {
-		
-		values.put(column, value);
-		
-		return this;
-	}
-	
 	public Query set(Column column, Boolean value) {
 		
 		if(value != null) {
@@ -1449,22 +1340,7 @@ public class Query {
 		return column.copyWithFunction(Function.COALESCE, value);
 	}
 	
-	public static Column coalesce(Column column, Date value) {
-		
-		return column.copyWithFunction(Function.COALESCE, value);
-	}
-	
-	public static Column coalesce(Column column, Timestamp value) {
-		
-		return column.copyWithFunction(Function.COALESCE, value);
-	}
-	
-	public static Column coalesce(Column column, Time value) {
-		
-		return column.copyWithFunction(Function.COALESCE, value);
-	}
-	
-	public static Column coalesce(Column column, Boolean value) {
+	public static Column coalesce(Column column, java.util.Date value) {
 		
 		return column.copyWithFunction(Function.COALESCE, value);
 	}
@@ -1739,24 +1615,10 @@ public class Query {
 		return case_;
 	}
 	
-	public Case when(Date columnValue) {
+	public Case when(java.util.Date columnValue) {
 		
 		Case case_ = new Case();
 		case_.whenValue = columnValue;
-		return case_;
-	}
-	
-	public Case when(Timestamp whenValue) {
-		
-		Case case_ = new Case();
-		case_.whenValue = whenValue;
-		return case_;
-	}
-	
-	public Case when(Time whenValue) {
-		
-		Case case_ = new Case();
-		case_.whenValue = whenValue;
 		return case_;
 	}
 	
@@ -1787,17 +1649,7 @@ public class Query {
 		return new Case(value);
 	}
 	
-	public Case else_(Date value) {
-		
-		return new Case(value);
-	}
-	
-	public Case else_(Timestamp value) {
-		
-		return new Case(value);
-	}
-	
-	public Case else_(Time value) {
+	public Case else_(java.util.Date value) {
 		
 		return new Case(value);
 	}
