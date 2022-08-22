@@ -450,12 +450,12 @@ public class Column {
 	
 	public Restriction in(Query query) {
 		
-		return new Restriction(this, Criteria.IN, query);
+		return new Restriction(Criteria.IN, this, query);
 	}
 	
 	public Restriction notIn(Query query) {
 		
-		return new Restriction(this, Criteria.NOT_IN, query);
+		return new Restriction(Criteria.NOT_IN, this, query);
 	}
 	
 	public Column over() {

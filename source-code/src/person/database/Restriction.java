@@ -43,6 +43,12 @@ public class Restriction {
 		this.query = query;
 	}
 	
+	protected Restriction(Criteria criteria, Column column, Query query) {
+		this.criteria = criteria;
+		this.column = column;
+		this.query = query;
+	}
+	
 	public Restriction and(Restriction restriction) {
 
 		restriction.operator = Operator.AND;

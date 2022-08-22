@@ -841,11 +841,9 @@ public class Query {
 					index++;
 				}
 				
-			}else if(restriction.value instanceof Query) {
+			}else if(restriction.query != null) {
 				
-				Query query = (Query) restriction.value;
-				
-				builder.append(query.getSelectQuery(parameters));
+				builder.append(restriction.query.getSelectQuery(parameters));
 			}
 			
 			builder.append(")");
