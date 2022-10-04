@@ -75,6 +75,9 @@ public class TestSelectQuery extends TestQuery {
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME)
 		.select(Person.GRADUATED, Person.CERTIFICATES)
+		.select(Person.CITY_ID, Person.SCHOOL_ID)
+		.select(Person.COMPANY_ID, Person.COUNTRY_ID)
+		.select(Person.HOME_ADDRESS_ID, Person.WORK_ADDRESS_ID)
 		.from(Table.PERSON)
 		.where(Person.ID.equal(id));
 		
@@ -82,7 +85,7 @@ public class TestSelectQuery extends TestQuery {
 		
 		record = getRecord();
 		
-		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates from public.person where prsn_id = ?");
+		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates, prsn_city_id, prsn_school_id, prsn_company_id, prsn_country_id, prsn_home_address_id, prsn_work_address_id from public.person where prsn_id = ?");
 		isParametersEquals(parameters, id);
 		isRecordEqual(record, 
 						entry(Person.ID, id),
@@ -98,7 +101,13 @@ public class TestSelectQuery extends TestQuery {
 						entry(Person.REGISTRATION_DATE_TIME, Timestamp.valueOf("2000-10-10 10:10:10")),
 						entry(Person.SLEEP_TIME, Time.valueOf("10:10:10")),
 						entry(Person.GRADUATED, true),
-						entry(Person.CERTIFICATES, Arrays.asList("DB2", "Java")));
+						entry(Person.CERTIFICATES, Arrays.asList("DB2", "Java")),
+						entry(Person.CITY_ID, 1),
+						entry(Person.SCHOOL_ID, 1),
+						entry(Person.COMPANY_ID, 1),
+						entry(Person.COUNTRY_ID, 1),
+						entry(Person.HOME_ADDRESS_ID, 1),
+						entry(Person.WORK_ADDRESS_ID, 2));
 		
 		parameters.clear();
 		
@@ -296,6 +305,8 @@ public class TestSelectQuery extends TestQuery {
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME)
 		.select(Person.GRADUATED, Person.CERTIFICATES)
+		.select(Person.CITY_ID, Person.SCHOOL_ID)
+		.select(Person.COMPANY_ID, Person.COUNTRY_ID)
 		.from(Table.PERSON)
 		.where(Person.ID.equal(id));
 		
@@ -303,7 +314,7 @@ public class TestSelectQuery extends TestQuery {
 		
 		record = getRecord();
 		
-		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates from public.person where prsn_id = ?");
+		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates, prsn_city_id, prsn_school_id, prsn_company_id, prsn_country_id from public.person where prsn_id = ?");
 		isParametersEquals(parameters, id);
 		isRecordEqual(record, 
 						entry(Person.ID, id),
@@ -319,7 +330,11 @@ public class TestSelectQuery extends TestQuery {
 						entry(Person.REGISTRATION_DATE_TIME, Timestamp.valueOf("2000-10-10 10:10:10")),
 						entry(Person.SLEEP_TIME, Time.valueOf("10:10:10")),
 						entry(Person.GRADUATED, true),
-						entry(Person.CERTIFICATES, Arrays.asList("DB2", "Java")));
+						entry(Person.CERTIFICATES, Arrays.asList("DB2", "Java")),
+						entry(Person.CITY_ID, 1),
+						entry(Person.SCHOOL_ID, 1),
+						entry(Person.COMPANY_ID, 1),
+						entry(Person.COUNTRY_ID, 1));
 		
 		parameters.clear();
 		
@@ -6152,6 +6167,9 @@ public class TestSelectQuery extends TestQuery {
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME)
 		.select(Person.GRADUATED, Person.CERTIFICATES)
+		.select(Person.CITY_ID, Person.SCHOOL_ID)
+		.select(Person.COMPANY_ID, Person.COUNTRY_ID)
+		.select(Person.HOME_ADDRESS_ID, Person.WORK_ADDRESS_ID)
 		.from(Table.PERSON)
 		.where(Person.ID.equal(id));
 		
@@ -6159,7 +6177,7 @@ public class TestSelectQuery extends TestQuery {
 		
 		record = getRecord();
 		
-		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates from public.person where prsn_id = ?");
+		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates, prsn_city_id, prsn_school_id, prsn_company_id, prsn_country_id, prsn_home_address_id, prsn_work_address_id from public.person where prsn_id = ?");
 		isParametersEquals(parameters, id);
 		isRecordEqual(record, 
 						entry(Person.ID, id),
@@ -6175,7 +6193,13 @@ public class TestSelectQuery extends TestQuery {
 						entry(Person.REGISTRATION_DATE_TIME, Timestamp.valueOf("2000-10-10 10:10:10")),
 						entry(Person.SLEEP_TIME, Time.valueOf("10:10:10")),
 						entry(Person.GRADUATED, true),
-						entry(Person.CERTIFICATES, Arrays.asList("DB2", "Java")));
+						entry(Person.CERTIFICATES, Arrays.asList("DB2", "Java")),
+						entry(Person.CITY_ID, 1),
+						entry(Person.SCHOOL_ID, 1),
+						entry(Person.COMPANY_ID, 1),
+						entry(Person.COUNTRY_ID, 1),
+						entry(Person.HOME_ADDRESS_ID, 1),
+						entry(Person.WORK_ADDRESS_ID, 2));
 		
 		parameters.clear();
 		
@@ -6414,6 +6438,9 @@ public class TestSelectQuery extends TestQuery {
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME)
 		.select(Person.GRADUATED, Person.CERTIFICATES)
+		.select(Person.CITY_ID, Person.SCHOOL_ID)
+		.select(Person.COMPANY_ID, Person.COUNTRY_ID)
+		.select(Person.HOME_ADDRESS_ID, Person.WORK_ADDRESS_ID)
 		.from(Table.PERSON)
 		.where(Person.ID.in(id, secondId));
 		
@@ -6421,7 +6448,7 @@ public class TestSelectQuery extends TestQuery {
 		
 		records = getRecordList();
 		
-		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates from public.person where prsn_id in (?, ?)");
+		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates, prsn_city_id, prsn_school_id, prsn_company_id, prsn_country_id, prsn_home_address_id, prsn_work_address_id from public.person where prsn_id in (?, ?)");
 		isParametersEquals(parameters, id, secondId);
 		isRecordListEqual(records, 
 						map(
@@ -6438,7 +6465,13 @@ public class TestSelectQuery extends TestQuery {
 							entry(Person.REGISTRATION_DATE_TIME, Timestamp.valueOf("2000-10-10 10:10:10")),
 							entry(Person.SLEEP_TIME, Time.valueOf("10:10:10")),
 							entry(Person.GRADUATED, true),
-							entry(Person.CERTIFICATES, Arrays.asList("DB2", "Java"))
+							entry(Person.CERTIFICATES, Arrays.asList("DB2", "Java")),
+							entry(Person.CITY_ID, 1),
+							entry(Person.SCHOOL_ID, 1),
+							entry(Person.COMPANY_ID, 1),
+							entry(Person.COUNTRY_ID, 1),
+							entry(Person.HOME_ADDRESS_ID, 1),
+							entry(Person.WORK_ADDRESS_ID, 2)
 						),
 						map(
 							entry(Person.ID, secondId),
@@ -6454,7 +6487,13 @@ public class TestSelectQuery extends TestQuery {
 							entry(Person.REGISTRATION_DATE_TIME, Timestamp.valueOf("2005-05-05 05:05:05")),
 							entry(Person.SLEEP_TIME, Time.valueOf("04:04:04")),
 							entry(Person.GRADUATED, false),
-							entry(Person.CERTIFICATES, Arrays.asList("Postgres", "C++"))
+							entry(Person.CERTIFICATES, Arrays.asList("Postgres", "C++")),
+							entry(Person.CITY_ID, 1),
+							entry(Person.SCHOOL_ID, 1),
+							entry(Person.COMPANY_ID, 1),
+							entry(Person.COUNTRY_ID, 1),
+							entry(Person.HOME_ADDRESS_ID, 1),
+							entry(Person.WORK_ADDRESS_ID, 2)
 						)
 				);
 		
@@ -6770,6 +6809,9 @@ public class TestSelectQuery extends TestQuery {
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME)
 		.select(Person.GRADUATED, Person.CERTIFICATES)
+		.select(Person.CITY_ID, Person.SCHOOL_ID)
+		.select(Person.COMPANY_ID, Person.COUNTRY_ID)
+		.select(Person.HOME_ADDRESS_ID, Person.WORK_ADDRESS_ID)
 		.from(Table.PERSON)
 		.where(Person.ID.in(id, secondId));
 		
@@ -6777,7 +6819,7 @@ public class TestSelectQuery extends TestQuery {
 		
 		recordsMap = getRecordMap();
 		
-		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates from public.person where prsn_id in (?, ?)");
+		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates, prsn_city_id, prsn_school_id, prsn_company_id, prsn_country_id, prsn_home_address_id, prsn_work_address_id from public.person where prsn_id in (?, ?)");
 		isParametersEquals(parameters, id, secondId);
 		isRecordMapEqual(recordsMap, 
 						entry(id, map(
@@ -6794,7 +6836,13 @@ public class TestSelectQuery extends TestQuery {
 							entry(Person.REGISTRATION_DATE_TIME, Timestamp.valueOf("2000-10-10 10:10:10")),
 							entry(Person.SLEEP_TIME, Time.valueOf("10:10:10")),
 							entry(Person.GRADUATED, true),
-							entry(Person.CERTIFICATES, Arrays.asList("DB2", "Java"))
+							entry(Person.CERTIFICATES, Arrays.asList("DB2", "Java")),
+							entry(Person.CITY_ID, 1),
+							entry(Person.SCHOOL_ID, 1),
+							entry(Person.COMPANY_ID, 1),
+							entry(Person.COUNTRY_ID, 1),
+							entry(Person.HOME_ADDRESS_ID, 1),
+							entry(Person.WORK_ADDRESS_ID, 2)
 						)),
 						entry(secondId, map(
 							entry(Person.ID, secondId),
@@ -6810,7 +6858,13 @@ public class TestSelectQuery extends TestQuery {
 							entry(Person.REGISTRATION_DATE_TIME, Timestamp.valueOf("2005-05-05 05:05:05")),
 							entry(Person.SLEEP_TIME, Time.valueOf("04:04:04")),
 							entry(Person.GRADUATED, false),
-							entry(Person.CERTIFICATES, Arrays.asList("Postgres", "C++"))
+							entry(Person.CERTIFICATES, Arrays.asList("Postgres", "C++")),
+							entry(Person.CITY_ID, 1),
+							entry(Person.SCHOOL_ID, 1),
+							entry(Person.COMPANY_ID, 1),
+							entry(Person.COUNTRY_ID, 1),
+							entry(Person.HOME_ADDRESS_ID, 1),
+							entry(Person.WORK_ADDRESS_ID, 2)
 						))
 				);
 		
@@ -7080,6 +7134,9 @@ public class TestSelectQuery extends TestQuery {
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME)
 		.select(Person.GRADUATED, Person.CERTIFICATES)
+		.select(Person.CITY_ID, Person.SCHOOL_ID)
+		.select(Person.COMPANY_ID, Person.COUNTRY_ID)
+		.select(Person.HOME_ADDRESS_ID, Person.WORK_ADDRESS_ID)
 		.from(Table.PERSON)
 		.where(Person.ID.equal(id));
 		
@@ -7102,8 +7159,20 @@ public class TestSelectQuery extends TestQuery {
 		expectedPersonDTO.setSleepTime(Time.valueOf("10:10:10"));
 		expectedPersonDTO.setGraduated(true);
 		expectedPersonDTO.setCertificates(Arrays.asList("DB2", "Java"));
+		expectedPersonDTO.setCity(new CityDTO());
+		expectedPersonDTO.getCity().setId(1);
+		expectedPersonDTO.setSchool(new SchoolDTO());
+		expectedPersonDTO.getSchool().setId(1);
+		expectedPersonDTO.setCompany(new CompanyDTO());
+		expectedPersonDTO.getCompany().setId(1);
+		expectedPersonDTO.setCountry(new CountryDTO());
+		expectedPersonDTO.getCountry().setId(1);
+		expectedPersonDTO.setHomeAddress(new AddressDTO());
+		expectedPersonDTO.getHomeAddress().setId(1);
+		expectedPersonDTO.setWorkAddress(new AddressDTO());
+		expectedPersonDTO.getWorkAddress().setId(2);
 		
-		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates from public.person where prsn_id = ?");
+		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates, prsn_city_id, prsn_school_id, prsn_company_id, prsn_country_id, prsn_home_address_id, prsn_work_address_id from public.person where prsn_id = ?");
 		isParametersEquals(parameters, id);
 		isRecordEqual(personDTO, expectedPersonDTO);
 		
@@ -7482,6 +7551,9 @@ public class TestSelectQuery extends TestQuery {
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME)
 		.select(Person.GRADUATED, Person.CERTIFICATES)
+		.select(Person.CITY_ID, Person.SCHOOL_ID)
+		.select(Person.COMPANY_ID, Person.COUNTRY_ID)
+		.select(Person.HOME_ADDRESS_ID, Person.WORK_ADDRESS_ID)
 		.from(Table.PERSON)
 		.where(Person.ID.in(id, secondId));
 		
@@ -7506,6 +7578,18 @@ public class TestSelectQuery extends TestQuery {
 		expectedPersonDTO.setSleepTime(Time.valueOf("10:10:10"));
 		expectedPersonDTO.setGraduated(true);
 		expectedPersonDTO.setCertificates(Arrays.asList("DB2", "Java"));
+		expectedPersonDTO.setCity(new CityDTO());
+		expectedPersonDTO.getCity().setId(1);
+		expectedPersonDTO.setSchool(new SchoolDTO());
+		expectedPersonDTO.getSchool().setId(1);
+		expectedPersonDTO.setCompany(new CompanyDTO());
+		expectedPersonDTO.getCompany().setId(1);
+		expectedPersonDTO.setCountry(new CountryDTO());
+		expectedPersonDTO.getCountry().setId(1);
+		expectedPersonDTO.setHomeAddress(new AddressDTO());
+		expectedPersonDTO.getHomeAddress().setId(1);
+		expectedPersonDTO.setWorkAddress(new AddressDTO());
+		expectedPersonDTO.getWorkAddress().setId(2);
 		
 		expectedPersons.add(expectedPersonDTO);
 		
@@ -7524,10 +7608,22 @@ public class TestSelectQuery extends TestQuery {
 		expectedPersonDTO.setSleepTime(Time.valueOf("04:04:04"));
 		expectedPersonDTO.setGraduated(false);
 		expectedPersonDTO.setCertificates(Arrays.asList("Postgres", "C++"));
+		expectedPersonDTO.setCity(new CityDTO());
+		expectedPersonDTO.getCity().setId(1);
+		expectedPersonDTO.setSchool(new SchoolDTO());
+		expectedPersonDTO.getSchool().setId(1);
+		expectedPersonDTO.setCompany(new CompanyDTO());
+		expectedPersonDTO.getCompany().setId(1);
+		expectedPersonDTO.setCountry(new CountryDTO());
+		expectedPersonDTO.getCountry().setId(1);
+		expectedPersonDTO.setHomeAddress(new AddressDTO());
+		expectedPersonDTO.getHomeAddress().setId(1);
+		expectedPersonDTO.setWorkAddress(new AddressDTO());
+		expectedPersonDTO.getWorkAddress().setId(2);
 		
 		expectedPersons.add(expectedPersonDTO);
 		
-		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates from public.person where prsn_id in (?, ?)");
+		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates, prsn_city_id, prsn_school_id, prsn_company_id, prsn_country_id, prsn_home_address_id, prsn_work_address_id from public.person where prsn_id in (?, ?)");
 		isParametersEquals(parameters, id, secondId);
 		isRecordListEqual(persons, expectedPersons);
 		
@@ -8059,6 +8155,9 @@ public class TestSelectQuery extends TestQuery {
 		.select(Person.SALARY, Person.ANNUAL_INCOME, Person.DATE_OF_BIRTH)
 		.select(Person.REGISTRATION_DATE_TIME, Person.SLEEP_TIME)
 		.select(Person.GRADUATED, Person.CERTIFICATES)
+		.select(Person.CITY_ID, Person.SCHOOL_ID)
+		.select(Person.COMPANY_ID, Person.COUNTRY_ID)
+		.select(Person.HOME_ADDRESS_ID, Person.WORK_ADDRESS_ID)
 		.from(Table.PERSON)
 		.where(Person.ID.in(id, secondId));
 		
@@ -8083,6 +8182,18 @@ public class TestSelectQuery extends TestQuery {
 		expectedPersonDTO.setSleepTime(Time.valueOf("10:10:10"));
 		expectedPersonDTO.setGraduated(true);
 		expectedPersonDTO.setCertificates(Arrays.asList("DB2", "Java"));
+		expectedPersonDTO.setCity(new CityDTO());
+		expectedPersonDTO.getCity().setId(1);
+		expectedPersonDTO.setSchool(new SchoolDTO());
+		expectedPersonDTO.getSchool().setId(1);
+		expectedPersonDTO.setCompany(new CompanyDTO());
+		expectedPersonDTO.getCompany().setId(1);
+		expectedPersonDTO.setCountry(new CountryDTO());
+		expectedPersonDTO.getCountry().setId(1);
+		expectedPersonDTO.setHomeAddress(new AddressDTO());
+		expectedPersonDTO.getHomeAddress().setId(1);
+		expectedPersonDTO.setWorkAddress(new AddressDTO());
+		expectedPersonDTO.getWorkAddress().setId(2);
 		
 		expectedPersonsMap.put(expectedPersonDTO.getId(), expectedPersonDTO);
 		
@@ -8101,10 +8212,22 @@ public class TestSelectQuery extends TestQuery {
 		expectedPersonDTO.setSleepTime(Time.valueOf("04:04:04"));
 		expectedPersonDTO.setGraduated(false);
 		expectedPersonDTO.setCertificates(Arrays.asList("Postgres", "C++"));
+		expectedPersonDTO.setCity(new CityDTO());
+		expectedPersonDTO.getCity().setId(1);
+		expectedPersonDTO.setSchool(new SchoolDTO());
+		expectedPersonDTO.getSchool().setId(1);
+		expectedPersonDTO.setCompany(new CompanyDTO());
+		expectedPersonDTO.getCompany().setId(1);
+		expectedPersonDTO.setCountry(new CountryDTO());
+		expectedPersonDTO.getCountry().setId(1);
+		expectedPersonDTO.setHomeAddress(new AddressDTO());
+		expectedPersonDTO.getHomeAddress().setId(1);
+		expectedPersonDTO.setWorkAddress(new AddressDTO());
+		expectedPersonDTO.getWorkAddress().setId(2);
 		
 		expectedPersonsMap.put(expectedPersonDTO.getId(), expectedPersonDTO);
 		
-		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates from public.person where prsn_id in (?, ?)");
+		isQueryEqual(query, "select prsn_id, prsn_name, prsn_gender, prsn_age, prsn_cpr, prsn_account_no, prsn_gpa, prsn_salary, prsn_annual_income, prsn_date_of_birth, prsn_registration_date_time, prsn_sleep_time, prsn_graduated, prsn_certificates, prsn_city_id, prsn_school_id, prsn_company_id, prsn_country_id, prsn_home_address_id, prsn_work_address_id from public.person where prsn_id in (?, ?)");
 		isParametersEquals(parameters, id, secondId);
 		isRecordMapEqual(personsMap, expectedPersonsMap);
 		
