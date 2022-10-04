@@ -2974,15 +2974,15 @@ public class Query {
 				
 				JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
 				
+				Map<String, String> joinProperties = getClassPropertyColumn(field.getType(), false);
+				
+				properties.put(joinColumn.name(), field.getName() + "." + joinProperties.get(joinColumn.on()));
+				
 				if(joinColumns.containsKey(joinColumn.name())) {
 					
 					String tableAlias = joinColumns.get(joinColumn.name());
 					
 					Map<String, String> tableColumns = getSelectColumnsByTableAlias(tableAlias);
-					
-					Map<String, String> joinProperties = getClassPropertyColumn(field.getType(), false);
-					
-					properties.put(joinColumn.name(), field.getName() + "." + joinProperties.get(joinColumn.on()));
 					
 					for(Entry<String, String> property : joinProperties.entrySet()) {
 						
@@ -3007,6 +3007,8 @@ public class Query {
 	private void populateDTO(ResultSet result, Object dto) throws Exception {
 		
 		Map<String, String> properties = getClassPropertyColumn(dto.getClass(), true);
+		
+		System.out.println("properties == " + properties);
 		
 		for(Column column : columns) {
 			
